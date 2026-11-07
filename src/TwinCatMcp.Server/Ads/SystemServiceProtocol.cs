@@ -49,6 +49,7 @@ public static class SystemServiceProtocol
     public const uint FWrite = 123;
     public const uint FDelete = 131;
     public const uint FFileFind = 133;
+    public const uint RmDir = 139;
     public const uint SysServStateGroup = 240;
     public const uint TargetInfo = 700;
     public const uint IpHostName = 702;

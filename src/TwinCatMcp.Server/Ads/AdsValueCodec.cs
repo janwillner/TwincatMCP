@@ -81,7 +81,7 @@ public static class AdsValueCodec
         string? name = null;
         foreach (var v in e.EnumValues)
         {
-            if (Convert.ToInt64(v.Primitive, CultureInfo.InvariantCulture) == raw)
+            if (Convert.ToInt64(v.Value, CultureInfo.InvariantCulture) == raw)
             {
                 name = v.Name;
                 break;
@@ -358,7 +358,7 @@ public static class AdsValueCodec
             var match = e.EnumValues.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
             if (match is not null)
             {
-                raw = Convert.ToInt64(match.Primitive, CultureInfo.InvariantCulture);
+                raw = Convert.ToInt64(match.Value, CultureInfo.InvariantCulture);
             }
             else if (long.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var num))
             {
