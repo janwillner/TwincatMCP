@@ -18,6 +18,8 @@ public static class ServerInstructions
         -> system_set_target -> system_activate_configuration (switches target to Run mode) -> plc_online_login (download) -> plc_online_start
         -> ads_browse_symbols / ads_read_symbols / ads_write_symbols / ads_wait_for_value / ads_monitor.
 
+        I/O: io_add_device (ethercat-master) -> ecat_search_catalog / ecat_add_terminals ["EK1100","EL1008"] -> GVL with AT %I*/%Q* ({attribute 'linkalways'} or used in code) -> build_solution -> mapping_link.
+        Motion: motion_create_nc_task -> motion_add_axis -> motion_set_axis_parameters -> motion_link_axis_to_drive (I/O) and motion_link_axis_to_plc (AXIS_REF from Tc2_MC2, must be used in code) -> build_solution.
         Libraries: lib_list_installed (catalog) -> lib_add ["Tc2_MC2"] -> lib_get_declaration ["MC_MoveAbsolute"] to see FB interfaces before using them.
         Packaging: lib_set_project_info -> archive_save_as_library; archive_save_solution (.tnzip) / archive_open.
 

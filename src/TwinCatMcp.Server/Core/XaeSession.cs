@@ -378,7 +378,7 @@ public sealed class XaeSession : IDisposable
             solution,
             project = _project is null ? null : new { name = _project.Name, file = _project.FullName },
             targetNetId,
-            twinCatProjects = solutionOpen ? EnumerateTwinCatProjects().Select(p => p.Name).ToArray() : [],
+            twinCatProjects = solutionOpen ? SafeGet(() => EnumerateTwinCatProjects().Select(p => p.Name).ToArray()) ?? [] : [],
         };
     }
 
