@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcModuleClass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2009/05/TcModuleClass">
+	<Vendor>
+		<Name>Beckhoff Automation GmbH</Name>
+	</Vendor>
+	<DataTypes>
+		<DataType>
+			<Name GUID="{db6b59a0-4fb0-4b14-a83c-ac7a76ad688d}">JobTaskId</Name>
+			<BaseType GUID="{18071995-0000-0000-0000-00000000000f}">OTCID</BaseType>
+			<Properties>
+				<Property>
+					<Name>TcJobTaskOID</Name>
+				</Property>
+			</Properties>
+		</DataType>
+	</DataTypes>
+	<Groups>
+		<Group>
+			<Name>JobObjects</Name>
+			<DisplayName>Job Objects</DisplayName>
+		</Group>
+	</Groups>
+	<Modules>
+		<Module GUID="{0102000C-0000-0000-f000-000000000064}" Group="JobObjects">
+			<Name>TcJobPool</Name>
+			<CLSID ClassFactory="TcRtsObjects">{0102000C-0000-0000-f000-000000000064}</CLSID>
+			<InitSequence>PO</InitSequence>
+			<Interfaces>
+				<Interface>
+					<Type GUID="{00000012-0000-0000-E000-000000000064}">ITComObject</Type>
+				</Interface>
+				<Interface>
+					<Type GUID="{608163AC-389C-43E9-8DC8-CCEFA1A43821}">ITcJobPool</Type>
+				</Interface>
+			</Interfaces>
+			<Parameters>
+				<Parameter>
+					<Name>JobTasks</Name>
+					<BaseType GUID="{db6b59a0-4fb0-4b14-a83c-ac7a76ad688d}">JobTaskId</BaseType>
+					<ArrayInfo>
+						<LBound>0</LBound>
+						<Elements MaxUnbounded="true" Min="0" Max="64">1</Elements>
+					</ArrayInfo>
+					<PTCID>#x08508041</PTCID>
+					<ContextId>1</ContextId>
+				</Parameter>
+				<Parameter>
+					<Name>PoolId</Name>
+					<BaseType GUID="{18071995-0000-0000-0000-000000000008}">UDINT</BaseType>
+					<PTCID>#x08508042</PTCID>
+					<ContextId>1</ContextId>
+				</Parameter>
+			</Parameters>
+		</Module>
+	</Modules>
+</TcModuleClass>
