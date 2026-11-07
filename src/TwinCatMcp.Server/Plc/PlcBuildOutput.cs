@@ -106,12 +106,26 @@ public static partial class PlcBuildOutput
         return "";
     }
 
-    /// <summary>Runs <paramref name="action"/> and returns the compiler diagnostics it wrote to the Build pane.</summary>
-    public static PlcBuildResult Capture(DTE2 dte, Action action)
+    /// <summary>
+    /// Runs <paramref name="action"/> and returns the compiler diagnostics it wrote to the Build pane.
+    /// The IDE may append the text shortly after the automation call returned, so the pane is polled until a
+    /// summary line ("Compile complete -- ...") shows up or <paramref name="settleMs"/> elapsed.
+    /// </summary>
+    public static PlcBuildResult Capture(DTE2 dte, Action action, int settleMs = 5000)
     {
         var before = ReadBuildPane(dte);
         action();
         var delta = Delta(before, ReadBuildPane(dte));
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        while (!HasSummary(delta) && sw.ElapsedMilliseconds < settleMs)
+        {
+            System.Threading.Thread.Sleep(250);
+            delta = Delta(before, ReadBuildPane(dte));
+        }
+
         return Parse(delta) with { Output = delta };
     }
+
+    public static bool HasSummary(string text)
+        => StCode.SplitLines(text).Any(l => CompileSummary().IsMatch(l.Trim()));
 }

@@ -64,8 +64,17 @@ public sealed class PlcTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var p = PlcTree.ResolveProject(s, project);
-            s.Lookup("TIPC").DeleteChild(p.Name);
-            return new { deleted = p.RootPath };
+            var root = p.RootPath;
+            try
+            {
+                s.Lookup("TIPC").DeleteChild(p.Name);
+            }
+            catch (System.Runtime.InteropServices.COMException ex) when (unchecked((uint)ex.HResult) == 0x98510007 && !s.SysManager.TestItemPath(root))
+            {
+                // TSM_E_ITEMDELETED: seen live on 4026 although the project was removed successfully.
+            }
+
+            return new { deleted = root, exists = s.SysManager.TestItemPath(root) };
         });
 
     private static object DescribeProject(PlcProjectRef p) => new
@@ -263,7 +272,7 @@ public sealed class PlcTools(XaeSession session)
         {
             var p = PlcTree.ResolveProject(s, project);
             var ok = false;
-            var result = CaptureWithDetails(s, () => ok = ((ITcPlcIECProject2)p.Nested).CheckAllObjects());
+            var result = CaptureWithDetails(s, () => ok = ((ITcPlcIECProject2)p.Nested).CheckAllObjects(), () => !ok);
             return Diagnostics(p, ok && result.ErrorCount == 0, result, includeWarnings, includeOutput);
         }, timeoutSeconds);
 
@@ -289,7 +298,7 @@ public sealed class PlcTools(XaeSession session)
                 {
                     failure = ex.Message; // thrown when the compile fails
                 }
-            });
+            }, () => failure is not null);
             if (failure is not null && result.Errors.Count == 0)
             {
                 result.Errors.Add(new PlcDiagnostic("error", null, failure, null, null, null));
@@ -303,10 +312,11 @@ public sealed class PlcTools(XaeSession session)
     /// only shows "Compile complete -- 1 errors". In that case the solution is cleaned and the action repeated
     /// so that the error details are printed again.
     /// </summary>
-    private static PlcBuildResult CaptureWithDetails(XaeSession s, Action action)
+    private static PlcBuildResult CaptureWithDetails(XaeSession s, Action action, Func<bool>? failed = null)
     {
         var result = PlcBuildOutput.Capture(s.Dte, action);
-        if (result.ErrorCount > result.Errors.Count(e => e.Code is not null))
+        var coded = result.Errors.Count(e => e.Code is not null);
+        if (result.ErrorCount > coded || (coded == 0 && failed?.Invoke() == true))
         {
             s.Dte.Solution.SolutionBuild.Clean(true);
             var again = PlcBuildOutput.Capture(s.Dte, action);

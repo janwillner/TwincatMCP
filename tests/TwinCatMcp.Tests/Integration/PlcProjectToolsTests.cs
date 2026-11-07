@@ -118,6 +118,45 @@ public sealed class PlcProjectToolsTests(PlcProjectFixture fx)
     }
 
     [Fact]
+    public async Task Second_project_from_empty_template_is_searchable_and_deletable()
+    {
+        var name = PlcProjectFixture.Unique("PlcE");
+        var created = await fx.Call("plc_create_project", new { name, template = "Empty PLC Template" });
+        try
+        {
+            var projectPath = created.GetProperty("projectPath").GetString()!;
+            Assert.Equal($"TIPC^{name}^{name} Project", projectPath);
+
+            var gvl = await fx.Call("pou_create_gvl", new { name = "GVL_Empty", project = name });
+            Assert.StartsWith(projectPath + "^", gvl.GetProperty("path").GetString());
+
+            var (ambiguous, isError) = await fx.CallRaw("plc_grep", new { pattern = "x" });
+            Assert.True(isError, ambiguous.ToString()); // two PLC projects -> project must be named
+
+            var found = await fx.Call("plc_find_elements", new { projects = new[] { "Plc1", name }, kinds = new[] { "gvl", "program" } });
+            var projects = found.GetProperty("elements").EnumerateArray().Select(e => e.GetProperty("project").GetString()).Distinct().ToArray();
+            Assert.Contains(name, projects);
+            Assert.Contains("Plc1", projects);
+        }
+        finally
+        {
+            await fx.Call("plc_delete_project", new { project = name });
+        }
+
+        var list = await fx.Call("plc_list_projects");
+        Assert.DoesNotContain(list.GetProperty("projects").EnumerateArray(), p => p.GetProperty("name").GetString() == name);
+    }
+
+    [Fact]
+    public async Task Boot_project_is_generated_locally_without_activation()
+    {
+        var r = await fx.Call("plc_generate_boot_project", new { activate = false });
+
+        Assert.True(r.GetProperty("generated").GetBoolean(), r.ToString());
+        Assert.False(r.GetProperty("activated").GetBoolean());
+    }
+
+    [Fact]
     public async Task Static_analysis_and_compile_run()
     {
         var sarif = Path.Combine(fx.WorkDir, "san.sarif.json");

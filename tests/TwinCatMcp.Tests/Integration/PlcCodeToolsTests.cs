@@ -204,6 +204,40 @@ public sealed class PlcCodeToolsTests(PlcProjectFixture fx)
         Assert.Equal($"{fx.Pous}^MAIN", read.GetProperty("objects")[0].GetProperty("path").GetString());
     }
 
+    [Fact]
+    public async Task Creates_sfc_program_with_transition_and_parameter_and_text_lists()
+    {
+        var prg = PlcProjectFixture.Unique("PRG_Sfc");
+        var prgPath = (await fx.Call("pou_create", new { name = prg, type = "PROGRAM", language = "SFC" })).GetProperty("path").GetString()!;
+
+        var t = await fx.Call("pou_create_transition", new { parentPath = prgPath, name = "T_Go", implementation = "TRUE" });
+        var pl = await fx.Call("pou_create_param_list", new { name = PlcProjectFixture.Unique("Param"), declaration = "VAR_GLOBAL CONSTANT\n\tcMaxAxes : UDINT := 4;\nEND_VAR\n" });
+        var tl = await fx.Call("pou_create_text_list", new { name = PlcProjectFixture.Unique("TL_Texts") });
+
+        Assert.Equal("TRANSITION", t.GetProperty("kind").GetString());
+        Assert.False(t.TryGetProperty("declaration", out _)); // transitions have no declaration area (null is omitted)
+        Assert.Equal("PARAMETER_LIST", pl.GetProperty("kind").GetString());
+        Assert.Contains("cMaxAxes", pl.GetProperty("declaration").GetString());
+        Assert.Equal("TEXT_LIST", tl.GetProperty("kind").GetString());
+
+        var read = await fx.Call("pou_read_code", new { paths = new[] { $"{prgPath}^T_Go" } });
+        Assert.Equal("TRUE", read.GetProperty("objects")[0].GetProperty("implementation").GetString());
+        await fx.Call("pou_delete", new { paths = new[] { prgPath, pl.GetProperty("path").GetString(), tl.GetProperty("path").GetString() } });
+    }
+
+    [Fact]
+    public async Task Creating_a_method_below_a_dut_is_rejected_with_a_hint()
+    {
+        var st = PlcProjectFixture.Unique("ST_X");
+        var path = (await fx.Call("pou_create_dut", new { name = st })).GetProperty("path").GetString();
+
+        var (json, isError) = await fx.CallRaw("pou_create_method", new { parentPath = path, name = "M_X" });
+
+        Assert.True(isError);
+        Assert.Contains("FUNCTION_BLOCK", json.GetProperty("hint").GetString());
+        await fx.Call("pou_delete", new { paths = new[] { path } });
+    }
+
     internal async Task<string> NewFb()
     {
         var fb = PlcProjectFixture.Unique("FB_T");
