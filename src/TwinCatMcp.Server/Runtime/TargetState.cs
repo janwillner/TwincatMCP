@@ -102,12 +102,12 @@ public static class TargetState
             {
                 using var rt = new AdsClient { Timeout = 2000 };
                 rt.Connect(AdsSessionManager.ParseNetId(netId), port);
-                var sbuf = new byte[256];
-                var read = rt.Read(SystemServiceTargetInfo, TargetInfoPlatform, sbuf.AsMemory());
-                platform = Encoding.ASCII.GetString(sbuf, 0, read).TrimEnd('\0');
-                var buf = new byte[4];
-                rt.Read(SystemServiceTargetInfo, TargetInfoTargetType, buf.AsMemory());
-                umrt = BitConverter.ToUInt32(buf) == 1;
+                var platformResult = rt.ReadAsResult(SystemServiceTargetInfo, TargetInfoPlatform, 256);
+                platformResult.ThrowOnError();
+                platform = Encoding.ASCII.GetString(platformResult.Data.Span).TrimEnd('\0');
+                var typeResult = rt.ReadAsResult(SystemServiceTargetInfo, TargetInfoTargetType, 4);
+                typeResult.ThrowOnError();
+                umrt = BitConverter.ToUInt32(typeResult.Data.Span) == 1;
                 error = null;
                 break;
             }

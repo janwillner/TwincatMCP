@@ -14,8 +14,10 @@ public sealed class SessionTools(XaeSession session)
     public Task<CallToolResult> Start(
         [Description("COM ProgID. Default 'TcXaeShell.DTE.17.0'. Alternatives: 'VisualStudio.DTE.17.0' (VS 2022), 'VisualStudio.DTE.18.0' (VS 2026).")] string? progId = null,
         [Description("Show the IDE main window (useful for watching what happens).")] bool visible = false,
-        [Description("Keep the IDE running after the MCP server exits.")] bool keepOpen = false)
-        => session.RunAsync(s => s.Start(progId, visible, keepOpen), TimeSpan.FromMinutes(5));
+        [Description("Keep the IDE running after the MCP server exits.")] bool keepOpen = false,
+        [Description("'process' (default): start a dedicated IDE process and attach to exactly that one – robust when other TcXaeShell instances run. " +
+                     "'com': plain COM activation (may be routed to an already running IDE, which is then treated as attached, not owned).")] string launchMode = "process")
+        => session.RunAsync(s => s.Start(progId, visible, keepOpen, launchMode), TimeSpan.FromMinutes(5));
 
     [McpServerTool(Name = "xae_attach"), Description(
         "Attaches to an already running Visual Studio / TcXaeShell instance (Running Object Table). " +

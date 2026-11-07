@@ -26,6 +26,17 @@ public sealed class SessionToolsTests(XaeProjectFixture fx)
     }
 
     [Fact]
+    public async Task Started_IDE_is_a_dedicated_process_owned_by_the_server()
+    {
+        var status = await fx.Call("xae_status");
+
+        Assert.True(status.GetProperty("ownsInstance").GetBoolean());
+        var pid = status.GetProperty("processId").GetInt32();
+        using var process = System.Diagnostics.Process.GetProcessById(pid);
+        Assert.Equal("TcXaeShell", process.ProcessName);
+    }
+
+    [Fact]
     public async Task Looking_up_an_unknown_path_returns_a_tool_error_with_hint()
     {
         var (json, isError) = await fx.CallRaw("tree_get_item", new { treePath = "TIPC^DoesNotExist" });

@@ -6,7 +6,7 @@ public static class ServerInstructions
         TwinCAT 3.1 (Build 4026) engineering + runtime MCP server.
 
         Two independent channels:
-        1. XAE / Automation Interface (engineering): tools prefixed xae_, solution_, tree_, build_, plc_, pou_, lib_, archive_, task_, rt_, io_, ecat_, mapping_, motion_, tccom_, system_, license_, variant_.
+        1. XAE / Automation Interface (engineering): tools prefixed xae_, solution_, tree_, build_, plc_, plc_online_, pou_, lib_, archive_, task_, rt_ (incl. rt_umrt_* Usermode Runtime), io_, ecat_, mapping_, motion_, tccom_, system_, license_, variant_.
            Requires an IDE session: xae_start (new TcXaeShell) or xae_attach (running IDE), then solution_create or solution_open.
         2. ADS (online/runtime, no IDE needed): tools prefixed ads_ and route_. Address = AMS Net ID ("local" = this PC) + port (PLC1 = 851, system service = 10000, NC = 500).
 
@@ -15,7 +15,8 @@ public static class ServerInstructions
 
         Typical workflow for a complete project:
         xae_start -> solution_create -> plc_create_project -> pou_create / pou_write_code (ST) -> lib_add -> task_* -> build_solution (check errors)
-        -> system_set_target -> system_activate_configuration (switches target to Run mode) -> plc_online_login (download) -> plc_online_start
+        -> system_set_target -> system_set_target_platform (Usermode Runtime / TwinCAT/BSD: 'TwinCAT OS (x64)') -> license_list (TC1200 needed)
+        -> system_activate_configuration (switches target to Run mode) -> plc_online_login (mode 'download') -> plc_online_start
         -> ads_browse_symbols / ads_read_symbols / ads_write_symbols / ads_wait_for_value / ads_monitor.
 
         I/O: io_add_device (ethercat-master) -> ecat_search_catalog / ecat_add_terminals ["EK1100","EL1008"] -> GVL with AT %I*/%Q* ({attribute 'linkalways'} or used in code) -> build_solution -> mapping_link.

@@ -123,7 +123,7 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
     [McpServerTool(Name = "system_restart", Destructive = true), Description(
         "Starts or restarts TwinCAT on the target in Run mode (ITcSysManager.StartRestartTwinCAT) with the configuration last activated on it, " +
         "then waits for ADS state Run. Does NOT activate the current project - use system_activate_configuration for that.")]
-    public Task<CallToolResult> Restart(int waitSeconds = 60, int timeoutSeconds = 180)
+    public Task<CallToolResult> Restart([Description("Seconds to wait for the target to reach Run mode after the restart.")] int waitSeconds = 60, int timeoutSeconds = 180)
         => XaeRuntime.RunThenAsync(session, s =>
         {
             var netId = XaeRuntime.TargetNetId(s);
@@ -141,7 +141,7 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         "Pass netId to address any target without an XAE session.")]
     public Task<CallToolResult> SetConfigMode(
         [Description("Optional AMS Net ID. Empty = target of the current XAE project.")] string? netId = null,
-        int waitSeconds = 30)
+        [Description("Seconds to wait until the target reports Config mode.")] int waitSeconds = 30)
         => WithTarget(netId, async target =>
         {
             TargetState.WriteControl(ads, target, AdsState.Reconfig);
@@ -153,7 +153,7 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         "without an XAE session via ADS: system service port 10000, state Reset). Does NOT activate the current project.")]
     public Task<CallToolResult> SetRunMode(
         [Description("Optional AMS Net ID. Empty = target of the current XAE project.")] string? netId = null,
-        int waitSeconds = 60)
+        [Description("Seconds to wait until the target reports Run mode.")] int waitSeconds = 60)
         => WithTarget(netId, async target =>
         {
             TargetState.WriteControl(ads, target, AdsState.Reset);

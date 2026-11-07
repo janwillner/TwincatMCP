@@ -26,7 +26,7 @@ public static class ToolResult
         };
     }
 
-    public static CallToolResult Error(Exception ex, string? tcErrorLog = null)
+    public static CallToolResult Error(Exception ex, string? tcErrorLog = null, IReadOnlyList<object>? xaeDialogs = null)
     {
         var inner = ex is AggregateException ae && ae.InnerExceptions.Count == 1 ? ae.InnerException! : ex;
         if (inner is System.Reflection.TargetInvocationException tie && tie.InnerException is not null)
@@ -60,6 +60,13 @@ public static class ToolResult
         if (!string.IsNullOrWhiteSpace(tcErrorLog))
         {
             body["twinCatErrors"] = tcErrorLog.Trim();
+        }
+
+        if (xaeDialogs is { Count: > 0 })
+        {
+            body["xaeDialogs"] = xaeDialogs;
+            body["hint"] = "The XAE shows a modal dialog (see xaeDialogs) that blocks all automation calls until a person closes it. " +
+                           "Read its text (e.g. 'license not found' -> license_activate_trial / license_list), close it in the IDE (xae_set_visible true), then retry.";
         }
 
         return new CallToolResult

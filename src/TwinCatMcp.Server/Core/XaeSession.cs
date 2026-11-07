@@ -67,7 +67,15 @@ public sealed class XaeSession : IDisposable
         {
             _logger.LogWarning(ex, "Tool execution failed");
             string? tcLog = null;
-            if (ex is not TimeoutException)
+            IReadOnlyList<object>? dialogs = null;
+            if (ex is TimeoutException || IsCallRejected(ex))
+            {
+                // A modal message box in the IDE blocks every COM call (even in SilentMode) - report its text.
+                // Window enumeration is plain Win32, no COM, so it works while the STA is blocked.
+                var found = TwinCatMcp.Runtime.XaeWindows.ModalDialogs(ProcessId);
+                dialogs = found.Count > 0 ? found : null;
+            }
+            else
             {
                 try
                 {
@@ -79,8 +87,21 @@ public sealed class XaeSession : IDisposable
                 }
             }
 
-            return ToolResult.Error(ex, tcLog);
+            return ToolResult.Error(ex, tcLog, dialogs);
         }
+    }
+
+    private static bool IsCallRejected(Exception ex)
+    {
+        for (var e = ex; e is not null; e = e.InnerException)
+        {
+            if (e is COMException com && unchecked((uint)com.HResult) is 0x80010001 or 0x8001010A)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsIdeGone(Exception ex)
@@ -159,7 +180,12 @@ public sealed class XaeSession : IDisposable
 
     // ------------------------------------------------------------------ lifecycle (STA only)
 
-    public object Start(string? progId, bool visible, bool keepOpenAfterExit)
+    /// <summary>
+    /// Starts a new IDE. Default launch mode "process" starts the IDE executable as a dedicated process and attaches to
+    /// exactly that process via the ROT. Plain COM activation ("com") can be routed by Windows to an already running
+    /// TcXaeShell (it registers its class object) and then blocks while that foreign IDE is busy.
+    /// </summary>
+    public object Start(string? progId, bool visible, bool keepOpenAfterExit, string? launchMode = null)
     {
         if (_dte is not null)
         {
@@ -173,7 +199,13 @@ public sealed class XaeSession : IDisposable
                        Hint = "Use TcXaeShell.DTE.17.0 (TwinCAT XAE Shell 4026) or VisualStudio.DTE.17.0/18.0 (VS integration).",
                    };
 
-        _logger.LogInformation("Starting {ProgId} (visible={Visible})", progId, visible);
+        var useProcess = !string.Equals(launchMode, "com", StringComparison.OrdinalIgnoreCase);
+        if (useProcess && LocalServerExe(type) is { } exe)
+        {
+            return StartAsProcess(progId, exe, visible, keepOpenAfterExit);
+        }
+
+        _logger.LogInformation("Starting {ProgId} via COM activation (visible={Visible})", progId, visible);
         var before = System.Diagnostics.Process.GetProcesses().Select(p => p.Id).ToHashSet();
         var dte = (DTE2)(Activator.CreateInstance(type) ?? throw new TcException($"Could not create {progId}."));
 
@@ -200,6 +232,106 @@ public sealed class XaeSession : IDisposable
 
         ConfigureSilentMode(true);
         return Status();
+    }
+
+    private System.Diagnostics.Process? _ownedProcess;
+
+    /// <summary>Seconds to wait for a freshly started IDE process to register its DTE in the ROT.</summary>
+    public static int StartupTimeoutSeconds { get; set; } = 240;
+
+    private object StartAsProcess(string progId, string exe, bool visible, bool keepOpenAfterExit)
+    {
+        _logger.LogInformation("Starting {Exe} as dedicated process (visible={Visible})", exe, visible);
+        var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(exe)
+        {
+            UseShellExecute = true,
+            WindowStyle = visible ? System.Diagnostics.ProcessWindowStyle.Normal : System.Diagnostics.ProcessWindowStyle.Minimized,
+        }) ?? throw new TcException($"Could not start {exe}.");
+
+        var deadline = DateTime.UtcNow.AddSeconds(StartupTimeoutSeconds);
+        RunningObjectTable.DteEntry? entry = null;
+        while (entry is null)
+        {
+            if (process.HasExited)
+            {
+                throw new TcException($"The IDE process exited during startup (exit code {process.ExitCode}).");
+            }
+
+            if (DateTime.UtcNow > deadline)
+            {
+                try { process.Kill(); } catch { /* ignore */ }
+                throw new TcException($"The IDE did not register in the Running Object Table within {StartupTimeoutSeconds} s.")
+                {
+                    Hint = "Retry xae_start, or use launchMode='com'.",
+                };
+            }
+
+            System.Threading.Thread.Sleep(1000);
+            entry = RunningObjectTable.GetDteInstances().FirstOrDefault(e => e.ProcessId == process.Id);
+        }
+
+        var dte = (DTE2)entry.Dte;
+        _dte = dte;
+        _ownedProcess = process;
+        ProgId = entry.ProgId.Length > 0 ? entry.ProgId : progId;
+        ProcessId = process.Id;
+        OwnsInstance = true;
+
+        // The shell may still be initializing its packages - the message filter retries rejected calls.
+        dte.SuppressUI = !visible;
+        dte.MainWindow.Visible = visible;
+        dte.UserControl = keepOpenAfterExit;
+        ConfigureSilentMode(true);
+        return Status();
+    }
+
+    /// <summary>Executable registered as LocalServer32 for the ProgID's CLSID (null if not resolvable).</summary>
+    private static string? LocalServerExe(Type comType)
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey($@"CLSID\{{{comType.GUID}}}\LocalServer32");
+            var raw = (key?.GetValue(null) as string)?.Trim();
+            if (string.IsNullOrEmpty(raw))
+            {
+                return null;
+            }
+
+            var path = raw.StartsWith('"') ? raw[1..raw.IndexOf('"', 1)] : raw.Split(' ')[0];
+            return File.Exists(path) ? path : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>After Quit(): make sure a process this server started really ends (never touches foreign IDEs).</summary>
+    private void EnsureOwnedProcessExited()
+    {
+        var p = _ownedProcess;
+        _ownedProcess = null;
+        if (p is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!p.WaitForExit(30_000))
+            {
+                _logger.LogWarning("Owned IDE process {Pid} did not exit after Quit - terminating it", p.Id);
+                p.Kill();
+            }
+        }
+        catch
+        {
+            // already gone
+        }
+        finally
+        {
+            p.Dispose();
+        }
     }
 
     [DllImport("user32.dll")]
@@ -281,6 +413,8 @@ public sealed class XaeSession : IDisposable
             return new { closed = false, message = "No XAE instance connected." };
         }
 
+        // Never close the user's solution of an attached IDE without explicit quitIde.
+        var quit = quitIde || OwnsInstance;
         try
         {
             if (saveAll)
@@ -288,9 +422,8 @@ public sealed class XaeSession : IDisposable
                 SaveAll();
             }
 
-            if (quitIde || OwnsInstance)
+            if (quit)
             {
-                // Never close the user's solution of an attached IDE without explicit quitIde.
                 if (_dte.Solution.IsOpen)
                 {
                     _dte.Solution.Close(saveAll);
@@ -301,10 +434,19 @@ public sealed class XaeSession : IDisposable
         }
         finally
         {
-            ReleaseDte();
+            ReleaseDte(); // keeps _ownedProcess
+            if (quit)
+            {
+                EnsureOwnedProcessExited();
+            }
+            else
+            {
+                _ownedProcess?.Dispose();
+                _ownedProcess = null;
+            }
         }
 
-        return new { closed = true };
+        return new { closed = true, quit };
     }
 
     public void ReleaseDte()
@@ -600,13 +742,22 @@ public sealed class XaeSession : IDisposable
         {
             _sta.InvokeAsync(() =>
             {
-                if (OwnsInstance && _dte is not null && !_dte.UserControl)
+                var quit = false;
+                if (OwnsInstance && _dte is not null)
                 {
-                    try { _dte.Quit(); } catch { /* ignore */ }
+                    try { quit = !_dte.UserControl; } catch { quit = true; }
+                    if (quit)
+                    {
+                        try { _dte.Quit(); } catch { /* ignore */ }
+                    }
                 }
 
                 ReleaseDte();
-            }, TimeSpan.FromSeconds(20)).Wait();
+                if (quit)
+                {
+                    EnsureOwnedProcessExited();
+                }
+            }, TimeSpan.FromSeconds(45)).Wait();
         }
         catch
         {
