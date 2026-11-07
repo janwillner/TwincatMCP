@@ -38,6 +38,12 @@ public sealed class PlcProjectToolsTests(PlcProjectFixture fx)
             await fx.Call("pou_write_code", new { path, implementation = "nUnknown := ;" });
             var bad = await fx.Call("build_solution", new { rebuild = false });
             Assert.False(bad.GetProperty("success").GetBoolean());
+            // The agent must see WHAT is wrong, not just that the build failed (hidden IDE: Error List stays empty).
+            var diagnostics = bad.GetProperty("diagnostics");
+            Assert.True(diagnostics.GetProperty("errorCount").GetInt32() > 0, bad.ToString());
+            var buildError = diagnostics.GetProperty("errors")[0];
+            Assert.Equal("C0007", buildError.GetProperty("code").GetString());
+            Assert.Equal(fb, buildError.GetProperty("object").GetString());
 
             var check = await fx.Call("plc_check_all_objects", new { includeOutput = true });
             Assert.False(check.GetProperty("ok").GetBoolean());
