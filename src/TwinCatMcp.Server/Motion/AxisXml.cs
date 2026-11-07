@@ -182,8 +182,14 @@ public static class AxisXml
     }
 
     /// <summary>ConsumeXml fragment that links the axis to an I/O box/terminal (same as "Link To I/O..." in XAE).</summary>
-    public static string BuildIoLink(string ioPath, int channel)
-        => "<TreeItem><NcAxisDef><IoItem><PathName>" + SecurityElement.Escape(ioPath) + "</PathName><Channel>" +
+    /// <remarks>
+    /// MDP drive terminals (EL70x1 = MDP-703, EL72xx = MDP-742 ...) are detected automatically; SoE drives such as the AX5000
+    /// are only linked when <paramref name="axisIoType"/> = "Sercos" is passed as well (verified on 4026.22).
+    /// </remarks>
+    public static string BuildIoLink(string ioPath, int channel, string? axisIoType = null)
+        => "<TreeItem><NcAxisDef>" +
+           (string.IsNullOrWhiteSpace(axisIoType) ? "" : "<AxisIoType>" + SecurityElement.Escape(axisIoType) + "</AxisIoType>") +
+           "<IoItem><PathName>" + SecurityElement.Escape(ioPath) + "</PathName><Channel>" +
            channel.ToString(CultureInfo.InvariantCulture) + "</Channel></IoItem></NcAxisDef></TreeItem>";
 
     public static string FormatValue(AxisParameterDef def, object? value)

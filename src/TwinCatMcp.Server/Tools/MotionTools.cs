@@ -255,12 +255,14 @@ public sealed class MotionTools(XaeSession session)
     [McpServerTool(Name = "motion_link_axis_to_drive"), Description(
         "Links an NC axis to an I/O drive box/terminal (like 'Link To I/O...' in XAE), e.g. an EL7041 stepper terminal " +
         "'TIID^Device 1 (EtherCAT)^Term 1 (EK1100)^Term 2 (EL7041)' or an AX5000 servo drive. TwinCAT then selects matching " +
-        "encoder/drive sub types (e.g. EL7041 -> encoder MDP 511, drive MDP 703) and creates all process data links. " +
-        "Works offline. channel: drive channel for multi-axis devices (0 = first). Pass ioPath='' to remove the I/O link.")]
+        "encoder/drive sub types (e.g. EL7041 -> encoder MDP 511, drive MDP 703; AX5000 -> SoE/Sercos drive) and creates all " +
+        "process data links. Works offline. channel: drive channel for multi-axis devices (0 = first, AX5203 has 0 and 1). " +
+        "Pass ioPath='' to remove the I/O link.")]
     public Task<CallToolResult> LinkAxisToDrive(
         [Description("Axis path or name.")] string axis,
         [Description("Tree path of the drive box/terminal below TIID, or '' to unlink.")] string ioPath,
-        [Description("Channel of multi-channel drives (0-based).")] int channel = 0)
+        [Description("Channel of multi-channel drives (0-based).")] int channel = 0,
+        [Description("Optional axis I/O type, e.g. 'Sercos' for SoE drives (AX5000). Default: detected by TwinCAT; if that fails 'Sercos' is tried.")] string? axisIoType = null)
         => session.RunAsync(s =>
         {
             var item = NcTree.ResolveAxis(s, axis);
@@ -270,8 +272,15 @@ public sealed class MotionTools(XaeSession session)
                 s.Lookup(ioPath); // nice error if the I/O path is wrong
             }
 
-            item.ConsumeXml(AxisXml.BuildIoLink(unlink ? "" : ioPath, channel));
+            item.ConsumeXml(AxisXml.BuildIoLink(unlink ? "" : ioPath, channel, unlink ? null : axisIoType));
             var summary = AxisXml.ReadSummary(item.ProduceXml(false));
+            if (!unlink && summary.IoLink is null && string.IsNullOrWhiteSpace(axisIoType))
+            {
+                // SoE drives (AX5000) are not detected automatically; they need AxisIoType 'Sercos'.
+                item.ConsumeXml(AxisXml.BuildIoLink(ioPath, channel, "Sercos"));
+                summary = AxisXml.ReadSummary(item.ProduceXml(false));
+            }
+
             var mapping = s.SysManager.ProduceMappingInfo();
             var links = NcTree.CountLinks(mapping, item.PathName, "TIID");
             if (!unlink && summary.IoLink is null)

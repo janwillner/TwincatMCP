@@ -124,6 +124,15 @@ public sealed class MotionAxisXmlTests
     }
 
     [Fact]
+    public void Io_link_for_SoE_drives_carries_the_axis_io_type_before_the_io_item()
+    {
+        // AX5000 (SoE) is only linked when AxisIoType 'Sercos' is given; TwinCAT then selects drive type 9.
+        Assert.Equal(
+            "<TreeItem><NcAxisDef><AxisIoType>Sercos</AxisIoType><IoItem><PathName>TIID^EcAx^Drive 1</PathName><Channel>0</Channel></IoItem></NcAxisDef></TreeItem>",
+            AxisXml.BuildIoLink("TIID^EcAx^Drive 1", 0, "Sercos"));
+    }
+
+    [Fact]
     public void Io_link_paths_are_xml_escaped()
     {
         Assert.Contains("<PathName>TIID^A &amp; B</PathName>", AxisXml.BuildIoLink("TIID^A & B", 0));

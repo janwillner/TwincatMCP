@@ -182,6 +182,24 @@ public sealed class MotionToolsTests(MotionFixture fx)
     }
 
     [Fact]
+    public async Task Axis_is_linked_to_the_second_channel_of_an_AX5203_servo_drive_offline()
+    {
+        var axis = await AddAxisAsync("ServoAxis");
+        var master = await fx.Call("tree_create_child", new { parentPath = "TIID", name = "EcServo", subType = 111 });
+        var drive = await fx.Call("tree_create_child", new { parentPath = master.GetProperty("path").GetString(), name = "Drive 1 (AX5203)", subType = 9099, info = "AX5203-0000-0214" });
+        var drivePath = drive.GetProperty("path").GetString()!;
+
+        var link = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = drivePath, channel = 1 });
+
+        var a = link.GetProperty("axis");
+        Assert.Equal(drivePath, a.GetProperty("ioLink").GetString());
+        Assert.Equal(1, a.GetProperty("ioChannel").GetInt32());
+        Assert.Equal("Sercos", a.GetProperty("axisIoType").GetString());
+        Assert.StartsWith("9:", a.GetProperty("drive").GetString());
+        Assert.True(link.GetProperty("ioLinkCount").GetInt32() > 0, link.ToString());
+    }
+
+    [Fact]
     public async Task Axes_are_removed()
     {
         await AddAxisAsync("Doomed");
