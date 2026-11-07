@@ -3,6 +3,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TwinCatMcp.Core;
 
+if (args.Contains("--tool-catalog"))
+{
+    Console.OutputEncoding = System.Text.Encoding.UTF8;
+    Console.Write(ToolCatalog.Generate(typeof(XaeSession).Assembly));
+    return;
+}
+
 var builder = Host.CreateApplicationBuilder(args);
 
 // stdout is reserved for the MCP protocol: all logs go to stderr.
