@@ -48,7 +48,8 @@ public sealed class IoTools(XaeSession session)
         {
             var subType = DeviceTypes.Resolve(type);
             var tiid = s.Lookup("TIID");
-            var device = tiid.CreateChild(name ?? "", subType, "", Type.Missing);
+            var existing = TreeInfo.Children(tiid).Select(c => c.Name).ToList();
+            var device = tiid.CreateChild(string.IsNullOrWhiteSpace(name) ? DeviceTypes.DefaultDeviceName(subType, existing) : name.Trim(), subType, "", Type.Missing);
             object? binding = null;
             if (!string.IsNullOrWhiteSpace(adapter))
             {
@@ -152,10 +153,13 @@ public sealed class IoTools(XaeSession session)
             var created = new List<object>();
             if (addFound)
             {
-                var i = TreeInfo.Children(tiid).Count();
                 foreach (var f in found)
                 {
-                    var dev = tiid.CreateChild(f.Name ?? $"Device {++i}", f.SubType, "", Type.Missing);
+                    var existing = TreeInfo.Children(tiid).Select(c => c.Name).ToList();
+                    var name = !string.IsNullOrWhiteSpace(f.Name) && !existing.Contains(f.Name, StringComparer.OrdinalIgnoreCase)
+                        ? f.Name
+                        : DeviceTypes.DefaultDeviceName(f.SubType, existing);
+                    var dev = tiid.CreateChild(name, f.SubType, "", Type.Missing);
                     if (f.AddressInfoXml is not null)
                     {
                         dev.ConsumeXml(IoXml.WrapDeviceDef(f.AddressInfoXml));

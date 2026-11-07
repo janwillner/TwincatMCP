@@ -78,6 +78,23 @@ public static class DeviceTypes
 
     public static string? NameOf(int subType) => All.FirstOrDefault(d => d.SubType == subType)?.Name;
 
+    /// <summary>
+    /// XAE-style default name "Device N (EtherCAT)" with the first free N (CreateChild with an empty name would create an
+    /// item without a name).
+    /// </summary>
+    public static string DefaultDeviceName(int subType, IEnumerable<string> existingNames)
+    {
+        var label = subType == 111 ? "EtherCAT" : All.FirstOrDefault(d => d.SubType == subType)?.Description ?? $"Type {subType}";
+        var names = existingNames.ToList();
+        var n = names.Count + 1;
+        while (names.Any(x => x.StartsWith($"Device {n} (", StringComparison.OrdinalIgnoreCase) || x.Equals($"Device {n}", StringComparison.OrdinalIgnoreCase)))
+        {
+            n++;
+        }
+
+        return $"Device {n} ({label})";
+    }
+
     private static string Normalize(string s)
         => string.Join("-", s.ToLowerInvariant().Split([' ', '_', '-', '/', '(', ')', ','], StringSplitOptions.RemoveEmptyEntries));
 }

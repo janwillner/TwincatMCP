@@ -101,6 +101,23 @@ public sealed class IoEtherCatTests(IoProjectFixture fx)
     }
 
     [Fact]
+    public async Task Coupler_variables_include_terminals_only_on_request()
+    {
+        var coupler = await CreateStation("M_SubBoxes");
+
+        var own = await fx.Call("io_list_variables", new { treePath = coupler, includeLinks = false });
+        var all = await fx.Call("io_list_variables", new { treePath = coupler, includeSubBoxes = true, includeLinks = false });
+        var device = await fx.Call("io_list_variables", new { treePath = "TIID^M_SubBoxes", includeLinks = false });
+
+        static List<string> Paths(JsonElement j) => j.GetProperty("variables").EnumerateArray().Select(v => v.GetProperty("path").GetString()!).ToList();
+        Assert.DoesNotContain(Paths(own), p => p.Contains("Term 2 (EL1008)"));
+        Assert.Contains(Paths(own), p => p.StartsWith(coupler + "^"));
+        Assert.Contains(Paths(all), p => p == coupler + "^Term 2 (EL1008)^Channel 1^Input");
+        Assert.DoesNotContain(Paths(device), p => p.Contains("Term 1 (EK1100)"));
+        Assert.Contains(Paths(device), p => p.StartsWith("TIID^M_SubBoxes^Inputs^"));
+    }
+
+    [Fact]
     public async Task Variable_info_contains_ads_address()
     {
         var coupler = await CreateStation("M_VarInfo");
@@ -233,6 +250,16 @@ public sealed class IoEtherCatTests(IoProjectFixture fx)
         await fx.Call("io_set_device_adapter", new { device = "M_Adapter", clear = true });
         var cleared = (await fx.Call("io_list_devices")).EnumerateArray().Single(d => d.GetProperty("name").GetString() == "M_Adapter");
         Assert.False(cleared.TryGetProperty("adapter", out var a) && a.ValueKind != JsonValueKind.Null);
+    }
+
+    [Fact]
+    public async Task Device_without_name_gets_the_XAE_default_name()
+    {
+        var created = await fx.Call("io_add_device", new { type = "ethercat-master" });
+
+        var name = created.GetProperty("device").GetProperty("name").GetString()!;
+        Assert.Matches(@"^Device \d+ \(EtherCAT\)$", name);
+        await fx.Call("io_remove_device", new { device = name });
     }
 
     [Fact]

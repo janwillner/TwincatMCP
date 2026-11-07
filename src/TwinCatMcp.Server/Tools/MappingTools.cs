@@ -112,10 +112,9 @@ public sealed class MappingTools(XaeSession session)
 
     [McpServerTool(Name = "mapping_check", ReadOnly = true), Description(
         "Checks all links: verifies that both ends of every link still exist in the tree and reports bit size mismatches " +
-        "(e.g. after deleting/renaming terminals or PLC variables). Optionally also runs the XAE commands " +
-        "'Check variable links' / 'Generate mappings' (results go to the XAE output window).")]
-    public Task<CallToolResult> Check(
-        [Description("Also execute the XAE commands CheckVariableLinks and GenerateMappings (ITcSmCommands).")] bool runXaeCommands = false)
+        "(e.g. after renaming PLC variables and rebuilding). A PLC BOOL linked to an I/O BIT is fine. " +
+        "The XAE recomputes the process image mappings itself during build_solution / activation.")]
+    public Task<CallToolResult> Check()
         => session.RunAsync(s =>
         {
             var links = MappingInfo.Parse(s.SysManager.ProduceMappingInfo());
@@ -138,13 +137,7 @@ public sealed class MappingTools(XaeSession session)
                 }
             }
 
-            object? xaeCommands = null;
-            if (runXaeCommands)
-            {
-                xaeCommands = IoTreeHelpers.RunSmCommands(s, ("CheckVariableLinks", c => c.CheckVariableLinks()), ("GenerateMappings", c => c.GenerateMappings()));
-            }
-
-            return new { linkCount = links.Count, ok = problems.Count == 0, problems, xaeCommands };
+            return new { linkCount = links.Count, ok = problems.Count == 0, problems };
         }, TimeSpan.FromMinutes(5));
 
     [McpServerTool(Name = "mapping_auto_link"), Description(

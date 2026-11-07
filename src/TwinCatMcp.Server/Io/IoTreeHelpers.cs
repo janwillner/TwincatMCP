@@ -78,6 +78,13 @@ public static class IoTreeHelpers
     public static IEnumerable<VarInfo> EnumerateVariables(ITcSmTreeItem root, bool includeSubBoxes, int max)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var rootPath = Safe(() => root.PathName) ?? "";
+
+        // Devices/couplers also expose the variable groups of all boxes below them (flat), so filter by path.
+        var subBoxPrefixes = includeSubBoxes
+            ? []
+            : TreeInfo.Descendants(root, 16).Where(IsBox).Select(b => Safe(() => b.PathName) + "^")
+                .Where(p => !p.Equals(rootPath + "^", StringComparison.OrdinalIgnoreCase)).ToList();
         var queue = new Queue<ITcSmTreeItem>();
         queue.Enqueue(root);
         var produced = 0;
@@ -85,7 +92,7 @@ public static class IoTreeHelpers
         {
             var item = queue.Dequeue();
             var path = Safe(() => item.PathName) ?? "";
-            if (!seen.Add(path))
+            if (!seen.Add(path) || subBoxPrefixes.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
             {
                 continue;
             }
@@ -123,56 +130,6 @@ public static class IoTreeHelpers
         {
             return null;
         }
-    }
-
-    /// <summary>
-    /// Executes XAE "System Manager commands" (ITcSmCommands). The object is obtained from the System Manager
-    /// (QueryInterface) or from DTE.GetObject("TcSmCommands"). Returns per-command status.
-    /// </summary>
-    public static object RunSmCommands(XaeSession s, params (string Name, Action<ITcSmCommands> Run)[] commands)
-    {
-        ITcSmCommands? cmds = s.SysManager as ITcSmCommands;
-        var source = cmds is null ? null : "ITcSysManager";
-        if (cmds is null)
-        {
-            foreach (var name in new[] { "TcSmCommands", "TcSysManagerCommands" })
-            {
-                try
-                {
-                    cmds = s.Dte.GetObject(name) as ITcSmCommands;
-                    if (cmds is not null)
-                    {
-                        source = $"DTE.GetObject(\"{name}\")";
-                        break;
-                    }
-                }
-                catch
-                {
-                    // try next
-                }
-            }
-        }
-
-        if (cmds is null)
-        {
-            return new { available = false, message = "ITcSmCommands is not available from this XAE instance." };
-        }
-
-        var results = new Dictionary<string, string>();
-        foreach (var (name, run) in commands)
-        {
-            try
-            {
-                run(cmds);
-                results[name] = "ok";
-            }
-            catch (Exception ex)
-            {
-                results[name] = "failed: " + ex.Message;
-            }
-        }
-
-        return new { available = true, source, results };
     }
 
     /// <summary>Walks up to the I/O device (TREEITEMTYPE_DEVICE) that owns a box/variable.</summary>

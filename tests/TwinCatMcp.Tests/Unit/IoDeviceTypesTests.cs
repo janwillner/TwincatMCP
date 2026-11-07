@@ -30,6 +30,15 @@ public sealed class IoDeviceTypesTests
         Assert.Contains("ethercat-master", ex.Hint);
     }
 
+    [Fact]
+    public void Default_device_name_follows_XAE_convention_and_is_unique()
+    {
+        Assert.Equal("Device 1 (EtherCAT)", DeviceTypes.DefaultDeviceName(111, []));
+        Assert.Equal("Device 3 (EtherCAT)", DeviceTypes.DefaultDeviceName(111, ["Device 1 (EtherCAT)", "Device 2 (EtherCAT)"]));
+        Assert.Equal("Device 2 (Profinet I/O Controller (RT))", DeviceTypes.DefaultDeviceName(113, ["EtherCAT Master"]));
+        Assert.Equal("Device 3 (EtherCAT)", DeviceTypes.DefaultDeviceName(111, ["X", "Device 2 (EtherCAT)"]));
+    }
+
     private static readonly NetworkAdapter[] Adapters =
     [
         new("Ethernet", "Realtek Gaming 2.5GbE Family Controller", "10-FF-E0-63-D7-15", "{2535F020-5AEA-4CD9-9922-95CA1254D8DB}", @"\DEVICE\{2535F020-5AEA-4CD9-9922-95CA1254D8DB}", "Down", "Ethernet", 0, false),
