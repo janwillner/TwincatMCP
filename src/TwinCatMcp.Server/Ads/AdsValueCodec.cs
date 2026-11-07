@@ -40,6 +40,8 @@ public static class AdsValueCodec
             case DataTypeCategory.Struct or DataTypeCategory.FunctionBlock or DataTypeCategory.Program or DataTypeCategory.Union
                 when type is IInterfaceType it:
                 return DecodeStruct(it, data);
+            case DataTypeCategory.Union when type is IUnionType u:
+                return DecodeUnion(u, data);
             case DataTypeCategory.Pointer or DataTypeCategory.Reference or DataTypeCategory.Interface:
                 return JsonValue.Create(FormatAddress(data[..type.ByteSize]));
         }
@@ -174,6 +176,21 @@ public static class AdsValueCodec
         return obj;
     }
 
+    /// <summary>UNION: every field overlays offset 0 - each field is shown with its interpretation of the bytes.</summary>
+    private static JsonNode DecodeUnion(IUnionType u, ReadOnlySpan<byte> data)
+    {
+        var obj = new JsonObject();
+        foreach (var f in u.Fields)
+        {
+            if (f.DataType is not null && f.DataType.ByteSize <= data.Length)
+            {
+                obj[f.InstanceName] = Decode(f.DataType, data[..f.DataType.ByteSize]);
+            }
+        }
+
+        return obj;
+    }
+
     // ---------------------------------------------------------------- encode
 
     /// <summary>
@@ -215,6 +232,9 @@ public static class AdsValueCodec
             case DataTypeCategory.Struct or DataTypeCategory.FunctionBlock or DataTypeCategory.Program or DataTypeCategory.Union
                 when type is IInterfaceType it:
                 EncodeStruct(it, v, dest, path);
+                return;
+            case DataTypeCategory.Union when type is IUnionType u:
+                EncodeUnion(u, v, dest, path);
                 return;
             case DataTypeCategory.Pointer or DataTypeCategory.Reference or DataTypeCategory.Interface:
                 WriteInteger(KindBySize(type.ByteSize, signed: false), ParseUnsigned(v, type, path), dest);
@@ -486,6 +506,25 @@ public static class AdsValueCodec
 
             EncodeInto(m.DataType!, prop.Value, dest.Slice(m.ByteOffset, m.DataType!.ByteSize), memberPath);
         }
+    }
+
+    private static void EncodeUnion(IUnionType u, JsonElement v, Span<byte> dest, string path)
+    {
+        if (v.ValueKind != JsonValueKind.Object || v.EnumerateObject().Count() != 1)
+        {
+            throw new TcException($"A UNION ({u.Name}) at '{path}' takes an object with exactly one field.")
+            {
+                Hint = "Fields: " + string.Join(", ", u.Fields.Select(f => f.InstanceName)),
+            };
+        }
+
+        var prop = v.EnumerateObject().First();
+        var field = u.Fields.FirstOrDefault(f => string.Equals(f.InstanceName, prop.Name, StringComparison.OrdinalIgnoreCase))
+                    ?? throw new TcException($"'{prop.Name}' is not a field of {u.Name} ('{path}').")
+                    {
+                        Hint = "Fields: " + string.Join(", ", u.Fields.Select(f => f.InstanceName)),
+                    };
+        EncodeInto(field.DataType!, prop.Value, dest[..field.DataType!.ByteSize], $"{path}.{field.InstanceName}");
     }
 
     // ---------------------------------------------------------------- helpers

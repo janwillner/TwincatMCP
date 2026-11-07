@@ -81,13 +81,14 @@ public sealed class AdsTestSymbolServer : AdsSymbolicServer
             .SetReturnType(dtInt);
         var dtRpc = new StructType("FB_Calc").AddAligned(new Member("nCalls", dtInt)).AddMethod(add);
 
-        symbolFactory.AddType(dtBool).AddType(dtInt).AddType(dtDInt).AddType(dtLReal).AddType(dtTime)
+        var factory = symbolFactory ?? throw new InvalidOperationException("Symbol factory not initialized.");
+        factory.AddType(dtBool).AddType(dtInt).AddType(dtDInt).AddType(dtLReal).AddType(dtTime)
             .AddType(dtString40).AddType(dtString20).AddType(dtWString).AddType(dtData).AddType(dtValues)
             .AddType(dtMatrix).AddType(dtColor).AddType(dtRpc);
 
         var area = new DataArea("PlcImage", IndexGroup, BaseOffset, (uint)_image.Length);
-        symbolFactory.AddDataArea(area);
-        symbolFactory
+        factory.AddDataArea(area);
+        factory
             .AddSymbol("MAIN.bFlag", dtBool, area)
             .AddSymbol("MAIN.nCounter", dtInt, area)
             .AddSymbol("MAIN.fValue", dtLReal, area)
