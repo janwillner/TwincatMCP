@@ -1,0 +1,3275 @@
+# TCatSysManagerLib 3.4.0.0 - API dump (reflection, TwinCAT 3.1.4026.22)
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0000_0001: COMPARE_MODE_DISABLED=0, COMPARE_MODE_ENABLED=1
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0116_0001: SMET_PAGE=0, SMET_VIEW=1, SMET_APP=2, SMET_TREE=3
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0151_0001: TCMB_OK=0, TCMB_OKCANCEL=1, TCMB_ABORTRETRYIGNORE=2, TCMB_YESNOCANCEL=3, TCMB_YESNO=4, TCMB_RETRYCANCEL=5, TCMB_CANCELTRYCONTINUE=6, TCMB_ICONSTOP=16, TCMB_ICONQUESTION=32, TCMB_ICONWARNING=48, TCMB_ICONINFORMATION=64
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0151_0002: TCMB_IDOK=1, TCMB_IDCANCEL=2, TCMB_IDABORT=3, TCMB_IDRETRY=4, TCMB_IDIGNORE=5, TCMB_IDYES=6, TCMB_IDNO=7
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0152_0001: DTCG_ADD=0, DTCG_DEL=1
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0164_0001: TCNPIT_ALL=0, TCNPIT_REFERENCED_LIBRARIES=1, TCNPIT_SOURCES_AND_FOLDERS=2, TCNPIT_ACTIVE_SECURITY=3, TCNPIT_NOACCESS=4
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0164_0002: TCNPIE_NONE=0, TCNPIE_PROJECT_RELATIVE_PATH=1
+
+ENUM __MIDL___MIDL_itf_TCatSysManager_0000_0164_0003: TCNPIA_NONE=0, TCNPIA_CLEAR_SECURITY=1, TCNPIA_HIDE_NOACCESS=2, TCNPIA_ENABLE_USERDB=3
+
+CLASS __MIDL_IWinTypes_0009 : 
+
+INTERFACE _ITcFlbBoxDef : _ITcModuleInstance, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  prop UInt32 vendorId {get;}
+  prop UInt32 ProductCode {get;}
+  prop UInt32 RevisionNumber {get;}
+  prop UInt32 SerialNumber {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+  ITcSmTreeItem LookupCoeVariable(Int32 inOut, UInt16 index, Byte subIndex)
+
+INTERFACE _ITcFlbBoxDef2 : _ITcFlbBoxDef, _ITcModuleInstance, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  prop UInt32 vendorId {get;}
+  prop UInt32 ProductCode {get;}
+  prop UInt32 RevisionNumber {get;}
+  prop UInt32 SerialNumber {get;}
+  prop String BicString[Boolean bReadFromDevice] {get;}
+  prop String BtnString[Boolean bReadFromDevice] {get;}
+  prop String BicElement[String id, Boolean bReadFromDevice] {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+  ITcSmTreeItem LookupCoeVariable(Int32 inOut, UInt16 index, Byte subIndex)
+
+INTERFACE _ITcModuleInstance : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+
+INTERFACE _ITcModuleManager
+  prop Int32 ModuleCount {get;}
+  prop ITcLicenseDescCollection Licenses {get;}
+  prop ITcModuleInstanceCollection Modules {get;}
+  Object LookupModule(UInt32 oid, ref Guid riid)
+  Object GetOnlineModulePara(UInt32 oid, UInt32 pid, UInt32 maxData)
+  Void SetOnlineModulePara(UInt32 oid, UInt32 pid, Object vData)
+  UInt32 GetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid)
+  Void SetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid, UInt32 data)
+  ITcEnumModuleInstances LookupModule2(String bstrModuleType)
+  Boolean TryLookupModule(String bstrModuleType, out ITcEnumModuleInstances pipModules)
+  ITcEnumTaskModules QueryTaskModules()
+  ITcTaskModule CreateTaskModule(String bstrName, UInt32 CycleTime, UInt32 Priority)
+  UInt32 GetFreeTaskPriority(UInt32 Priority)
+  ITcEnumLicenses QueryLicenses()
+
+INTERFACE _ITcPlcDeclDoc : _ITcPlcVarDecl, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String DeclarationText {get;set;}
+  prop String DocumentXml {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void Declare(ITcPlcVarDeclaration pDeclaration)
+  Boolean RemoveDeclaration(String bstrIdentifier)
+
+INTERFACE _ITcPlcDeclImpl : _ITcPlcVarDecl, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String DeclarationText {get;set;}
+  prop String ImplementationText {get;set;}
+  prop String ImplementationXml {get;set;}
+  prop IECLANGUAGETYPES Language {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void Declare(ITcPlcVarDeclaration pDeclaration)
+  Boolean RemoveDeclaration(String bstrIdentifier)
+
+INTERFACE _ITcPlcIECProject : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Boolean IsLoggedIn {get;}
+  prop PLC_APPSTATE OnlineApplicationState {get;}
+  prop PLC_OPSTATE OnlineOperationState {get;}
+  prop ITcPlcReferences References {get;}
+  prop ITcPlcLibRepositories Repositories {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bFolderStructure = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Void Login(PLC_LOGIN_FLAGS loginFlags = opt)
+  Void Logoff()
+  Void Start()
+  Void Stop()
+  Void Reset(PLC_RESET_TYPE resetType = opt)
+  Void AddLibrary(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void RemoveReference(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void InsertRepository(String bstrName, String rootFolder, Int32 iIndex)
+  Void RemoveRepository(String bstrName)
+  Void MoveRepository(String bstrRepositoryName, Int32 iNewIndex)
+  Void InstallLibrary(String bstrRepositoryName, String bstrLibPath, Boolean bOverwrite)
+  Void UninstallLibrary(String bstrRepositoryName, String bstrLibraryName, String bstrVersion = opt, String bstrDistributor = opt)
+  ITcPlcReferences ScanLibraries()
+  Void AddPlaceholder(String bstrPlaceholderName, String bstrDefaultLibName = opt, String bstrDefaultVersion = opt, String bstrDefaultDistributor = opt)
+  Void SetEffectiveResolution(String bstrPlaceholderName, String bstrLibName, String bstrVersion = opt, String bstrDistributor = opt)
+  Void FreezePlaceholder(String bstrPlaceholderName = opt)
+  Void PlcOpenExport2(String bstrFile, String bstrSelection, Boolean bSubTree)
+  Boolean CheckAllObjects()
+  String ProduceLibrarySignatures(ITcPlcLibRef pLibRef)
+  String ProduceAllLibrarySignatures()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+  Void LoadStaticAnalysisSettings(String bstrFilename)
+  Void SaveStaticAnalysisSettings(String bstrFilename)
+  Void ExportStandardMetrics(String bstrFilename)
+
+INTERFACE _ITcPlcIECProject2 : _ITcPlcIECProject, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Boolean IsLoggedIn {get;}
+  prop PLC_APPSTATE OnlineApplicationState {get;}
+  prop PLC_OPSTATE OnlineOperationState {get;}
+  prop ITcPlcReferences References {get;}
+  prop ITcPlcLibRepositories Repositories {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bFolderStructure = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Void Login(PLC_LOGIN_FLAGS loginFlags = opt)
+  Void Logoff()
+  Void Start()
+  Void Stop()
+  Void Reset(PLC_RESET_TYPE resetType = opt)
+  Void AddLibrary(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void RemoveReference(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void InsertRepository(String bstrName, String rootFolder, Int32 iIndex)
+  Void RemoveRepository(String bstrName)
+  Void MoveRepository(String bstrRepositoryName, Int32 iNewIndex)
+  Void InstallLibrary(String bstrRepositoryName, String bstrLibPath, Boolean bOverwrite)
+  Void UninstallLibrary(String bstrRepositoryName, String bstrLibraryName, String bstrVersion = opt, String bstrDistributor = opt)
+  ITcPlcReferences ScanLibraries()
+  Void AddPlaceholder(String bstrPlaceholderName, String bstrDefaultLibName = opt, String bstrDefaultVersion = opt, String bstrDefaultDistributor = opt)
+  Void SetEffectiveResolution(String bstrPlaceholderName, String bstrLibName, String bstrVersion = opt, String bstrDistributor = opt)
+  Void FreezePlaceholder(String bstrPlaceholderName = opt)
+  Void PlcOpenExport2(String bstrFile, String bstrSelection, Boolean bSubTree)
+  Boolean CheckAllObjects()
+  String ProduceLibrarySignatures(ITcPlcLibRef pLibRef)
+  String ProduceAllLibrarySignatures()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+  Void LoadStaticAnalysisSettings(String bstrFilename)
+  Void SaveStaticAnalysisSettings(String bstrFilename)
+  Void ExportStandardMetrics(String bstrFilename)
+  Void SaveAsLibrary2(String bstrLibraryPath, Boolean bEncrypt = opt, Boolean binstall = opt)
+
+INTERFACE _ITcPlcImplementation : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String ImplementationText {get;set;}
+  prop String ImplementationXml {get;set;}
+  prop IECLANGUAGETYPES Language {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+
+INTERFACE _ITcPlcLibrary : _ITcPlcLibRef
+  prop String Name {get;}
+  prop String LibraryName {get;}
+  prop String Version {get;}
+  prop String Distributor {get;}
+  prop String DisplayName {get;}
+
+INTERFACE _ITcPlcLibraryManager : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop ITcPlcReferences References {get;}
+  prop ITcPlcLibRepositories Repositories {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void AddLibrary(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void RemoveReference(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void InsertRepository(String bstrName, String rootFolder, Int32 iIndex)
+  Void RemoveRepository(String bstrName)
+  Void MoveRepository(String bstrRepositoryName, Int32 iNewIndex)
+  Void InstallLibrary(String bstrRepositoryName, String bstrLibPath, Boolean bOverwrite)
+  Void UninstallLibrary(String bstrRepositoryName, String bstrLibraryName, String bstrVersion = opt, String bstrDistributor = opt)
+  ITcPlcReferences ScanLibraries()
+  Void AddPlaceholder(String bstrPlaceholderName, String bstrDefaultLibName = opt, String bstrDefaultVersion = opt, String bstrDefaultDistributor = opt)
+  Void SetEffectiveResolution(String bstrPlaceholderName, String bstrLibName, String bstrVersion = opt, String bstrDistributor = opt)
+  Void FreezePlaceholder(String bstrPlaceholderName = opt)
+  String ProduceLibrarySignatures(ITcPlcLibRef pLibRef)
+  String ProduceAllLibrarySignatures()
+
+INTERFACE _ITcPlcLibRef
+  prop String Name {get;}
+
+INTERFACE _ITcPlcLibRepository
+  prop String Name {get;}
+  prop String Folder {get;}
+
+INTERFACE _ITcPlcPlaceholderRef : _ITcPlcLibRef
+  prop String Name {get;}
+  prop String PlaceholderName {get;}
+  prop ITcPlcLibrary EffectiveResolution {get;}
+  prop ITcPlcLibrary DefaultResolution {get;}
+
+INTERFACE _ITcPlcPou : _ITcPlcDeclImpl, _ITcPlcVarDecl, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String DeclarationText {get;set;}
+  prop String ImplementationText {get;set;}
+  prop String ImplementationXml {get;set;}
+  prop IECLANGUAGETYPES Language {get;set;}
+  prop String DocumentXml {get;set;}
+  prop String ReturnType {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void Declare(ITcPlcVarDeclaration pDeclaration)
+  Boolean RemoveDeclaration(String bstrIdentifier)
+
+INTERFACE _ITcPlcProject : _ITcProjectRoot, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop ITcSmTreeItem NestedProject {get;}
+  prop Boolean BootProjectAutostart {get;set;}
+  prop TcEncryptionType BootProjectEncryption {get;set;}
+  prop Boolean TmcFileCopy {get;set;}
+  prop ITcPlcArchiveSettings TargetArchiveSettings {get;}
+  prop ITcPlcArchiveSettings FileArchiveSettings {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void GenerateBootProject(Boolean bActivate = opt)
+  Void CompileProject()
+
+INTERFACE _ITcPlcTaskReference : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String LinkedTask {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+
+INTERFACE _ITcPlcVarDecl : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String DeclarationText {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  Void Declare(ITcPlcVarDeclaration pDeclaration)
+  Boolean RemoveDeclaration(String bstrIdentifier)
+
+INTERFACE _ITcProjectRoot : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop ITcSmTreeItem NestedProject {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+
+INTERFACE _ITcSmPlc2Object : _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop String Plc2Name {get;}
+  prop String Plc2Kind {get;}
+  prop Int32 Plc2Id {get;}
+  prop String Plc2Type {get;}
+  prop String Plc2Path {get;}
+  prop Boolean Plc2Compile {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+
+INTERFACE _ITcSmTreeItem : IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+
+INTERFACE _ITcTaskDef : _ITcTaskModule, _ITcModuleInstance, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  prop UInt32 CycleTime {get;set;}
+  prop UInt32 Priority {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+  Void Advise(ITcTaskModuleEventHandler pEventHandlerInterface, out UInt32 cookie)
+  Void Unadvise(UInt32 cookie)
+
+INTERFACE _ITcTaskModule : _ITcModuleInstance, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  prop UInt32 CycleTime {get;set;}
+  prop UInt32 Priority {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+  Void Advise(ITcTaskModuleEventHandler pEventHandlerInterface, out UInt32 cookie)
+  Void Unadvise(UInt32 cookie)
+
+CLASS _RemotableHandle : 
+
+INTERFACE _TcTComObjectDef : _ITcModuleInstance, _ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds = opt, Object vInfo = opt)
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+
+INTERFACE CATID_SmExtension
+
+CLASS CATID_SmExtensionClass : CATID_SmExtension
+
+ENUM COMPARE_MODE: COMPARE_MODE_DISABLED=0, COMPARE_MODE_ENABLED=1
+
+ENUM DATATYPE_CHANGES: DTCG_ADD=0, DTCG_DEL=1
+
+ENUM DISABLED_STATE: SMDS_NOT_DISABLED=0, SMDS_DISABLED=1, SMDS_PARENT_DISABLED=2
+
+ENUM DISPID_PROPS: DISPID_PROPS_NAME=1, DISPID_PROPS_ITEMTYPE=2, DISPID_PROPS_DISABLED=7, DISPID_PROPS_PATHNAME=8, DISPID_PROPS_SAVEOWNFILE=29, DISPID_PROPS_SIGNFILE=30, DISPID_PROPS_ENCRYPTFILE=31, DISPID_PROPS_OPLEVEL=32, DISPID_PROPS_TCVERSIONFIXED=38, DISPID_PROPS_PVDISABLE=40, DISPID_PROPS_PVPARAMETER=41, DISPID_PROPS_PVLINK=42, DISPID_PROPS_PVDEFINE=43, DISPID_PROPS_PVSPARAMETER=44, DISPID_PROPS_PVSIMULATION=45, DISPID_PROPS_PLC2_NAME=420, DISPID_PROPS_PLC2_KIND=421, DISPID_PROPS_PLC2_ID=422, DISPID_PROPS_PLC2_TYPE=423, DISPID_PROPS_PLC2_PATH=424, DISPID_PROPS_PLC2_COMPILE=425
+
+ENUM ENVIRONMENT_CATEGORY: ENVCAT_ALL=0, ENVCAT_TWINCAT=1, ENVCAT_SHELL=2, ENVCAT_VISUAL_STUDIO=3
+
+ENUM ENVIRONMENT_CONTEXT: ENVCONTEXT_LOCAL=0, ENVCONTEXT_TARGET=1
+
+ENUM EXTENSION_TYPE: SMET_PAGE=0, SMET_VIEW=1, SMET_APP=2, SMET_TREE=3
+
+INTERFACE GUID_SmOptionPage
+
+CLASS GUID_SmOptionPageClass : GUID_SmOptionPage
+
+ENUM IECLANGUAGETYPES: IECLANGUAGE_NONE=0, IECLANGUAGE_ST=1, IECLANGUAGE_IL=2, IECLANGUAGE_SFC=3, IECLANGUAGE_FBD=4, IECLANGUAGE_CFC=5, IECLANGUAGE_LD=6, IECLANGUAGE_UMLCD=7, IECLANGUAGE_UMLSC=8, IECLANGUAGE_UMLAD=9
+
+INTERFACE ITcAdsSymbolWatchWindow
+  Void AswAddSymbol(String bstrDisplayName, ITcTypeAdsOnline ipAds, ITcTypeInstance ipType)
+  Void AswRemoveSymbol(ITcTypeAdsOnline ip)
+
+INTERFACE ITcArchiveImportExport
+  ITcTreeItemCollection ImportArchive(String bstrFile, TCARCHIVE_IMPORTMODE mode, String bstrBefore = opt, Object vInfo = opt)
+  Void ExportArchive(String bstrFile, Object vInfo = opt)
+  Void ExportArchive2(String bstrFile, ITcTreeItemCollection pChilds, Object vInfo = opt)
+
+INTERFACE ITcArchivePersist
+  Void SaveAsArchive(String bstrPath)
+  Void LoadFromArchive(String bstrPath, String solutionFolder)
+
+INTERFACE ITcAutomationSettings
+  prop Boolean SilentMode {get;set;}
+  prop String TypeLibVersion {get;}
+
+INTERFACE ITcBicDevice
+  prop String BicString[Boolean bReadFromDevice] {get;}
+  prop String BtnString[Boolean bReadFromDevice] {get;}
+  prop String BicElement[String id, Boolean bReadFromDevice] {get;}
+
+INTERFACE ITcConfigManager
+  prop String ActiveTargetPlatform {get;set;}
+  prop String[] TargetPlatforms {get;}
+
+INTERFACE ITcDocExport
+  prop ITcDocTopicCollection DocumentationTopics {get;}
+
+INTERFACE ITcDocTopic
+  prop String TopicName {get;}
+  prop String DocumentationXml {get;}
+  prop ITcDocTopicCollection SubTopics {get;}
+
+INTERFACE ITcDocTopicCollection : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcDocTopic Item[Object vIndex] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcEnumLicenses
+  Void Next(UInt32 celt, out ITcLicenseDesc rgpITcLicenseDesc, out UInt32 pCeltFetched)
+  Void Skip(UInt32 celt)
+  Void Reset()
+  Void Clone(out ITcEnumLicenses ppEnum)
+
+INTERFACE ITcEnumModuleInstances
+  Void Next(UInt32 celt, out ITcModuleInstance2 ppLibrary, out UInt32 pCeltFetched)
+  Void Skip(UInt32 celt)
+  Void Reset()
+  Void Clone(out ITcEnumModuleInstances ppEnum)
+
+INTERFACE ITcEnumTaskModules
+  Void Next(UInt32 celt, out ITcTaskModule rgpITcTaskModule, out UInt32 pCeltFetched)
+  Void Skip(UInt32 celt)
+  Void Reset()
+  Void Clone(out ITcEnumTaskModules ppEnum)
+
+INTERFACE ITcEnumTypeGuid
+  Void Next(UInt32 celt, out Guid rgVar, out UInt32 pCeltFetched)
+  Void Skip(UInt32 celt)
+  Void Reset()
+  Void Clone(out ITcEnumTypeGuid ppEnum)
+
+INTERFACE ITcEnvironment
+  String[] GetVariableNames(ENVIRONMENT_CONTEXT ectx = opt, ENVIRONMENT_CATEGORY eCat = opt)
+  String GetVariableValue(String bstrName, ENVIRONMENT_CONTEXT eContext = opt)
+  String Expand(String bstrString, ENVIRONMENT_CONTEXT eContext = opt)
+  String[] GetEnvStrings(ENVIRONMENT_CONTEXT ectx = opt, ENVIRONMENT_CATEGORY eCat = opt)
+
+INTERFACE ITcEtherCATSlave
+  prop UInt32 vendorId {get;}
+  prop UInt32 ProductCode {get;}
+  prop UInt32 RevisionNumber {get;}
+  prop UInt32 SerialNumber {get;}
+  ITcSmTreeItem LookupCoeVariable(Int32 inOut, UInt16 index, Byte subIndex)
+
+INTERFACE ITcExternalSecurityInfo
+  String TcRetrieveEncryptionKey(String bstrAuth, Boolean bChangeUserDlg = opt)
+  Boolean TcCheckObjectProtectionLevel(Guid opLevel, TC_OBJ_PROTECTION req, Boolean bChangeUserDlg = opt)
+  Boolean TcCheckUserRight(Guid right, Boolean bChangeUserDlg = opt)
+  Boolean TcCanRetrieveFile(String fileName, Boolean bChangeUserDlg = opt)
+  Boolean TcIsEncryptedFile(String fileName)
+  String TcRetrieveEncryptedFile(String bstrAuth, String fileName, Boolean bChangeUserDlg = opt)
+  Void TcStoreFile(String bstrAuth, String fileName, Boolean bEncrypt, Boolean bSign, String strXml, Boolean bChangeUserDlg = opt)
+
+INTERFACE ITcExternalSecurityInfo2 : ITcExternalSecurityInfo
+  String TcRetrieveEncryptionKey(String bstrAuth, Boolean bChangeUserDlg = opt)
+  Boolean TcCheckObjectProtectionLevel(Guid opLevel, TC_OBJ_PROTECTION req, Boolean bChangeUserDlg = opt)
+  Boolean TcCheckUserRight(Guid right, Boolean bChangeUserDlg = opt)
+  Boolean TcCanRetrieveFile(String fileName, Boolean bChangeUserDlg = opt)
+  Boolean TcIsEncryptedFile(String fileName)
+  String TcRetrieveEncryptedFile(String bstrAuth, String fileName, Boolean bChangeUserDlg = opt)
+  Void TcStoreFile(String bstrAuth, String fileName, Boolean bEncrypt, Boolean bSign, String strXml, Boolean bChangeUserDlg = opt)
+  String TcGenerateSignature(String bstrAuth, String bstrHash)
+  Boolean TcVerifySignature(String bstrHash, String bstrSignature)
+
+INTERFACE ITcGasJsonCommand
+  Void JsonReq(Int32 session, String jReq)
+  Void JsonExecute()
+  Void JsonRegisterNoteHandler(ITcGasJsonNotification ipNote)
+
+INTERFACE ITcGasJsonNotification
+  Void JsonNote(String jNote)
+  Void JsonRes(Int32 session, String jRes)
+  Void JsonSignal()
+
+INTERFACE ITcIecProjectInternal
+  Void SetTargetNetId(String netId)
+  Void CreateOfflineBootPrj(String filePath)
+  Void AfterPlcProjectInserted()
+
+INTERFACE ITcIecProjectInternal2 : ITcIecProjectInternal
+  Void SetTargetNetId(String netId)
+  Void CreateOfflineBootPrj(String filePath)
+  Void AfterPlcProjectInserted()
+  ITcPlcFiles GetReferencedLibraryFilesRecursive()
+
+INTERFACE ITcIecProjectInternal3 : ITcIecProjectInternal2, ITcIecProjectInternal
+  Void SetTargetNetId(String netId)
+  Void CreateOfflineBootPrj(String filePath)
+  Void AfterPlcProjectInserted()
+  ITcPlcFiles GetReferencedLibraryFilesRecursive()
+  Void GetVariableDeclarationLocation(String sVarName, out String psFile, out UInt32 pLine)
+
+INTERFACE ITcInterfaceInstance
+  prop String Name {get;}
+  prop Guid ITcId {get;}
+  prop String IecDeclaration {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+
+INTERFACE ITcInternalGasServer
+  Void GasMainStart(out Int32 pWebsocketPort, out Int32 pWorkbenchId)
+  Void GasMainStop()
+  Void GasAddSmProject(Object ipSysMan, out Int32 pProjectId)
+  Void GasCloseSmProject(Int32 projectId)
+  Boolean GasMainIsStarted()
+  Int32 GasGetWebsocketPort()
+
+INTERFACE ITcInternalGasServer2 : ITcInternalGasServer
+  Void GasMainStart(out Int32 pWebsocketPort, out Int32 pWorkbenchId)
+  Void GasMainStop()
+  Void GasAddSmProject(Object ipSysMan, out Int32 pProjectId)
+  Void GasCloseSmProject(Int32 projectId)
+  Boolean GasMainIsStarted()
+  Int32 GasGetWebsocketPort()
+  ITcJsonCommand GasCreateJsonCommandSession()
+  Void GasCloseJsonCommandSession(ITcJsonCommand ipCmd)
+
+INTERFACE ITcInternalSecurityInfo
+  String TcGenerateSignature(String bstrAuth, String bstrHash)
+  Boolean TcVerifySignature(String bstrHash, String bstrSignature)
+  String TcGetEncryptionKey(String bstrAuth)
+  Boolean TcLoadUnsignedFile(String bstrPath, Boolean bChangeUserDlg)
+  Boolean TcViewEncryptedFile(String bstrPath, Boolean bChangeUserDlg)
+  Void TcGetWriteOptions(String bstrPath, out Boolean pSign, out Boolean pEncrypt)
+  UInt32 TcGetObjectProtectionLevelCnt()
+  Guid TcGetObjectProtectionLevelInfo(UInt32 idx, out String pBstrName, out String pBstrCmt)
+  Boolean TcGetObjectProtectionLevel(Guid opLevel, TC_OBJ_PROTECTION req, Boolean bChangeUserDlg)
+  Boolean TcHasUserRight(Guid right, Boolean bChangeUserDlg = opt)
+
+INTERFACE ITcInternalVersionInfo
+  Void SetVersion(UInt32 major, UInt32 minor, UInt32 build, UInt32 revision)
+
+INTERFACE ITcItemExport
+  prop String ExportInfo {get;}
+
+INTERFACE ITcItemExport2 : ITcItemExport
+  prop String ExportInfo {get;}
+  String ExportCompilerMessages(String bstrParameter)
+
+INTERFACE ITcJsonCommand
+  Void JsonReq(Int32 session, ref SByte jReq)
+  Void JsonExecute()
+  Void JsonRegisterNoteHandler(ITcJsonNotification ipNote)
+
+INTERFACE ITcJsonNotification
+  Void JsonNote(ref SByte jNote)
+  Void JsonRes(Int32 session, ref SByte jRes)
+  Void JsonSignal()
+
+INTERFACE ITcLibraryManager
+  String GetLibraryIecDeclaration(String bstrLibraryId, Boolean bTryToLoad = opt)
+
+INTERFACE ITcLibraryManager2 : ITcLibraryManager
+  String GetLibraryIecDeclaration(String bstrLibraryId, Boolean bTryToLoad = opt)
+  String GetLibraryIecDeclarationEx(String bstrLibraryId, Boolean bTryToLoad = opt, Boolean bUseNamespaceForMembers = opt)
+
+INTERFACE ITcLicenseDesc
+  prop String LicenseId {get;}
+  prop String OemId {get;}
+  prop String VendorName {get;}
+  prop String DisplayName {get;}
+  prop String Comment {get;}
+  prop UInt32 Instances {get;}
+
+INTERFACE ITcLicenseDesc2 : ITcLicenseDesc
+  prop String LicenseId {get;}
+  prop String OemId {get;}
+  prop String VendorName {get;}
+  prop String DisplayName {get;}
+  prop String Comment {get;}
+  prop UInt32 Instances {get;}
+  prop String OrderId {get;}
+  prop ITcLicenseInfoCollection LicensesContained {get;}
+  prop ITcLicenseInfoCollection LicensesRequired {get;}
+  prop ITcLicenseInfoCollection LicenseAlternatives {get;}
+
+INTERFACE ITcLicenseDescCollection : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcLicenseDesc Item[Object vIndex] {get;}
+  IEnumerator GetEnumerator()
+  Boolean TryLookup(String guidLic, out ITcLicenseDesc ppLic)
+  ITcLicenseDesc Lookup(String guidLic)
+  Boolean Contains(String guidLic)
+
+INTERFACE ITcLicenseInfo
+  prop UInt32 Instances {get;}
+  prop String LicenseId {get;}
+
+INTERFACE ITcLicenseInfoCollection : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcLicenseInfo Item[Object vIndex] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcLicenseManager
+  ITcEnumLicenses QueryLicenses()
+
+INTERFACE ITcLicenseManager2 : ITcLicenseManager
+  prop ITcLicenseDescCollection Licenses {get;}
+  ITcEnumLicenses QueryLicenses()
+
+INTERFACE ITcModuleInstance
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+
+INTERFACE ITcModuleInstance2 : ITcModuleInstance
+  prop Guid ClassID {get;}
+  prop UInt32 ParentOID {get;}
+  prop UInt32 oid {get;}
+  prop String ModuleTypeName {get;}
+  prop String ModuleInstanceName {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  Object GetModulePara(UInt32 pid)
+  Void SetModulePara(UInt32 pid, Object vData)
+  UInt32 GetModuleParaDWORD(UInt32 pid)
+  Void SetModuleParaDWORD(UInt32 pid, UInt32 data)
+  ITcTypeInstance GetTypeOfModulePara(UInt32 pid)
+  Void SetModuleContext(UInt32 index, UInt32 pOid)
+  Void GetModuleContext(UInt32 index, ref UInt32 pOid)
+
+INTERFACE ITcModuleInstanceCollection : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcModuleInstance Item[Object vIndex] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcModuleManager : IEnumerable
+  prop Int32 ModuleCount {get;}
+  IEnumerator GetEnumerator()
+  Object LookupModule(UInt32 oid, ref Guid riid)
+  Object GetOnlineModulePara(UInt32 oid, UInt32 pid, UInt32 maxData)
+  Void SetOnlineModulePara(UInt32 oid, UInt32 pid, Object vData)
+  UInt32 GetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid)
+  Void SetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid, UInt32 data)
+
+INTERFACE ITcModuleManager2 : ITcModuleManager, IEnumerable
+  prop Int32 ModuleCount {get;}
+  IEnumerator GetEnumerator()
+  Object LookupModule(UInt32 oid, ref Guid riid)
+  Object GetOnlineModulePara(UInt32 oid, UInt32 pid, UInt32 maxData)
+  Void SetOnlineModulePara(UInt32 oid, UInt32 pid, Object vData)
+  UInt32 GetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid)
+  Void SetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid, UInt32 data)
+  ITcEnumModuleInstances LookupModule(String bstrModuleType)
+  Boolean TryLookupModule(String bstrModuleType, out ITcEnumModuleInstances pipModules)
+
+INTERFACE ITcModuleManager3 : ITcModuleManager2, ITcModuleManager, IEnumerable
+  prop Int32 ModuleCount {get;}
+  prop ITcModuleInstanceCollection Modules {get;}
+  IEnumerator GetEnumerator()
+  Object LookupModule(UInt32 oid, ref Guid riid)
+  Object GetOnlineModulePara(UInt32 oid, UInt32 pid, UInt32 maxData)
+  Void SetOnlineModulePara(UInt32 oid, UInt32 pid, Object vData)
+  UInt32 GetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid)
+  Void SetOnlineModuleParaDWORD(UInt32 oid, UInt32 pid, UInt32 data)
+  ITcEnumModuleInstances LookupModule(String bstrModuleType)
+  Boolean TryLookupModule(String bstrModuleType, out ITcEnumModuleInstances pipModules)
+
+INTERFACE ITcModuleOnlineMode
+  prop Int32 OnlineMode {get;set;}
+  Void TcGetObjPara(UInt32 oid, UInt32 pid, out UInt32 pnData, out Object pData)
+  Void TcSetObjPara(UInt32 oid, UInt32 pid, UInt32 nData, Object data)
+
+INTERFACE ITcNestedProject
+  Void DatatypeChanged(ref Guid typeGuid, DATATYPE_CHANGES changeType)
+  Void TargetStateChanged(UInt16 adsState, UInt16 deviceState, UInt16 restartIndex)
+
+INTERFACE ITcNestedProject2 : ITcNestedProject
+  Void DatatypeChanged(ref Guid typeGuid, DATATYPE_CHANGES changeType)
+  Void TargetStateChanged(UInt16 adsState, UInt16 deviceState, UInt16 restartIndex)
+  Void BeginDatatypeChange()
+  Void EndDatatypeChange()
+
+INTERFACE ITcNestedProjectAO
+  ITcSmTreeItem LookupNestedTreeItem(String bstrItem)
+
+INTERFACE ITcNestedProjectFactory
+  Void SetParentHierarchy(Object ipHier, Int32 idNestedNode)
+
+INTERFACE ITcNestedProjectItems
+  ITcPlcFiles EnumerateProjectItems(TC_NESTED_PROJECT_ITEM_TYPE tcnpit, TC_NESTED_PROJECT_ITEM_ENUMERATION_FLAGS enumFlags)
+  Void ApplyToProjectItems(TC_NESTED_PROJECT_ITEM_TYPE tcnpit, TC_NESTED_PROJECT_ITEM_ACTION itemAction)
+
+INTERFACE ITcNestedProjectTemplate
+  Guid GetProjectTemplateGuid()
+
+INTERFACE ITcPlc2ProjectInternal
+  prop UInt16 AdsPort {get;}
+
+INTERFACE ITcPlcArchiveSettings
+  prop Boolean SaveLoginInformation {get;set;}
+  prop Boolean SaveProjectSources {get;set;}
+  prop Boolean SaveCompiledLibraries {get;set;}
+  prop Boolean SaveSourceLibraries {get;set;}
+
+INTERFACE ITcPlcDeclaration
+  prop String DeclarationText {get;set;}
+
+INTERFACE ITcPlcFiles : IEnumerable
+  prop Int32 Count {get;}
+  prop String Item[Int32 n] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcPlcIECProject : ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+
+INTERFACE ITcPlcIECProject2 : ITcPlcIECProject, ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Boolean CheckAllObjects()
+
+INTERFACE ITcPlcIECProject3 : ITcPlcIECProject2, ITcPlcIECProject, ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Boolean CheckAllObjects()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+
+INTERFACE ITcPlcIECProject4 : ITcPlcIECProject3, ITcPlcIECProject2, ITcPlcIECProject, ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Boolean CheckAllObjects()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+  Void LoadStaticAnalysisSettings(String bstrFilename)
+  Void SaveStaticAnalysisSettings(String bstrFilename)
+
+INTERFACE ITcPlcIECProject5 : ITcPlcIECProject4, ITcPlcIECProject3, ITcPlcIECProject2, ITcPlcIECProject, ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Boolean CheckAllObjects()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+  Void LoadStaticAnalysisSettings(String bstrFilename)
+  Void SaveStaticAnalysisSettings(String bstrFilename)
+  Void ExportStandardMetrics(String bstrFilename)
+
+INTERFACE ITcPlcIECProject6 : ITcPlcIECProject5, ITcPlcIECProject4, ITcPlcIECProject3, ITcPlcIECProject2, ITcPlcIECProject, ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Boolean CheckAllObjects()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+  Void LoadStaticAnalysisSettings(String bstrFilename)
+  Void SaveStaticAnalysisSettings(String bstrFilename)
+  Void ExportStandardMetrics(String bstrFilename)
+  Void SaveAsLibrary2(String bstrLibraryPath, Boolean bEncrypt = opt, Boolean binstall = opt)
+
+INTERFACE ITcPlcIECProject7 : ITcPlcIECProject6, ITcPlcIECProject5, ITcPlcIECProject4, ITcPlcIECProject3, ITcPlcIECProject2, ITcPlcIECProject, ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+  Void SaveAsLibrary(String bstrLibraryPath, Boolean binstall = opt)
+  Boolean CheckAllObjects()
+  Void RunStaticAnalysis(Boolean bCheckAll = opt)
+  Void LoadStaticAnalysisSettings(String bstrFilename)
+  Void SaveStaticAnalysisSettings(String bstrFilename)
+  Void ExportStandardMetrics(String bstrFilename)
+  Void SaveAsLibrary2(String bstrLibraryPath, Boolean bEncrypt = opt, Boolean binstall = opt)
+  Void ExportToSarif(String bstrFilename)
+
+INTERFACE ITcPlcImplementation
+  prop String ImplementationText {get;set;}
+  prop String ImplementationXml {get;set;}
+  prop IECLANGUAGETYPES Language {get;set;}
+
+INTERFACE ITcPlcLibrary : ITcPlcLibRef
+  prop String Name {get;}
+  prop String LibraryName {get;}
+  prop String Version {get;}
+  prop String Distributor {get;}
+  prop String DisplayName {get;}
+
+INTERFACE ITcPlcLibraryManager
+  prop ITcPlcReferences References {get;}
+  prop ITcPlcLibRepositories Repositories {get;}
+  Void AddLibrary(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void RemoveReference(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void InsertRepository(String bstrName, String rootFolder, Int32 iIndex)
+  Void RemoveRepository(String bstrName)
+  Void MoveRepository(String bstrRepositoryName, Int32 iNewIndex)
+  Void InstallLibrary(String bstrRepositoryName, String bstrLibPath, Boolean bOverwrite)
+  Void UninstallLibrary(String bstrRepositoryName, String bstrLibraryName, String bstrVersion = opt, String bstrDistributor = opt)
+  ITcPlcReferences ScanLibraries()
+  Void AddPlaceholder(String bstrPlaceholderName, String bstrDefaultLibName = opt, String bstrDefaultVersion = opt, String bstrDefaultDistributor = opt)
+  Void SetEffectiveResolution(String bstrPlaceholderName, String bstrLibName, String bstrVersion = opt, String bstrDistributor = opt)
+  Void FreezePlaceholder(String bstrPlaceholderName = opt)
+
+INTERFACE ITcPlcLibraryManager2 : ITcPlcLibraryManager
+  prop ITcPlcReferences References {get;}
+  prop ITcPlcLibRepositories Repositories {get;}
+  Void AddLibrary(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void RemoveReference(String bstrLibName, String bstrVersion = opt, String bstrCompany = opt)
+  Void InsertRepository(String bstrName, String rootFolder, Int32 iIndex)
+  Void RemoveRepository(String bstrName)
+  Void MoveRepository(String bstrRepositoryName, Int32 iNewIndex)
+  Void InstallLibrary(String bstrRepositoryName, String bstrLibPath, Boolean bOverwrite)
+  Void UninstallLibrary(String bstrRepositoryName, String bstrLibraryName, String bstrVersion = opt, String bstrDistributor = opt)
+  ITcPlcReferences ScanLibraries()
+  Void AddPlaceholder(String bstrPlaceholderName, String bstrDefaultLibName = opt, String bstrDefaultVersion = opt, String bstrDefaultDistributor = opt)
+  Void SetEffectiveResolution(String bstrPlaceholderName, String bstrLibName, String bstrVersion = opt, String bstrDistributor = opt)
+  Void FreezePlaceholder(String bstrPlaceholderName = opt)
+  String ProduceLibrarySignatures(ITcPlcLibRef pLibRef)
+  String ProduceAllLibrarySignatures()
+
+INTERFACE ITcPlcLibRef
+  prop String Name {get;}
+
+INTERFACE ITcPlcLibRepositories : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcPlcLibRepository Item[Int32 n] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcPlcLibRepository
+  prop String Name {get;}
+  prop String Folder {get;}
+
+INTERFACE ITcPlcNode
+  String GetUniqueProjectPathName(String sProjectName)
+  ITcPlcProjectInternal AppendProjectRoot(String fileName)
+  Void RemoveProjectRoot(UInt32 vsItemID)
+
+INTERFACE ITcPlcOnline
+  prop Boolean IsLoggedIn {get;}
+  prop PLC_APPSTATE OnlineApplicationState {get;}
+  prop PLC_OPSTATE OnlineOperationState {get;}
+  Void Login(PLC_LOGIN_FLAGS loginFlags = opt)
+  Void Logoff()
+  Void Start()
+  Void Stop()
+  Void Reset(PLC_RESET_TYPE resetType = opt)
+
+INTERFACE ITcPlcOpenImportExport
+  Void PlcOpenExport(String bstrFile, String bstrSelection)
+  Void PlcOpenImport(String bstrFile, Int32 options = opt, String bstrSelection = opt, Boolean bSubTree = opt)
+
+INTERFACE ITcPlcOpenImportExport2
+  Void PlcOpenExport2(String bstrFile, String bstrSelection, Boolean bSubTree)
+
+INTERFACE ITcPlcPlaceholderRef : ITcPlcLibRef
+  prop String Name {get;}
+  prop String PlaceholderName {get;}
+  prop ITcPlcLibrary EffectiveResolution {get;}
+  prop ITcPlcLibrary CurrentLibrary {get;}
+
+INTERFACE ITcPlcPlaceholderRef2 : ITcPlcPlaceholderRef, ITcPlcLibRef
+  prop String Name {get;}
+  prop String PlaceholderName {get;}
+  prop ITcPlcLibrary EffectiveResolution {get;}
+  prop ITcPlcLibrary CurrentLibrary {get;}
+  prop ITcPlcLibrary DefaultResolution {get;}
+
+INTERFACE ITcPlcPou : ITcXmlDocument
+  prop String DocumentXml {get;set;}
+  prop String ReturnType {get;set;}
+
+INTERFACE ITcPlcProfiler
+  Void AddProfiler(String relativePath)
+  Void RemoveProfiler()
+  Void SetProfiler(Boolean enable)
+  Void AddConfiguration(String Name, String config)
+  Void SetActiveConfig(String Name)
+  String GetActiveConfig()
+  Void StartProfiling()
+  Void SnapshotProfiling()
+  Void StopProfiling()
+  UInt32 GetProfilerStatus()
+  String[] GetResults(String configName, UInt32 lastItems, UInt32 format)
+
+INTERFACE ITcPlcProject
+  prop Boolean BootProjectAutostart {get;set;}
+  prop TcEncryptionType BootProjectEncryption {get;set;}
+  prop Boolean TmcFileCopy {get;set;}
+  Void GenerateBootProject(Boolean bActivate = opt)
+  Void CompileProject()
+
+INTERFACE ITcPlcProject2 : ITcPlcProject
+  prop Boolean BootProjectAutostart {get;set;}
+  prop TcEncryptionType BootProjectEncryption {get;set;}
+  prop Boolean TmcFileCopy {get;set;}
+  prop ITcPlcArchiveSettings TargetArchiveSettings {get;}
+  prop ITcPlcArchiveSettings FileArchiveSettings {get;}
+  Void GenerateBootProject(Boolean bActivate = opt)
+  Void CompileProject()
+
+INTERFACE ITcPlcProjectInternal
+  prop UInt32 ApplicationOID {get;}
+  prop String ApplicationName {get;}
+  prop UInt16 AdsPort {get;}
+  prop String LanguageModel {get;}
+  UInt32 GetTaskPouObjectOID(UInt32 prio)
+  Void BeforeDownload(Int32 onlineChange)
+  Void AfterDownload(PLC_DOWNLOAD_TYPES downloadType)
+  Void BeforeLogin()
+
+INTERFACE ITcPlcProjectInternal2 : ITcPlcProjectInternal
+  prop UInt32 ApplicationOID {get;}
+  prop String ApplicationName {get;}
+  prop UInt16 AdsPort {get;}
+  prop String LanguageModel {get;}
+  UInt32 GetTaskPouObjectOID(UInt32 prio)
+  Void BeforeDownload(Int32 onlineChange)
+  Void AfterDownload(PLC_DOWNLOAD_TYPES downloadType)
+  Void BeforeLogin()
+  Void AfterLogin(Int32 bUpToDate, Int32 bOnlineChangePossible)
+
+INTERFACE ITcPlcProjectInternal3 : ITcPlcProjectInternal2, ITcPlcProjectInternal
+  prop UInt32 ApplicationOID {get;}
+  prop String ApplicationName {get;}
+  prop UInt16 AdsPort {get;}
+  prop String LanguageModel {get;}
+  UInt32 GetTaskPouObjectOID(UInt32 prio)
+  Void BeforeDownload(Int32 onlineChange)
+  Void AfterDownload(PLC_DOWNLOAD_TYPES downloadType)
+  Void BeforeLogin()
+  Void AfterLogin(Int32 bUpToDate, Int32 bOnlineChangePossible)
+  UInt32 GetApplicationInstanceCount()
+  String GetApplicationInstanceName(UInt32 idx)
+  String GetActiveApplicationInstance()
+  Void SetActiveApplicationInstance(String Name)
+
+INTERFACE ITcPlcReferences : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcPlcLibRef Item[Int32 n] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcPlcTaskReference
+  prop String LinkedTask {get;set;}
+
+INTERFACE ITcPlcVarDeclaration
+  prop PLC_VARDECL_SCOPE Scope {get;}
+  prop String Name {get;}
+  prop String Type {get;}
+  prop String InitValue {get;}
+  prop String Address {get;}
+  prop String Comment {get;}
+  prop PLC_VARDECL_FLAGS Flags {get;}
+
+INTERFACE ITcPlcVarDeclObject
+  Void Declare(ITcPlcVarDeclaration pDeclaration)
+  Boolean RemoveDeclaration(String bstrIdentifier)
+
+INTERFACE ITcProjectArchive
+  Void AddFilesToArchive(String bstrArchivePath, String bstrRootFolder, UInt32 ulFlags)
+
+INTERFACE ITcProjectNodeAO
+  Void TreeItemDeleted(ITcSmTreeItem pItem)
+
+INTERFACE ITcProjectRoot
+  prop ITcSmTreeItem NestedProject {get;}
+
+INTERFACE ITcRemoteManager
+  prop String Version {get;set;}
+  prop String[] Versions {get;}
+  Void SetComponentVersion(String bstrComponent, String bstrVersion)
+  String GetComponentVersion(String bstrComponent)
+  String[] GetComponentVersions(String bstrComponent)
+
+INTERFACE ITcSecurityFactory
+  Void SetSecurityInfo(ITcInternalSecurityInfo ipSI)
+
+INTERFACE ITcSmCommands
+  Void AccessBusCouplerIPLinkFirmware()
+  Void ActivateConfiguration2()
+  Void CheckVariableLinks()
+  Void ChooseTargetSystemDialog()
+  Void ChooseTargetSystemCombo(String route)
+  Object ChooseTargetSystemComboGetList()
+  String GetCurrentTargetSystem()
+  Void ExportXMLDescription()
+  Void GenerateMappings()
+  Void ImportXMLDescription()
+  Void ReadTargetServerVersions()
+  Void ReloadDevices()
+  Void ReSetToConfigMode()
+  Void ReSetToRunMode()
+  Void SearchDevices()
+  Void ShowRealtimeCompatibleDevices()
+  Void ToggleFreeRun()
+  Void UpdateBusCouplerIPLinkFirmware()
+  RTIMESTATUS GetTargetRealTimeStatus()
+  Void Register(ITcSmEventHandler pEventHandlerInterface)
+  Void Unregister(ITcSmEventHandler pEventHandlerInterface)
+
+INTERFACE ITcSmCommands2 : ITcSmCommands
+  Void AccessBusCouplerIPLinkFirmware()
+  Void ActivateConfiguration2()
+  Void CheckVariableLinks()
+  Void ChooseTargetSystemDialog()
+  Void ChooseTargetSystemCombo(String route)
+  Object ChooseTargetSystemComboGetList()
+  String GetCurrentTargetSystem()
+  Void ExportXMLDescription()
+  Void GenerateMappings()
+  Void ImportXMLDescription()
+  Void ReadTargetServerVersions()
+  Void ReloadDevices()
+  Void ReSetToConfigMode()
+  Void ReSetToRunMode()
+  Void SearchDevices()
+  Void ShowRealtimeCompatibleDevices()
+  Void ToggleFreeRun()
+  Void UpdateBusCouplerIPLinkFirmware()
+  RTIMESTATUS GetTargetRealTimeStatus()
+  Void Register(ITcSmEventHandler pEventHandlerInterface)
+  Void Unregister(ITcSmEventHandler pEventHandlerInterface)
+  Void ChooseProjectVariantDialog()
+  Void ChooseProjectVariantCombo(String variant)
+  Object ChooseProjectVariantComboGetList()
+  String GetCurrentProjectVariant()
+
+INTERFACE ITcSmDriveExtension
+  Void OnLinkedToNc(Int32 nChannel)
+
+INTERFACE ITcSmEcTermExtension
+  Void IsCompatibleWith(Int32 nVendorId, Int32 nProductCode, Int32 nRevisionNo, Int32 nSerialNo, Boolean bStrict)
+  Void ChangeTypeTo(Int32 nVendorId, Int32 nProductCode, Int32 nRevisionNo, Int32 nSerialNo)
+
+INTERFACE ITcSmEnumTreeItem
+  Void Next(UInt32 celt, out ITcSmTreeItem rgVar, out UInt32 pCeltFetched)
+  Void Skip(UInt32 celt)
+  Void Reset()
+  Void Clone(out ITcSmEnumTreeItem ppEnum)
+
+INTERFACE ITcSmEventHandler
+  Void RTimeStatusHasChanged(RTIMESTATUS status)
+
+INTERFACE ITcSmEventHandler2 : ITcSmEventHandler
+  Void RTimeStatusHasChanged(RTIMESTATUS status)
+  Void ReloadDevicesExecuted(Int32 result)
+
+INTERFACE ITcSmExtension
+  Void Init(ITcSmTreeItem ipItem)
+  String Extension(EXTENSION_TYPE extensionType, Int32 extensionIdx)
+
+INTERFACE ITcSmExtension2 : ITcSmExtension
+  Void Init(ITcSmTreeItem ipItem)
+  String Extension(EXTENSION_TYPE extensionType, Int32 extensionIdx)
+  Int32 ExtensionCount(EXTENSION_TYPE extensionType)
+
+INTERFACE ITcSmExtension3 : ITcSmExtension2, ITcSmExtension
+  Void Init(ITcSmTreeItem ipItem)
+  String Extension(EXTENSION_TYPE extensionType, Int32 extensionIdx)
+  Int32 ExtensionCount(EXTENSION_TYPE extensionType)
+  Void Init2(ITcSmTreeItem ipItem, Int32 nType, Object vInfo = opt)
+
+INTERFACE ITcSmExtension4 : ITcSmExtension2, ITcSmExtension
+  Void Init(ITcSmTreeItem ipItem)
+  String Extension(EXTENSION_TYPE extensionType, Int32 extensionIdx)
+  Int32 ExtensionCount(EXTENSION_TYPE extensionType)
+  Void Init3(ITcSmTreeItem ipItem, ITcSysManager2 ipSysMan)
+
+INTERFACE ITcSmExtensionEventHandler
+  Void OnClose()
+
+INTERFACE ITcSmExtensionOwner
+  String ProduceExtensionXml(ITcSmExtension ipExtension)
+  Void ConsumeExtensionXml(ITcSmExtension ipExtension, String bstrXML)
+  TCMESSAGEBOX_RESULT TcMessageBox(String bstrMessage, TCMESSAGEBOX_TYPE nType)
+
+INTERFACE ITcSmExtensionOwner2 : ITcSmExtensionOwner
+  String ProduceExtensionXml(ITcSmExtension ipExtension)
+  Void ConsumeExtensionXml(ITcSmExtension ipExtension, String bstrXML)
+  TCMESSAGEBOX_RESULT TcMessageBox(String bstrMessage, TCMESSAGEBOX_TYPE nType)
+  Void EnableReloadView(Boolean bEnable)
+
+INTERFACE ITcSmExtensionOwner3 : ITcSmExtensionOwner2, ITcSmExtensionOwner
+  String ProduceExtensionXml(ITcSmExtension ipExtension)
+  Void ConsumeExtensionXml(ITcSmExtension ipExtension, String bstrXML)
+  TCMESSAGEBOX_RESULT TcMessageBox(String bstrMessage, TCMESSAGEBOX_TYPE nType)
+  Void EnableReloadView(Boolean bEnable)
+  Object CreateWebBrowser(ref _RemotableHandle windowsHandle)
+  Object CreateWinFormsWebBrowser()
+
+INTERFACE ITcSmExtensionPP
+  prop String Caption {get;}
+  Void Init(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension)
+  Void SetActivate(Boolean newActivateState)
+
+INTERFACE ITcSmExtensionPP2 : ITcSmExtensionPP
+  prop String Caption {get;}
+  Void Init(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension)
+  Void SetActivate(Boolean newActivateState)
+  Void Init2(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension, Boolean bConfigIdActual, Boolean bSuperUser, Int32 languageId)
+
+INTERFACE ITcSmExtensionPP3 : ITcSmExtensionPP2, ITcSmExtensionPP
+  prop String Caption {get;}
+  Void Init(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension)
+  Void SetActivate(Boolean newActivateState)
+  Void Init2(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension, Boolean bConfigIdActual, Boolean bSuperUser, Int32 languageId)
+  Void UpdateData(Boolean bSaveAndValidate)
+
+INTERFACE ITcSmExtensionPP4 : ITcSmExtensionPP3, ITcSmExtensionPP2, ITcSmExtensionPP
+  prop String Caption {get;}
+  Void Init(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension)
+  Void SetActivate(Boolean newActivateState)
+  Void Init2(ITcSysManager2 ipSysMan, ITcSmTreeItem ipItem, ITcSmExtension ipExtension, Boolean bConfigIdActual, Boolean bSuperUser, Int32 languageId)
+  Void UpdateData(Boolean bSaveAndValidate)
+  Void OnClose()
+  Void GetSize(ref Int32 pcx, ref Int32 pcy)
+
+INTERFACE ITcSmGasExtension
+  Void Register(ITcGasJsonCommand ipReq)
+  Void Unregister()
+
+INTERFACE ITcSmPlc2Object
+  prop String Plc2Name {get;}
+  prop String Plc2Kind {get;}
+  prop Int32 Plc2Id {get;}
+  prop String Plc2Type {get;}
+  prop String Plc2Path {get;}
+  prop Boolean Plc2Compile {get;set;}
+
+INTERFACE ITcSmTreeItem : IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+
+INTERFACE ITcSmTreeItem10 : ITcSmTreeItem9, ITcSmTreeItem8, ITcSmTreeItem7, ITcSmTreeItem6, ITcSmTreeItem5, ITcSmTreeItem4, ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  prop Boolean PvSimulation {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem2 : ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+
+INTERFACE ITcSmTreeItem3 : ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem4 : ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem5 : ITcSmTreeItem4, ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  prop String LanguageIndependentName {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem6 : ITcSmTreeItem5, ITcSmTreeItem4, ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem7 : ITcSmTreeItem6, ITcSmTreeItem5, ITcSmTreeItem4, ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem8 : ITcSmTreeItem7, ITcSmTreeItem6, ITcSmTreeItem5, ITcSmTreeItem4, ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItem9 : ITcSmTreeItem8, ITcSmTreeItem7, ITcSmTreeItem6, ITcSmTreeItem5, ITcSmTreeItem4, ITcSmTreeItem3, ITcSmTreeItem2, ITcSmTreeItem, IEnumerable
+  prop String Name {get;set;}
+  prop Int32 ItemType {get;}
+  prop Int32 ItemSubType {get;set;}
+  prop String ItemSubTypeName {get;}
+  prop String Comment {get;set;}
+  prop ITcSmTreeItem Parent {get;}
+  prop DISABLED_STATE Disabled {get;set;}
+  prop String PathName {get;}
+  prop ITcSmTreeItem Child[Int32 n] {get;}
+  prop Int32 ChildCount {get;}
+  prop ITcSmTreeItem Var[Int32 nInOut, Int32 n] {get;}
+  prop Int32 VarCount[Int32 nInOut] {get;}
+  prop Int32 ResourcesCount {get;}
+  prop UInt32 TreeItemId {get;}
+  prop UInt32 ToolWindowId {get;}
+  prop Object Project {get;}
+  prop String LanguageIndependentName {get;}
+  prop Boolean SaveInOwnFile {get;set;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop ITcTreeItemCollection ChildItems {get;}
+  prop ITcSysManager12 SystemManager {get;}
+  prop Object VSProjectItem {get;}
+  prop Boolean PvDisable {get;set;}
+  prop Boolean PvParameter {get;set;}
+  prop Boolean PvLink {get;set;}
+  prop Boolean PvDefine {get;set;}
+  prop TCPV_PARA_VALUES PvSParameter {get;set;}
+  IEnumerator GetEnumerator()
+  ITcSmTreeItem CreateChild(String bstrName, Int32 nSubType = opt, String bstrBefore = opt, Object vInfo = opt)
+  Void DeleteChild(String bstrName)
+  ITcSmTreeItem ImportChild(String bstrFile = opt, String bstrBefore = opt, Boolean bReconnect = opt, String bstrName = opt)
+  Void ExportChild(String bstrName, String bstrFile = opt)
+  String ProduceXml(Boolean bRecursive = opt)
+  Void ConsumeXml(String bstrXML)
+  String GetLastXmlError()
+  ITcSmTreeItem LookupChild(String bstrName)
+  ITcSmTreeItem2 ChangeChildSubType(String bstrChild, Int32 nNewSubType, Boolean bAggressive = opt, Object vInfo = opt)
+  Void ClaimResources(Int32 resourceIdx = opt)
+  Int32 CompareItem(ITcSmTreeItem pItem, Boolean bRecursive = opt)
+
+INTERFACE ITcSmTreeItemExtension
+  Void Recalc(out Boolean pbUpdateView)
+  Void Freshup()
+  Boolean CheckConfig()
+  Void ScanDevices(Boolean bQuiet, Boolean bVerify, out Boolean bReloadRequired)
+  Boolean IsScanDevicesAvailable()
+
+INTERFACE ITcSysManager
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+
+INTERFACE ITcSysManager10 : ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+
+INTERFACE ITcSysManager11 : ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+
+INTERFACE ITcSysManager12 : ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+
+INTERFACE ITcSysManager13 : ITcSysManager12, ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  TcTreeItemCollection CreateItemCollection(Boolean bAllowDuplicates = opt)
+
+INTERFACE ITcSysManager14 : ITcSysManager13, ITcSysManager12, ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  prop String CurrentProjectVariant {get;set;}
+  prop String ProjectVariantConfig {get;set;}
+  prop String ProjectVariantItems {get;set;}
+  prop String PinnedTcVersion {get;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  TcTreeItemCollection CreateItemCollection(Boolean bAllowDuplicates = opt)
+
+INTERFACE ITcSysManager15 : ITcSysManager14, ITcSysManager13, ITcSysManager12, ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  prop String CurrentProjectVariant {get;set;}
+  prop String ProjectVariantConfig {get;set;}
+  prop String ProjectVariantItems {get;set;}
+  prop String PinnedTcVersion {get;}
+  prop Boolean PlcStandaloneMode {get;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  TcTreeItemCollection CreateItemCollection(Boolean bAllowDuplicates = opt)
+
+INTERFACE ITcSysManager16 : ITcSysManager15, ITcSysManager14, ITcSysManager13, ITcSysManager12, ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  prop String CurrentProjectVariant {get;set;}
+  prop String ProjectVariantConfig {get;set;}
+  prop String ProjectVariantItems {get;set;}
+  prop String PinnedTcVersion {get;}
+  prop Boolean PlcStandaloneMode {get;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  TcTreeItemCollection CreateItemCollection(Boolean bAllowDuplicates = opt)
+  String JsonCommand(String jReq)
+  Void BuildTargetPlatform(String platformId = opt)
+
+INTERFACE ITcSysManager17 : ITcSysManager16, ITcSysManager15, ITcSysManager14, ITcSysManager13, ITcSysManager12, ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  prop String CurrentProjectVariant {get;set;}
+  prop String ProjectVariantConfig {get;set;}
+  prop String ProjectVariantItems {get;set;}
+  prop String PinnedTcVersion {get;}
+  prop Boolean PlcStandaloneMode {get;}
+  prop String ProjectName {get;set;}
+  prop String ProjectFilePath {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  TcTreeItemCollection CreateItemCollection(Boolean bAllowDuplicates = opt)
+  String JsonCommand(String jReq)
+  Void BuildTargetPlatform(String platformId = opt)
+
+INTERFACE ITcSysManager18 : ITcSysManager17, ITcSysManager16, ITcSysManager15, ITcSysManager14, ITcSysManager13, ITcSysManager12, ITcSysManager11, ITcSysManager10, ITcSysManager9, ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  prop Object DTE {get;}
+  prop Object VsProject {get;}
+  prop Boolean AutoSaveProjectToTarget {get;set;}
+  prop Boolean TcVersionFixed {get;set;}
+  prop String CurrentProjectVariant {get;set;}
+  prop String ProjectVariantConfig {get;set;}
+  prop String ProjectVariantItems {get;set;}
+  prop String PinnedTcVersion {get;}
+  prop Boolean PlcStandaloneMode {get;}
+  prop String ProjectName {get;set;}
+  prop String ProjectFilePath {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+  ITcSmTreeItem SelectSafetyModuleByIdent(UInt32 protocolType, UInt32 vendorId, UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  TcTreeItemCollection CreateItemCollection(Boolean bAllowDuplicates = opt)
+  String JsonCommand(String jReq)
+  Void BuildTargetPlatform(String platformId = opt)
+  Void SelectTreeItem(String bstrItem)
+
+INTERFACE ITcSysManager2 : ITcSysManager
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+
+INTERFACE ITcSysManager3 : ITcSysManager2, ITcSysManager
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+
+INTERFACE ITcSysManager4 : ITcSysManager3, ITcSysManager2, ITcSysManager
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+
+INTERFACE ITcSysManager5 : ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+
+INTERFACE ITcSysManager6 : ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+
+INTERFACE ITcSysManager7 : ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+
+INTERFACE ITcSysManager8 : ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+
+INTERFACE ITcSysManager9 : ITcSysManager8, ITcSysManager7, ITcSysManager6, ITcSysManager5, ITcSysManager4, ITcSysManager3, ITcSysManager2, ITcSysManager
+  prop TcConfigManager ConfigurationManager {get;}
+  prop ITcEnvironment Environment {get;}
+  prop Boolean SignFile {get;set;}
+  prop Boolean EncryptFile {get;set;}
+  prop String ObjectProtectionLevel {get;set;}
+  Void OpenConfiguration(String bstrFile = opt)
+  Void SaveConfiguration(String bstrFile = opt)
+  Void NewConfiguration()
+  Void ActivateConfiguration()
+  ITcSmTreeItem LookupTreeItem(String bstrItem)
+  Void StartRestartTwinCAT()
+  Boolean IsTwinCATStarted()
+  Void LinkVariables(String bstrV1, String bstrV2, Int32 offs1 = opt, Int32 offs2 = opt, Int32 size = opt)
+  Void UnlinkVariables(String bstrV1, String bstrV2 = opt)
+  Void SetTargetNetId(String bstrNetId = opt)
+  String GetTargetNetId()
+  String GetLastErrorMessages()
+  ITcSmTreeItem LookupTreeItemById(Int32 ItemType, Int32 itemId)
+  String ProduceMappingInfo()
+  Void ConsumeMappingInfo(String bstrXML)
+  Void ClearMappingInfo()
+  ITcTypeSystem GetTypeSystem()
+  ITcModuleManager GetModuleManager()
+  ITcSmEnumTreeItem QueryTreeItems(String bstrCategory)
+  ITcSmTreeItem SelectECatModuleByIdent(UInt32 moduleIdent, String bstrCaption, UInt32 currentOid = opt)
+  Boolean TryLookupTreeItem(String bstrItem, out ITcSmTreeItem pipItem)
+  Boolean TestItemPath(String bstrItem)
+  Void SaveAsArchive(String bstrArchivePath)
+
+INTERFACE ITcSysManagerCommand
+  String ExecuteCommand(String bstrXML)
+
+INTERFACE ITcSysManagerCompare
+  Void SetCompareMode(COMPARE_MODE compareMode)
+
+INTERFACE ITcSysManagerFileFolder
+  String GetSpecialFolderOrFilePath(UInt32 idFileFolder, Object vInfo = opt)
+
+INTERFACE ITcSysManagerRM : ITcRemoteManager
+  prop String Version {get;set;}
+  prop String[] Versions {get;}
+  Void SetComponentVersion(String bstrComponent, String bstrVersion)
+  String GetComponentVersion(String bstrComponent)
+  String[] GetComponentVersions(String bstrComponent)
+  Object CreateSysManager(ref Guid riid, String bstrVersion = opt)
+  ITcSysManager15 CreateSysManager15(String bstrVersion = opt)
+
+INTERFACE ITcTaskModule
+  prop UInt32 CycleTime {get;set;}
+  prop UInt32 Priority {get;set;}
+
+INTERFACE ITcTaskModule2 : ITcTaskModule
+  prop UInt32 CycleTime {get;set;}
+  prop UInt32 Priority {get;set;}
+  Void Advise(ITcTaskModuleEventHandler pEventHandlerInterface, out UInt32 cookie)
+  Void Unadvise(UInt32 cookie)
+
+INTERFACE ITcTaskModuleEventHandler
+  Void OnItemDeleted()
+  Void OnPriorityChanged(UInt16 prior)
+  Void OnCycleTimeChanged(Int32 CycleTime)
+  Void OnNameChanged(String newName)
+
+INTERFACE ITcTaskModuleManager
+  ITcEnumTaskModules QueryTaskModules()
+  ITcTaskModule CreateTaskModule(String bstrName, UInt32 CycleTime, UInt32 Priority)
+  UInt32 GetFreeTaskPriority(UInt32 Priority)
+
+INTERFACE ITcTreeItemCollection : IEnumerable
+  prop Int32 Count {get;}
+  prop ITcSmTreeItem7 Item[Object vIndex] {get;}
+  IEnumerator GetEnumerator()
+
+INTERFACE ITcTreeItemCollection2 : ITcTreeItemCollection, IEnumerable
+  prop Int32 Count {get;}
+  prop ITcSmTreeItem7 Item[Object vIndex] {get;}
+  IEnumerator GetEnumerator()
+  Void Add(ITcSmTreeItem7 pItem)
+  Void AddRange(ITcTreeItemCollection pColl)
+  Boolean Remove(ITcSmTreeItem7 pItem)
+  Void Clear()
+  Boolean Contains(ITcSmTreeItem7 pItem)
+  Boolean ContainsPath(String PathName)
+
+INTERFACE ITcTypeAdsOnline
+  String GetValueToString(UInt32 onlineStamp = opt, String bstrSubItem = opt)
+  Void SymbolRemoved()
+
+INTERFACE ITcTypeAdsOnline2 : ITcTypeAdsOnline
+  String GetValueToString(UInt32 onlineStamp = opt, String bstrSubItem = opt)
+  Void SymbolRemoved()
+  UInt32 CountTypeFormats()
+  String TypeFormatName(UInt32 idx)
+  String TypeFormatPreview(UInt32 idx)
+  String GetValueToStringEx(UInt32 onlineStamp = opt, String bstrSubItem = opt, UInt32 formatIdx = opt)
+
+INTERFACE ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+
+INTERFACE ITcTypeInstance10 : ITcTypeInstance9, ITcTypeInstance8, ITcTypeInstance7, ITcTypeInstance6, ITcTypeInstance5, ITcTypeInstance4, ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  prop Guid HiddenThrough {get;}
+  prop UInt32 ByteSize {get;}
+  prop UInt32 TypeFormats {get;}
+  prop UInt32 NamedConstants {get;}
+  prop UInt32 MethodCount {get;}
+  prop UInt32 ImplementedInterfaceCount {get;}
+  prop String CTypeName {get;}
+  prop String CDeclarationsOfMethods {get;}
+  prop String CDeclarationsOfDataFields {get;}
+  prop ITcTypeInstance9 ExtendedType {get;}
+  prop String FullName {get;}
+  prop String Namespace {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+  String TypeFormatName(UInt32 idx)
+  String TypeFormatPreview(UInt32 idx)
+  UInt32 TypicalFormatCharCount(UInt32 formatIdx = opt)
+  String GetValueToString(Object data, UInt32 formatIdx = opt)
+  Object SetValueToString(String text, UInt32 formatIdx = opt)
+  String NamedConstantName(UInt32 idx)
+  Object NamedConstantValue(UInt32 idx)
+  String ExportTranslationsXml(Boolean bRecursive = opt)
+  String GetCSignatureOfMethod(UInt32 MethodIdx, Boolean IgnoreParamNames, String Owner)
+  String GetCDeclarationOfMethod(UInt32 MethodIdx)
+  String GetCDefinitionOfMethod(UInt32 MethodIdx, String Owner, String CustomImpl)
+  ITcTypeInstance9 GetInterfaceType(UInt32 InterfaceIdx)
+  String GetIecDeclaration(Boolean bUseNamespaceForMembers)
+
+INTERFACE ITcTypeInstance2 : ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+
+INTERFACE ITcTypeInstance3 : ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+
+INTERFACE ITcTypeInstance4 : ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+
+INTERFACE ITcTypeInstance5 : ITcTypeInstance4, ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  prop Guid HiddenThrough {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+
+INTERFACE ITcTypeInstance6 : ITcTypeInstance5, ITcTypeInstance4, ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  prop Guid HiddenThrough {get;}
+  prop UInt32 ByteSize {get;}
+  prop UInt32 TypeFormats {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+  String TypeFormatName(UInt32 idx)
+  String TypeFormatPreview(UInt32 idx)
+  UInt32 TypicalFormatCharCount(UInt32 formatIdx = opt)
+  String GetValueToString(Object data, UInt32 formatIdx = opt)
+  Object SetValueToString(String text, UInt32 formatIdx = opt)
+
+INTERFACE ITcTypeInstance7 : ITcTypeInstance6, ITcTypeInstance5, ITcTypeInstance4, ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  prop Guid HiddenThrough {get;}
+  prop UInt32 ByteSize {get;}
+  prop UInt32 TypeFormats {get;}
+  prop UInt32 NamedConstants {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+  String TypeFormatName(UInt32 idx)
+  String TypeFormatPreview(UInt32 idx)
+  UInt32 TypicalFormatCharCount(UInt32 formatIdx = opt)
+  String GetValueToString(Object data, UInt32 formatIdx = opt)
+  Object SetValueToString(String text, UInt32 formatIdx = opt)
+  String NamedConstantName(UInt32 idx)
+  Object NamedConstantValue(UInt32 idx)
+
+INTERFACE ITcTypeInstance8 : ITcTypeInstance7, ITcTypeInstance6, ITcTypeInstance5, ITcTypeInstance4, ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  prop Guid HiddenThrough {get;}
+  prop UInt32 ByteSize {get;}
+  prop UInt32 TypeFormats {get;}
+  prop UInt32 NamedConstants {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+  String TypeFormatName(UInt32 idx)
+  String TypeFormatPreview(UInt32 idx)
+  UInt32 TypicalFormatCharCount(UInt32 formatIdx = opt)
+  String GetValueToString(Object data, UInt32 formatIdx = opt)
+  Object SetValueToString(String text, UInt32 formatIdx = opt)
+  String NamedConstantName(UInt32 idx)
+  Object NamedConstantValue(UInt32 idx)
+  String ExportTranslationsXml(Boolean bRecursive = opt)
+
+INTERFACE ITcTypeInstance9 : ITcTypeInstance8, ITcTypeInstance7, ITcTypeInstance6, ITcTypeInstance5, ITcTypeInstance4, ITcTypeInstance3, ITcTypeInstance2, ITcTypeInstance
+  prop String Name {get;}
+  prop Guid Guid {get;}
+  prop ITcTypeInstance BaseType {get;}
+  prop String IecDeclaration {get;}
+  prop String CDeclaration {get;}
+  prop Boolean IsAligned {get;}
+  prop Int32 ChildItemCount {get;}
+  prop Boolean AutoDeleteType {get;set;}
+  prop Boolean HiddenType {get;set;}
+  prop Guid HiddenThrough {get;}
+  prop UInt32 ByteSize {get;}
+  prop UInt32 TypeFormats {get;}
+  prop UInt32 NamedConstants {get;}
+  prop UInt32 MethodCount {get;}
+  prop UInt32 ImplementedInterfaceCount {get;}
+  prop String CTypeName {get;}
+  prop String CDeclarationsOfMethods {get;}
+  prop String CDeclarationsOfDataFields {get;}
+  prop ITcTypeInstance9 ExtendedType {get;}
+  String ExportXml(Boolean bRecursive = opt)
+  Void ImportXml(String bstrXML)
+  ITcEnumTypeGuid QueryDependingTypes(Boolean bRecursive = opt, Boolean bIgnoreGlobalTypes = opt)
+  String GetCDeclaration(Boolean createInclusionGuard)
+  String GetChildItemName(Int32 idx)
+  ITcTypeInstance3 GetChildItemType(Int32 idx)
+  Int32 GetChildItemBitOffs(Int32 idx)
+  String TypeFormatName(UInt32 idx)
+  String TypeFormatPreview(UInt32 idx)
+  UInt32 TypicalFormatCharCount(UInt32 formatIdx = opt)
+  String GetValueToString(Object data, UInt32 formatIdx = opt)
+  Object SetValueToString(String text, UInt32 formatIdx = opt)
+  String NamedConstantName(UInt32 idx)
+  Object NamedConstantValue(UInt32 idx)
+  String ExportTranslationsXml(Boolean bRecursive = opt)
+  String GetCSignatureOfMethod(UInt32 MethodIdx, Boolean IgnoreParamNames, String Owner)
+  String GetCDeclarationOfMethod(UInt32 MethodIdx)
+  String GetCDefinitionOfMethod(UInt32 MethodIdx, String Owner, String CustomImpl)
+  ITcTypeInstance9 GetInterfaceType(UInt32 InterfaceIdx)
+
+INTERFACE ITcTypeSystem : IEnumerable
+  prop Int32 TypeCount {get;}
+  prop ITcTypeInstance Type[Int32 n] {get;}
+  IEnumerator GetEnumerator()
+  ITcTypeInstance LookupType(Guid Guid)
+  ITcTypeInstance CreateType(String xml)
+  Void DeleteType(Guid Guid)
+
+INTERFACE ITcTypeSystem2 : ITcTypeSystem, IEnumerable
+  prop Int32 TypeCount {get;}
+  prop ITcTypeInstance Type[Int32 n] {get;}
+  IEnumerator GetEnumerator()
+  ITcTypeInstance LookupType(Guid Guid)
+  ITcTypeInstance CreateType(String xml)
+  Void DeleteType(Guid Guid)
+  ITcTypeInstance2 CreateTemporaryDataType(String xml)
+  Boolean CreateAlignedDataType(String xml, Int32 alignmentSizeInBytes, out ITcTypeInstance2 pipType, out String pErrorMessage)
+  Int32 ImportDataTypesFromTmcFile(String filePath, out String pErrorMessage)
+
+INTERFACE ITcTypeSystem3 : ITcTypeSystem2, ITcTypeSystem, IEnumerable
+  prop Int32 TypeCount {get;}
+  prop ITcTypeInstance Type[Int32 n] {get;}
+  IEnumerator GetEnumerator()
+  ITcTypeInstance LookupType(Guid Guid)
+  ITcTypeInstance CreateType(String xml)
+  Void DeleteType(Guid Guid)
+  ITcTypeInstance2 CreateTemporaryDataType(String xml)
+  Boolean CreateAlignedDataType(String xml, Int32 alignmentSizeInBytes, out ITcTypeInstance2 pipType, out String pErrorMessage)
+  Int32 ImportDataTypesFromTmcFile(String filePath, out String pErrorMessage)
+  ITcEnumTypeGuid QueryHiddenThroughTypes(Guid Guid)
+
+INTERFACE ITcUserManagement
+  prop String ActiveUser {get;}
+  Void LoginUser(String bstrUserName, String bstrPassword)
+
+INTERFACE ITcUserManagement2 : ITcUserManagement
+  prop String ActiveUser {get;}
+  Void LoginUser(String bstrUserName, String bstrPassword)
+  Void SelectUserDB(String bstrUserDBSpecifier)
+
+INTERFACE ITcVariable
+  prop Int32 LinkCount {get;}
+  String GetPathOfLinkedVariable(Int32 index)
+  ITcSmTreeItem GetLinkedVariable(Int32 index)
+  ITcSmTreeItem GetOwnerByType(Int32 Type)
+
+INTERFACE ITcVariable2 : ITcVariable
+  prop Int32 LinkCount {get;}
+  String GetPathOfLinkedVariable(Int32 index)
+  ITcSmTreeItem GetLinkedVariable(Int32 index)
+  ITcSmTreeItem GetOwnerByType(Int32 Type)
+  Void OpenLinkToDialog(String bstrCaption = opt)
+  Void AddLinkToVariable(String bstrPath, Int32 offs = opt, Int32 offsVar = opt, Int32 size = opt)
+  ITcSmTreeItem GetLinkedVariableOffsSize(Int32 index, out Int32 pOffs, out Int32 pOffsVar, out Int32 pSize)
+
+INTERFACE ITcXmlDocument
+  prop String DocumentXml {get;set;}
+
+ENUM PLC_APPSTATE: PLC_APPSTATE_NONE=0, PLC_APPSTATE_RUN=1, PLC_APPSTATE_STOP=2, PLC_APPSTATE_HALT_ON_BP=3, PLC_APPSTATE_DEBUG_STEP=4, PLC_APPSTATE_SINGLE_CYCLE=5, PLC_APPSTATE_UNKNOWN=-1
+
+ENUM PLC_DOWNLOAD_TYPES: PDT_DOWNLOAD=0, PDT_ONLINECHANGE=1, PDT_BOOTPROJECT=2
+
+ENUM PLC_LOGIN_FLAGS: PLC_LOGIN_FLAGS_NONE=0, PLC_LOGIN_FLAGS_REGULAR=1, PLC_LOGIN_FLAGS_FORCEONLINECHANGE=2, PLC_LOGIN_FLAGS_FORCEDOWNLOAD=4, PLC_LOGIN_FLAGS_FORCECOMPILECODE=16, PLC_LOGIN_FLAGS_FORCEGENERATECODE=32, PLC_LOGIN_FLAGS_SILENT=256
+
+ENUM PLC_OPSTATE: PLC_OPSTATE_NONE=0, PLC_OPSTATE_PROGRAMLOADED=1, PLC_OPSTATE_DOWNLOAD=2, PLC_OPSTATE_ONLINECHANGE=4, PLC_OPSTATE_STOREBOOTPROJECT=8, PLC_OPSTATE_FORCEACTIVE=16, PLC_OPSTATE_EXCEPTION=32, PLC_OPSTATE_RUNAFTERDOWNLOAD=64, PLC_OPSTATE_STOREBOOTPROJECTONLY=128, PLC_OPSTATE_EXIT=256, PLC_OPSTATE_DELETE=512, PLC_OPSTATE_RESET=1024, PLC_OPSTATE_RETAINMISMATCH=2048, PLC_OPSTATE_BOOTPROJECTVALID=4096, PLC_OPSTATE_LOADBOOTPROJECT=8192, PLC_OPSTATE_FLOWACTIVE=16384, PLC_OPSTATE_RUNINFLASH=32768, PLC_OPSTATE_COREDUMPLOADED=131072, PLC_OPSTATE_ECECUTIONPOINTSACTIVE=262144, PLC_OPSTATE_DUMPCREATING=524288
+
+ENUM PLC_RESET_TYPE: PLC_RESET_TYPE_None=0, PLC_RESET_TYPE_Cold=1, PLC_RESET_TYPE_Origin=2
+
+ENUM PLC_VARDECL_FLAGS: VARDECL_FLAGS_CONSTANT=1, VARDECL_FLAGS_RETAIN=2, VARDECL_FLAGS_PERSISTENT=4
+
+ENUM PLC_VARDECL_SCOPE: None=0, Var=1, VAR_INPUT=2, VAR_OUTPUT=3, VAR_IN_OUT=4, VAR_TEMP=5, VAR_STAT=6, VAR_GLOBAL=7
+
+ENUM PLCACCESS: PLCACCESS_PUBLIC=0, PLCACCESS_PRIVATE=1, PLCACCESS_PROTECTED=2, PLCACCESS_INTERNAL=3
+
+ENUM PLCIMPORTOPTIONS: PLCIMPORTOPTIONS_NONE=0, PLCIMPORTOPTIONS_REPLACE=1, PLCIMPORTOPTIONS_RENAME=2, PLCIMPORTOPTIONS_SKIP=3
+
+ENUM RTIMESTATUS: RTS_Unsupported=0, RTS_Stopped=1, RTS_Running=2, RTS_Timeout=3, RTS_Unknown=4, RTS_ConfigMode=5, RTS_FreeRunMode=6, RTS_Exception=7
+
+ENUM TC_NESTED_PROJECT_ITEM_ACTION: TCNPIA_NONE=0, TCNPIA_CLEAR_SECURITY=1, TCNPIA_HIDE_NOACCESS=2, TCNPIA_ENABLE_USERDB=3
+
+ENUM TC_NESTED_PROJECT_ITEM_ENUMERATION_FLAGS: TCNPIE_NONE=0, TCNPIE_PROJECT_RELATIVE_PATH=1
+
+ENUM TC_NESTED_PROJECT_ITEM_TYPE: TCNPIT_ALL=0, TCNPIT_REFERENCED_LIBRARIES=1, TCNPIT_SOURCES_AND_FOLDERS=2, TCNPIT_ACTIVE_SECURITY=3, TCNPIT_NOACCESS=4
+
+ENUM TC_OBJ_PROTECTION: TC_OBJ_PROTECTION_VIEW=0, TC_OBJ_PROTECTION_DELETE=1, TC_OBJ_PROTECTION_MODIFY=2, TC_OBJ_PROTECTION_ARCHILD=3, TC_OBJ_PROTECTION_MAX=4
+
+ENUM TCARCHIVE_IMPORTMODE: ARCHIVE_IMPORTMODE_ADD=1, ARCHIVE_IMPORTMODE_RENAME=2, ARCHIVE_IMPORTMODE_ADDRENAME=3, ARCHIVE_IMPORTMODE_OVERWRITE=4, ARCHIVE_IMPORTMODE_ADDOVERWRITE=5
+
+ENUM TCARCHIVE_SELECTIONMODE: ARCHIVE_SELECTIONMODE_ALL=1, ARCHIVE_SELECTIONMODE_TWINCATOBJECTS=2
+
+INTERFACE TcArchivePersist : ITcArchivePersist
+
+CLASS TcArchivePersistClass : ITcArchivePersist, TcArchivePersist
+
+INTERFACE TcAutomationSettings : ITcAutomationSettings
+
+CLASS TcAutomationSettingsClass : ITcAutomationSettings, TcAutomationSettings
+
+INTERFACE TcConfigManager : ITcConfigManager
+
+CLASS TcConfigManagerClass : ITcConfigManager, TcConfigManager
+
+ENUM TcEncryptionType: TcEncryptionType_None=0, TcEncryptionType_Target=1, TcEncryptionType_Volume=2, TcEncryptionType_MAX=2
+
+INTERFACE TCID_SmIoConfiguration
+
+CLASS TCID_SmIoConfigurationClass : TCID_SmIoConfiguration
+
+INTERFACE TCID_SmIoDevices
+
+CLASS TCID_SmIoDevicesClass : TCID_SmIoDevices
+
+INTERFACE TCID_SmNcConfiguration
+
+CLASS TCID_SmNcConfigurationClass : TCID_SmNcConfiguration
+
+INTERFACE TCID_SmPlcConfiguration
+
+CLASS TCID_SmPlcConfigurationClass : TCID_SmPlcConfiguration
+
+INTERFACE TCID_SmRTimeConfiguration
+
+CLASS TCID_SmRTimeConfigurationClass : TCID_SmRTimeConfiguration
+
+ENUM TCMESSAGEBOX_RESULT: TCMB_IDOK=1, TCMB_IDCANCEL=2, TCMB_IDABORT=3, TCMB_IDRETRY=4, TCMB_IDIGNORE=5, TCMB_IDYES=6, TCMB_IDNO=7
+
+ENUM TCMESSAGEBOX_TYPE: TCMB_OK=0, TCMB_OKCANCEL=1, TCMB_ABORTRETRYIGNORE=2, TCMB_YESNOCANCEL=3, TCMB_YESNO=4, TCMB_RETRYCANCEL=5, TCMB_CANCELTRYCONTINUE=6, TCMB_ICONSTOP=16, TCMB_ICONQUESTION=32, TCMB_ICONWARNING=48, TCMB_ICONINFORMATION=64
+
+ENUM TCPV_PARA_VALUES: PV_NONE=0, PV_ALL=1, PV_SELECTED=2
+
+INTERFACE TcRemoteManager : ITcRemoteManager
+
+CLASS TcRemoteManagerClass : ITcRemoteManager, TcRemoteManager
+
+INTERFACE TcSmCommands : ITcSmCommands2, ITcSmCommands
+
+CLASS TcSmCommandsClass : ITcSmCommands2, ITcSmCommands, TcSmCommands
+
+ENUM TCSMEXTENSION_TYPE: TCSMEXTENSION_TYPE_NONE=0, TCSMEXTENSION_TYPE_NOCAT=1
+
+INTERFACE TcSysManager : ITcSysManager
+
+ENUM TCSYSMANAGERBOXTYPES: TSM_BOX_TYPE_UNKNOWN=0, TSM_BOX_TYPE_BK2000=1, TSM_BOX_TYPE_M1400=2, TSM_BOX_TYPE_M2400=3, TSM_BOX_TYPE_M3120_1=4, TSM_BOX_TYPE_M3120_2=5, TSM_BOX_TYPE_M3120_3=6, TSM_BOX_TYPE_M3120_4=7, TSM_BOX_TYPE_M3000=8, TSM_BOX_TYPE_C1120=9, TSM_BOX_TYPE_BK2010=10, TSM_BOX_TYPE_AX2000=11, TSM_BOX_TYPE_M2510=12, TSM_BOX_TYPE_PROG_CDL=13, TSM_BOX_TYPE_BK2020=20, TSM_BOX_TYPE_BC2000=21, TSM_BOX_TYPE_FOX20=31, TSM_BOX_TYPE_FOX50=32, TSM_BOX_TYPE_FOXRK001=33, TSM_BOX_TYPE_FOXRK002=34, TSM_BOX_TYPE_CP1001=35, TSM_BOX_TYPE_SMCEX250=36, TSM_BOX_TYPE_IPXB2=40, TSM_BOX_TYPE_ILXB2=41, TSM_BOX_TYPE_ILXC2=42, TSM_BOX_TYPE_TSMBOX_200=50, TSM_BOX_TYPE_BX2000=51, TSM_BOX_TYPE_CX1500_B200=52, TSM_BOX_TYPE_BK3000=1001, TSM_BOX_TYPE_BK3100=1002, TSM_BOX_TYPE_PBDP_GSD=1003, TSM_BOX_TYPE_BK3010=1004, TSM_BOX_TYPE_BK3110=1005, TSM_BOX_TYPE_BK3500=1006, TSM_BOX_TYPE_LC3100=1007, TSM_BOX_TYPE_PBDP_DRIVE=1008, TSM_BOX_TYPE_BK3020=1009, TSM_BOX_TYPE_BK3120=1010, TSM_BOX_TYPE_BC3100=1011, TSM_BOX_TYPE_PBDP_DRIVE2=1012, TSM_BOX_TYPE_PBDP_DRIVE3=1013, TSM_BOX_TYPE_PBDP_DRIVE4=1014, TSM_BOX_TYPE_PBDP_DRIVE5=1015, TSM_BOX_TYPE_PBDP_DRIVE6=1016, TSM_BOX_TYPE_PBDP_DRIVE7=1017, TSM_BOX_TYPE_PBDP_DRIVE8=1018, TSM_BOX_TYPE_BK3150=1019, TSM_BOX_TYPE_BC3150=1020, TSM_BOX_TYPE_BK3XXX=1021, TSM_BOX_TYPE_BC3XXX=1022, TSM_BOX_TYPE_IPXB3=1030, TSM_BOX_TYPE_ILXB3=1031, TSM_BOX_TYPE_ILXC3=1032, TSM_BOX_TYPE_TSMBOX_310=1040, TSM_BOX_TYPE_BX3100=1041, TSM_BOX_TYPE_CX1500_B310=1042, TSM_BOX_TYPE_FC310X_SLAVE=1043, TSM_BOX_TYPE_EL6731_SLAVE=1044, TSM_BOX_TYPE_AX2000_B310=1051, TSM_BOX_TYPE_TCPBDPSLAVE=1100, TSM_BOX_TYPE_TCFDLAGAG=1101, TSM_BOX_TYPE_TCMPI=1102, TSM_BOX_TYPE_TCPBMCSLAVE=1103, TSM_BOX_TYPE_TCPBMCSLAVE2=1104, TSM_BOX_TYPE_TCPBMCSLAVE3=1105, TSM_BOX_TYPE_TCPBMCSLAVE4=1106, TSM_BOX_TYPE_TCPBMCSLAVE5=1107, TSM_BOX_TYPE_TCPBMCSLAVE6=1108, TSM_BOX_TYPE_TCPBMCSLAVE7=1109, TSM_BOX_TYPE_TCPBMCSLAVE8=1110, TSM_BOX_TYPE_TCPBMONSLAVE=1111, TSM_BOX_TYPE_BK4000=2001, TSM_BOX_TYPE_IBS_GENERIC=2002, TSM_BOX_TYPE_IBS_BK=2003, TSM_BOX_TYPE_BK4010=2004, TSM_BOX_TYPE_BK4500=2005, TSM_BOX_TYPE_BK4510=2006, TSM_BOX_TYPE_IBS_SLAVEBOX=2007, TSM_BOX_TYPE_BC4000=2008, TSM_BOX_TYPE_BK4020=2009, TSM_BOX_TYPE_CP2020=2020, TSM_BOX_TYPE_IPXB4=2030, TSM_BOX_TYPE_ILXB4=2031, TSM_BOX_TYPE_ILXC4=2032, TSM_BOX_TYPE_SERCOSAXIS=3001, TSM_BOX_TYPE_AX2000_B750=3002, TSM_BOX_TYPE_BK7500=3011, TSM_BOX_TYPE_BK7510=3012, TSM_BOX_TYPE_BK7520=3013, TSM_BOX_TYPE_SERCOSMASTERBOX=3021, TSM_BOX_TYPE_SERCOSSLAVEBOX=3031, TSM_BOX_TYPE_BK8100=4001, TSM_BOX_TYPE_BK8110=4002, TSM_BOX_TYPE_BK8000=4003, TSM_BOX_TYPE_BK8010=4004, TSM_BOX_TYPE_CP9040=4005, TSM_BOX_TYPE_BC8000=4011, TSM_BOX_TYPE_BC8100=4012, TSM_BOX_TYPE_IPXB80=4030, TSM_BOX_TYPE_ILXB80=4031, TSM_BOX_TYPE_ILXC80=4032, TSM_BOX_TYPE_IPXB81=4040, TSM_BOX_TYPE_ILXB81=4041, TSM_BOX_TYPE_ILXC81=4042, TSM_BOX_TYPE_BC8150=4050, TSM_BOX_TYPE_BK5100=5001, TSM_BOX_TYPE_BK5110=5002, TSM_BOX_TYPE_CANNODE=5003, TSM_BOX_TYPE_BK5120=5004, TSM_BOX_TYPE_LC5100=5005, TSM_BOX_TYPE_CANDRIVE=5006, TSM_BOX_TYPE_AX2000_B510=5007, TSM_BOX_TYPE_BK5150=5008, TSM_BOX_TYPE_BK5151=5009, TSM_BOX_TYPE_BC5150=5011, TSM_BOX_TYPE_IPXB51=5030, TSM_BOX_TYPE_ILXB51=5031, TSM_BOX_TYPE_ILXC51=5032, TSM_BOX_TYPE_TSMBOX_510=5040, TSM_BOX_TYPE_BX5100=5041, TSM_BOX_TYPE_CX1500_B510=5042, TSM_BOX_TYPE_FC510XSLV=5043, TSM_BOX_TYPE_TCCANSLAVE=5050, TSM_BOX_TYPE_CANQUEUE=5051, TSM_BOX_TYPE_BK5200=5201, TSM_BOX_TYPE_BK5210=5202, TSM_BOX_TYPE_DEVICENET=5203, TSM_BOX_TYPE_BK5220=5204, TSM_BOX_TYPE_LC5200=5205, TSM_BOX_TYPE_BK5250=5208, TSM_BOX_TYPE_BC5250=5209, TSM_BOX_TYPE_BK52XX=5211, TSM_BOX_TYPE_BC52XX=5212, TSM_BOX_TYPE_IPXB52=5230, TSM_BOX_TYPE_ILXB52=5231, TSM_BOX_TYPE_ILXC52=5232, TSM_BOX_TYPE_TSMBOX_520=5240, TSM_BOX_TYPE_BX5200=5241, TSM_BOX_TYPE_CX1500_B520=5242, TSM_BOX_TYPE_FC520XSLV=5243, TSM_BOX_TYPE_TCDNSLAVE=5250, TSM_BOX_TYPE_BK9000=9001, TSM_BOX_TYPE_BK9100=9002, TSM_BOX_TYPE_BK9050=9005, TSM_BOX_TYPE_BC9000=9011, TSM_BOX_TYPE_BC9100=9012, TSM_BOX_TYPE_BX9000=9013, TSM_BOX_TYPE_BX9000SLV=9014, TSM_BOX_TYPE_BC9050=9015, TSM_BOX_TYPE_BC9050SLV=9016, TSM_BOX_TYPE_BC9120=9017, TSM_BOX_TYPE_BC9120SLV=9018, TSM_BOX_TYPE_BC9020=9019, TSM_BOX_TYPE_BC9020SLV=9020, TSM_BOX_TYPE_IPXB9=9030, TSM_BOX_TYPE_ILXB9=9031, TSM_BOX_TYPE_ILXC9=9032, TSM_BOX_TYPE_REMOTETASK=9041, TSM_BOX_TYPE_NV_PUBLISHER=9051, TSM_BOX_TYPE_NV_SUBSCRIBER=9052, TSM_BOX_TYPE_NV_PUBVAR=9053, TSM_BOX_TYPE_NV_SUBVAR=9054, TSM_BOX_TYPE_NV_PUBDATA=9055, TSM_BOX_TYPE_NV_SUBDATA=9056, TSM_BOX_TYPE_AX2000_B900=9061, TSM_BOX_TYPE_FLB_FRAME=9071, TSM_BOX_TYPE_BK1120=9081, TSM_BOX_TYPE_IPXB11=9085, TSM_BOX_TYPE_ILXB11=9086, TSM_BOX_TYPE_ILXC11=9087, TSM_BOX_TYPE_EK1000=9091, TSM_BOX_TYPE_EK1100=9092, TSM_BOX_TYPE_EL6731=9093, TSM_BOX_TYPE_EL6751=9094, TSM_BOX_TYPE_EL6752=9095, TSM_BOX_TYPE_EL6731SLV=9096, TSM_BOX_TYPE_EL6751SLV=9097, TSM_BOX_TYPE_EL6752SLV=9098, TSM_BOX_TYPE_EXXXXX=9099, TSM_BOX_TYPE_EL6601=9100, TSM_BOX_TYPE_EL6001=9101, TSM_BOX_TYPE_EL6021=9103, TSM_BOX_TYPE_EL6720=9104, TSM_BOX_TYPE_FSOESLAVE=9105, TSM_BOX_TYPE_PNIODEVICE=9121, TSM_BOX_TYPE_PNIOTCDEVICE=9122, TSM_BOX_TYPE_PNIODEVICEINTF=9123, TSM_BOX_TYPE_PNIO_DRIVE=9124, TSM_BOX_TYPE_PNIOBK9103=9125, TSM_BOX_TYPE_PNIOILB903=9126, TSM_BOX_TYPE_EIPSLAVEINTF=9133, TSM_BOX_TYPE_PTPSLAVEINTF=9143, TSM_BOX_TYPE_RAWUDPINTF=9151, TSM_BOX_TYPE_BK9500=9500, TSM_BOX_TYPE_BK9510=9510, TSM_BOX_TYPE_BK9520=9520, TSM_BOX_TYPE_CPX8XX=9591, TSM_BOX_TYPE_CX1102=9700, TSM_BOX_TYPE_CX1103=9701, TSM_BOX_TYPE_CX1190=9702
+
+CLASS TcSysManagerClass : ITcSysManager, TcSysManager, ITcSysManager2, ITcSysManager3, ITcSysManager4, ITcSysManager5, ITcSysManager6, ITcSysManager7, ITcSysManager8, ITcSysManager9, ITcSysManager10, ITcSysManager11, ITcSysManager12, ITcSysManager13, ITcSysManager14, ITcSysManager15, ITcSysManager16, ITcSysManager17, ITcSysManager18
+
+ENUM TCSYSMANAGERDEVICETYPES: TSM_DEV_TYPE_UNKNOWN=0, TSM_DEV_TYPE_C1220=1, TSM_DEV_TYPE_C1200=2, TSM_DEV_TYPE_SPC3=3, TSM_DEV_TYPE_CIF30DPM=4, TSM_DEV_TYPE_CIF40IBSM=5, TSM_DEV_TYPE_BKHFPC=6, TSM_DEV_TYPE_CP5412A2=7, TSM_DEV_TYPE_SERCANSISA=8, TSM_DEV_TYPE_LPTPORT=9, TSM_DEV_TYPE_DPRAM=10, TSM_DEV_TYPE_COMPORT=11, TSM_DEV_TYPE_CIF30CAN=12, TSM_DEV_TYPE_CIF30PB=13, TSM_DEV_TYPE_BKHFCP2030=14, TSM_DEV_TYPE_IBSSCIT=15, TSM_DEV_TYPE_CIF30IBM=16, TSM_DEV_TYPE_CIF30DNM=17, TSM_DEV_TYPE_FCXXXX=18, TSM_DEV_TYPE_CIF50PB=19, TSM_DEV_TYPE_CIF50IBM=20, TSM_DEV_TYPE_CIF50DNM=21, TSM_DEV_TYPE_CIF50CAN=22, TSM_DEV_TYPE_CIF60PB=23, TSM_DEV_TYPE_CIF60DNM=24, TSM_DEV_TYPE_CIF60CAN=25, TSM_DEV_TYPE_CIF104DP=26, TSM_DEV_TYPE_C104PB=27, TSM_DEV_TYPE_C104IBM=28, TSM_DEV_TYPE_C104CAN=29, TSM_DEV_TYPE_C104DNM=30, TSM_DEV_TYPE_BKHFCP9030=31, TSM_DEV_TYPE_SMB=32, TSM_DEV_TYPE_PBMON=33, TSM_DEV_TYPE_CP5613=34, TSM_DEV_TYPE_CIF60IBM=35, TSM_DEV_TYPE_FC200X=36, TSM_DEV_TYPE_FC3100_OLD=37, TSM_DEV_TYPE_FC3100=38, TSM_DEV_TYPE_FC5100=39, TSM_DEV_TYPE_FC5200=41, TSM_DEV_TYPE_BKHFNCBP=43, TSM_DEV_TYPE_SERCANSPCI=44, TSM_DEV_TYPE_ETHERNET=45, TSM_DEV_TYPE_SERCONPCI=46, TSM_DEV_TYPE_IBSSCRIRTLK=47, TSM_DEV_TYPE_FC7500=48, TSM_DEV_TYPE_CIF30IBS=49, TSM_DEV_TYPE_CIF50IBS=50, TSM_DEV_TYPE_C104IBS=51, TSM_DEV_TYPE_BKHFCP9040=52, TSM_DEV_TYPE_BKHFAH2000=53, TSM_DEV_TYPE_BKHFCP9035=54, TSM_DEV_TYPE_AH2000MC=55, TSM_DEV_TYPE_FC3100MON=56, TSM_DEV_TYPE_USB=57, TSM_DEV_TYPE_FC5100MON=58, TSM_DEV_TYPE_FC5200MON=59, TSM_DEV_TYPE_FC3100SLV=60, TSM_DEV_TYPE_FC5100SLV=61, TSM_DEV_TYPE_FC5200SLV=62, TSM_DEV_TYPE_IBSSCITPCI=63, TSM_DEV_TYPE_IBSSCRIRTLKPCI=64, TSM_DEV_TYPE_CX1100_BK=65, TSM_DEV_TYPE_ENETRTMP=66, TSM_DEV_TYPE_CX1500_M200=67, TSM_DEV_TYPE_CX1500_B200=68, TSM_DEV_TYPE_CX1500_M310=69, TSM_DEV_TYPE_CX1500_B310=70, TSM_DEV_TYPE_CX1500_M510=71, TSM_DEV_TYPE_CX1500_B510=72, TSM_DEV_TYPE_CX1500_M520=73, TSM_DEV_TYPE_CX1500_B520=74, TSM_DEV_TYPE_CX1500_M750=75, TSM_DEV_TYPE_CX1500_B750=76, TSM_DEV_TYPE_BX_BK=77, TSM_DEV_TYPE_BX_M510=78, TSM_DEV_TYPE_BX_B310=79, TSM_DEV_TYPE_IBSSCRIRTPCI=80, TSM_DEV_TYPE_BX_B510=81, TSM_DEV_TYPE_BX_B520=82, TSM_DEV_TYPE_BC3150=83, TSM_DEV_TYPE_BC5150=84, TSM_DEV_TYPE_BC5250=85, TSM_DEV_TYPE_EL6731=86, TSM_DEV_TYPE_EL6751=87, TSM_DEV_TYPE_EL6752=88, TSM_DEV_TYPE_COMPB=89, TSM_DEV_TYPE_COMIBM=90, TSM_DEV_TYPE_COMDNM=91, TSM_DEV_TYPE_COMCAN=92, TSM_DEV_TYPE_COMIBS=93, TSM_DEV_TYPE_ETHERCAT=94, TSM_DEV_TYPE_PROFINETIOCONTROLLER=95, TSM_DEV_TYPE_PROFINETIODEVICE=96, TSM_DEV_TYPE_EL6731SLV=97, TSM_DEV_TYPE_EL6751SLV=98, TSM_DEV_TYPE_EL6752SLV=99, TSM_DEV_TYPE_C104PPB=100, TSM_DEV_TYPE_C104PCAN=101, TSM_DEV_TYPE_C104PDNM=102, TSM_DEV_TYPE_BC8150=103, TSM_DEV_TYPE_BX9000=104, TSM_DEV_TYPE_CX9000_BK=105, TSM_DEV_TYPE_EL6601=106, TSM_DEV_TYPE_BC9050=107, TSM_DEV_TYPE_BC9120=108, TSM_DEV_TYPE_ENETADAPTER=109, TSM_DEV_TYPE_BC9020=110, TSM_DEV_TYPE_ETHERCATPROT=111, TSM_DEV_TYPE_ETHERNETNVPROT=112, TSM_DEV_TYPE_ETHERNETPNMPROT=113, TSM_DEV_TYPE_EL6720=114, TSM_DEV_TYPE_ETHERNETPNSPROT=115, TSM_DEV_TYPE_BKHFCP6608=116
+
+INTERFACE TcSysManagerDll : ITcSysManager
+
+CLASS TcSysManagerDllClass : ITcSysManager, TcSysManagerDll, ITcSysManager2, ITcSysManager3, ITcSysManager4, ITcSysManager5, ITcSysManager6, ITcSysManager7, ITcSysManager8, ITcSysManager9, ITcSysManager10, ITcSysManager11, ITcSysManager12, ITcSysManager13, ITcSysManager14, ITcSysManager15, ITcSysManager16, ITcSysManager17, ITcSysManager18
+
+ENUM TCSYSMANAGERHRESULTS: TSM_E_ITEMNOTFOUND=-1739522047, TSM_E_INVALIDITEMTYPE=-1739522046, TSM_E_INVALIDITEMSUBTYPE=-1739522045, TSM_E_MISMATCHINGITEMS=-1739522044, TSM_E_CORRUPTEDLINK=-1739522043, TSM_E_ITEMREFERENCED=-1739522042, TSM_E_ITEMDELETED=-1739522041, TSM_E_XMLERROR=-1739522040, TSM_E_INVALIDVINFO=-1739522039
+
+INTERFACE TcTreeItemCollection : ITcTreeItemCollection2, ITcTreeItemCollection, IEnumerable
+
+CLASS TcTreeItemCollectionClass : ITcTreeItemCollection2, ITcTreeItemCollection, IEnumerable, TcTreeItemCollection
+
+INTERFACE TcUserManagement : ITcUserManagement
+
+CLASS TcUserManagementClass : ITcUserManagement, TcUserManagement, ITcUserManagement2
+
+ENUM TREEITEMTYPES: TREEITEMTYPE_UNKNOWN=0, TREEITEMTYPE_TASK=1, TREEITEMTYPE_DEVICE=2, TREEITEMTYPE_IMAGE=3, TREEITEMTYPE_MAPPING=4, TREEITEMTYPE_BOX=5, TREEITEMTYPE_TERM=6, TREEITEMTYPE_VAR=7, TREEITEMTYPE_VARGRP=8, TREEITEMTYPE_IECPRJ=9, TREEITEMTYPE_CNCPRJ=10, TREEITEMTYPE_GSDMOD=11, TREEITEMTYPE_CDL=12, TREEITEMTYPE_IECLZS=13, TREEITEMTYPE_LZSGRP=14, TREEITEMTYPE_IODEF=15, TREEITEMTYPE_ADDTASKS=16, TREEITEMTYPE_DEVICEGRP=17, TREEITEMTYPE_MAPGRP=18, TREEITEMTYPE_NCDEF=19, TREEITEMTYPE_NCAXISES=20, TREEITEMTYPE_NCCHANNEL=21, TREEITEMTYPE_NCAXIS=22, TREEITEMTYPE_NCENCODER=23, TREEITEMTYPE_NCDRIVE=24, TREEITEMTYPE_NCCONTROLLER=25, TREEITEMTYPE_NCGROUP=26, TREEITEMTYPE_NCINTERPRETER=27, TREEITEMTYPE_CANPDO=30, TREEITEMTYPE_RTIMESET=31, TREEITEMTYPE_BCPLC_VARS=32, TREEITEMTYPE_FILENAME=33, TREEITEMTYPE_DNETCONNECT=34, TREEITEMTYPE_NVPUBLISHERVAR=35, TREEITEMTYPE_NVSUBSCRIBERVAR=36, TREEITEMTYPE_FLBCMD=37, TREEITEMTYPE_NCTABLEGRP=40, TREEITEMTYPE_NCTABLE=41, TREEITEMTYPE_NCTABLESLAVE=42, TREEITEMTYPE_EIPCONNECTION=43, TREEITEMTYPE_PNIOAPI=44, TREEITEMTYPE_PNIOMOD=45, TREEITEMTYPE_PNIOSUBMOD=46, TREEITEMTYPE_ETHETNETPROTOCOL=47, TREEITEMTYPE_TCOMOBJECT=48, TREEITEMTYPE_TCOMOBJECTGRP=49, TREEITEMTYPE_UDPIPSENDDATA=50, TREEITEMTYPE_UDPIPRECEIVEDATA=51, TREEITEMTYPE_TCOMMAPPING=52, TREEITEMTYPE_MODULECFGEDITGRP=53, TREEITEMTYPE_MODULECFGEDIT=54, TREEITEMTYPE_CCATSLOT=55, TREEITEMTYPE_PROJECTDEF=56, TREEITEMTYPE_PLCPROJECTDEF=56, TREEITEMTYPE_TCOMPLCOBJECT=57, TREEITEMTYPE_HIERARCHYNODE=58, TREEITEMTYPE_LICENSE=59, TREEITEMTYPE_FLBMODULE=60, TREEITEMTYPE_EIPMASTERCONN=61, TREEITEMTYPE_EIPMASTEREXPLMSG=62, TREEITEMTYPE_EIPMASTERPRODUCERCONN=63, TREEITEMTYPE_EIPMASTERCONSUMERCONN=64, TREEITEMTYPE_USERMNG=65, TREEITEMTYPE_MQTTPUBLISHERSYM=66, TREEITEMTYPE_MQTTSUBSCRIBERSYM=67, TREEITEMTYPE_NC3DEF=70, TREEITEMTYPE_NC3AXES=71, TREEITEMTYPE_NC3GRPS=72, TREEITEMTYPE_NC3TABS=73, TREEITEMTYPE_NC3OBJS=74, TREEITEMTYPE_NC3CONTEXTS=75, TREEITEMTYPE_NC3CONTEXT=76, TREEITEMTYPE_LICENSE_DEVICE=77, TREEITEMTYPE_NC3MOVER=78, TREEITEMTYPE_ANALYTICSCONFIG=100, TREEITEMTYPE_ANALYTICSLOGGER=101, TREEITEMTYPE_ANALYTICSSTREAM=102, TREEITEMTYPE_ANALYTICSSTREAMCONTEXT=103, TREEITEMTYPE_CAMDEF=200, TREEITEMTYPE_CAMGROUP=201, TREEITEMTYPE_CAM=202, TREEITEMTYPE_CAMENCODER=203, TREEITEMTYPE_CAMTOOLGRP=204, TREEITEMTYPE_CAMTOOL=205, TREEITEMTYPE_LINEDEF=300, TREEITEMTYPE_ISGDEF=400, TREEITEMTYPE_ISGCHANNEL=401, TREEITEMTYPE_ISGAGROUP=402, TREEITEMTYPE_ISGAXIS=403, TREEITEMTYPE_ISGVOLCOMPGRP=404, TREEITEMTYPE_ISGVOLCOMP=405, TREEITEMTYPE_RTSCONFIG=500, TREEITEMTYPE_RTSAPP=501, TREEITEMTYPE_RTSAPPTASK=502, TREEITEMTYPE_RTSADI=503, TREEITEMTYPE_CPPCONFIG=504, TREEITEMTYPE_SPLCCONFIG=505, TREEITEMTYPE_EXTFILE=506, TREEITEMTYPE_PLCAPP=600, TREEITEMTYPE_PLCFOLDER=601, TREEITEMTYPE_PLCPOUPROG=602, TREEITEMTYPE_PLCPOUFUNC=603, TREEITEMTYPE_PLCPOUFB=604, TREEITEMTYPE_PLCDUTENUM=605, TREEITEMTYPE_PLCDUTSTRUCT=606, TREEITEMTYPE_PLCDUTUNION=607, TREEITEMTYPE_PLCACTION=608, TREEITEMTYPE_PLCMETHOD=609, TREEITEMTYPE_PLCITFMETH=610, TREEITEMTYPE_PLCPROP=611, TREEITEMTYPE_PLCITFPROP=612, TREEITEMTYPE_PLCPROPGET=613, TREEITEMTYPE_PLCPROPSET=614, TREEITEMTYPE_PLCGVL=615, TREEITEMTYPE_PLCTRANSITION=616, TREEITEMTYPE_PLCLIBMAN=617, TREEITEMTYPE_PLCITF=618, TREEITEMTYPE_PLCVISOBJ=619, TREEITEMTYPE_PLCVISMAN=620, TREEITEMTYPE_PLCTASK=621, TREEITEMTYPE_PLCPROJECTINFO=622, TREEITEMTYPE_PLCDUTALIAS=623, TREEITEMTYPE_PLCTARGETVISU=624, TREEITEMTYPE_PLCGLOBALTEXTLIST=625, TREEITEMTYPE_PLCTEXTLIST=626, TREEITEMTYPE_PLCGLOBALIMAGEPOOL=627, TREEITEMTYPE_PLCIMAGEPOOL=628, TREEITEMTYPE_PLCGVLPARAMLIST=629, TREEITEMTYPE_PLCWEBVISU=630, TREEITEMTYPE_PLCUMLCLASSDIAGRAM=631, TREEITEMTYPE_PLCRECIPEMANAGER=632, TREEITEMTYPE_PLCRECIPEDEFINITION=633, TREEITEMTYPE_PLCTRENDOBJECT=634, TREEITEMTYPE_PLCTRENDMANAGER=635, TREEITEMTYPE_PLCPROGREF=650, TREEITEMTYPE_PLCEXTDATATYPE=651, TREEITEMTYPE_PLCEXTDATATYPECONT=652, TREEITEMTYPE_PLCTMCDESCRIPTION=653, TREEITEMTYPE_TMCDESCRIPTION=653, TREEITEMTYPE_PLCITFPROPGET=654, TREEITEMTYPE_PLCITFPROPSET=655, TREEITEMTYPE_PLCLIBREF=656, TREEITEMTYPE_PLCLIBPLACEHOLDER=657, TREEITEMTYPE_PLCTEXTLISTENUMERATION=658, TREEITEMTYPE_VISIONCFG=700, TREEITEMTYPE_VISIONAPP=701, TREEITEMTYPE_VISIONCAMERA=702, TREEITEMTYPE_VISIONFILESOURCE=703, TREEITEMTYPE_VISIONTCOMOBJECT=704, TREEITEMTYPE_VISIONJOBPOOL=705, TREEITEMTYPE_SAF_PROJECTDEF=800, TREEITEMTYPE_SAF_APP=801, TREEITEMTYPE_SAF_ALIASDEV=802, TREEITEMTYPE_SAF_GROUP=803, TREEITEMTYPE_SAF_GENERATEDCODE=804, TREEITEMTYPE_SAF_SAL_FILE=805, TREEITEMTYPE_SAF_H_FILE=806, TREEITEMTYPE_SAF_C_FILE=807, TREEITEMTYPE_SAF_SDS_FILE=808, TREEITEMTYPE_SAF_SYSTEMCONFIG=809, TREEITEMTYPE_SAF_DEPENDENTFILE=810, TREEITEMTYPE_CPP_PROJECTDEF=900, TREEITEMTYPE_PLC2CONFIG=1000, TREEITEMTYPE_PLC2_PROJECTDEF=1100, TREEITEMTYPE_PLC2_PROJECT=1110, TREEITEMTYPE_PLC2_PROJECTFILE=1120, TREEITEMTYPE_PLC2_PROJECTFILEFOLDER=1130, TREEITEMTYPE_PLC2_PROJECTLIBS=1140, TREEITEMTYPE_PLC2_PROJECTLIB=1145, TREEITEMTYPE_PLC2_PROJECTOBJS=1150, TREEITEMTYPE_PLC2_PROJECTOBJ=1155, TREEITEMTYPE_TCOMPLC2OBJECT=1160, TREEITEMTYPE_MEAS_APP=2000, TREEITEMTYPE_MEAS_SCOPE=2001, TREEITEMTYPE_MEAS_SCOPECHART=2002, TREEITEMTYPE_MEAS_SCOPEAXIS=2003, TREEITEMTYPE_MEAS_SCOPECHANNEL=2004, TREEITEMTYPE_MEAS_SCOPECURSOR=2006, TREEITEMTYPE_MEAS_SCOPETRIGGER=2007, TREEITEMTYPE_MEAS_SCOPEREPORT=2008

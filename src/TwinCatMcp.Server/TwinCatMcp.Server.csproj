@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>TwinCatMcp</RootNamespace>
+    <AssemblyName>TwinCatMcp.Server</AssemblyName>
+    <Version>0.1.0</Version>
+    <!-- COM interop types are embedded; no Beckhoff DLL needs to be shipped. -->
+    <NoWarn>$(NoWarn);CA1416;CS1591</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TwinCatInteropDir>$(WINDIR)\Microsoft.NET\assembly\GAC_MSIL\TCatSysManagerLib\v4.0_3.4.0.0__180016cd49e5e8c3</TwinCatInteropDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="7.0.389" />
+    <PackageReference Include="envdte" Version="17.14.40260" />
+    <PackageReference Include="envdte80" Version="17.14.40260" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
+    <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TwinCAT Automation Interface (TCatSysManagerLib 3.4, shipped with TwinCAT 3.1.4026). -->
+    <Reference Include="TCatSysManagerLib">
+      <HintPath>$(TwinCatInteropDir)\TCatSysManagerLib.dll</HintPath>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
