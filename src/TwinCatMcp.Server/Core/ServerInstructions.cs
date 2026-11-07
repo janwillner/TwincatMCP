@@ -18,6 +18,9 @@ public static class ServerInstructions
         -> system_set_target -> system_activate_configuration (switches target to Run mode) -> plc_online_login (download) -> plc_online_start
         -> ads_browse_symbols / ads_read_symbols / ads_write_symbols / ads_wait_for_value / ads_monitor.
 
+        Libraries: lib_list_installed (catalog) -> lib_add ["Tc2_MC2"] -> lib_get_declaration ["MC_MoveAbsolute"] to see FB interfaces before using them.
+        Packaging: lib_set_project_info -> archive_save_as_library; archive_save_solution (.tnzip) / archive_open.
+
         Every tool returns JSON. Errors come back with isError=true, a message, an optional hint and the TwinCAT error log.
         After changing ST code always run build_solution (or plc_check_all_objects) and fix reported errors before activating.
         """;

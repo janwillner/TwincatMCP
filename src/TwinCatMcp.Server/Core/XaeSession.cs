@@ -174,19 +174,48 @@ public sealed class XaeSession : IDisposable
                    };
 
         _logger.LogInformation("Starting {ProgId} (visible={Visible})", progId, visible);
-        var before = RunningObjectTable.GetDteInstances().Select(e => e.ProcessId).ToHashSet();
+        var before = System.Diagnostics.Process.GetProcesses().Select(p => p.Id).ToHashSet();
         var dte = (DTE2)(Activator.CreateInstance(type) ?? throw new TcException($"Could not create {progId}."));
 
-        dte.SuppressUI = !visible;
-        dte.MainWindow.Visible = visible;
-        dte.UserControl = keepOpenAfterExit;
+        // Determine the IDE process from its main window - robust even when several IDEs start concurrently.
+        var pid = ProcessIdOf(dte);
+        var isNewProcess = pid is > 0 && !before.Contains(pid.Value);
 
         _dte = dte;
         ProgId = progId;
-        OwnsInstance = true;
-        ProcessId = RunningObjectTable.GetDteInstances().Select(e => e.ProcessId).FirstOrDefault(p => !before.Contains(p));
+        ProcessId = pid;
+
+        // Only claim ownership (and therefore the right to Quit() it later) for a freshly spawned process.
+        OwnsInstance = isNewProcess;
+        if (isNewProcess)
+        {
+            dte.SuppressUI = !visible;
+            dte.MainWindow.Visible = visible;
+            dte.UserControl = keepOpenAfterExit;
+        }
+        else
+        {
+            _logger.LogWarning("CreateInstance returned an already running IDE (pid {Pid}); it is treated as attached, not owned.", pid);
+        }
+
         ConfigureSilentMode(true);
         return Status();
+    }
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+    private static int? ProcessIdOf(DTE2 dte)
+    {
+        try
+        {
+            var hwnd = new IntPtr(dte.MainWindow.HWnd);
+            return GetWindowThreadProcessId(hwnd, out var pid) != 0 && pid != 0 ? (int)pid : null;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public object Attach(string? solutionPathOrPid)
@@ -261,6 +290,7 @@ public sealed class XaeSession : IDisposable
 
             if (quitIde || OwnsInstance)
             {
+                // Never close the user's solution of an attached IDE without explicit quitIde.
                 if (_dte.Solution.IsOpen)
                 {
                     _dte.Solution.Close(saveAll);

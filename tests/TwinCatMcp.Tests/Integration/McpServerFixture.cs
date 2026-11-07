@@ -111,7 +111,7 @@ public class XaeProjectFixture : McpServerFixture
     {
         try
         {
-            await CallRaw("xae_close", new { saveAll = false, quitIde = true }, TimeSpan.FromMinutes(2));
+            await CallRaw("xae_close", new { saveAll = false, quitIde = false }, TimeSpan.FromMinutes(2));
         }
         catch
         {
