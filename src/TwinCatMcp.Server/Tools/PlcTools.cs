@@ -135,7 +135,7 @@ public sealed class PlcTools(XaeSession session)
     public Task<CallToolResult> Grep(
         [Description(".NET regular expression applied per line, e.g. 'nCount\\s*:=' or 'FB_Motor'.")] string pattern,
         [Description(ProjectParam)] string? project = null,
-        bool ignoreCase = true,
+        [Description("Case-insensitive regex matching (default true).")] bool ignoreCase = true,
         [Description("Optional kind filter (see plc_find_elements), e.g. ['pou','method'].")] string[]? kinds = null,
         [Description("Search only 'declaration' or 'implementation'. Empty = both.")] string? section = null,
         int maxResults = 200)
@@ -513,9 +513,9 @@ public sealed class PlcTools(XaeSession session)
         "bootProjectEncryption (None|Target|Volume), tmcFileCopy (copy the .tmc to the target).")]
     public Task<CallToolResult> SetSettings(
         [Description(ProjectParam)] string? project = null,
-        bool? bootProjectAutostart = null,
+        [Description("Start the boot project automatically when TwinCAT starts (null = unchanged).")] bool? bootProjectAutostart = null,
         [Description("None | Target | Volume")] string? bootProjectEncryption = null,
-        bool? tmcFileCopy = null)
+        [Description("Copy the TMC file to the target on activation (null = unchanged).")] bool? tmcFileCopy = null)
         => session.RunAsync(s =>
         {
             var p = PlcTree.ResolveProject(s, project);
@@ -565,7 +565,7 @@ public sealed class PlcTools(XaeSession session)
     [McpServerTool(Name = "plc_generate_boot_project"), Description(
         "Builds the boot project of a PLC project for the current target (ITcPlcProject.GenerateBootProject). " +
         "activate=true also activates it (it then starts with TwinCAT when bootProjectAutostart is set).")]
-    public Task<CallToolResult> GenerateBootProject([Description(ProjectParam)] string? project = null, bool activate = false, int timeoutSeconds = 600)
+    public Task<CallToolResult> GenerateBootProject([Description(ProjectParam)] string? project = null, [Description("Also activate the boot project on the target (writes the target boot folder). Default false = generate locally only.")] bool activate = false, int timeoutSeconds = 600)
         => session.RunAsync(s =>
         {
             var p = PlcTree.ResolveProject(s, project);

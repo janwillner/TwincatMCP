@@ -224,7 +224,7 @@ public sealed class PouTools(XaeSession session)
     public Task<CallToolResult> Grep(
         [Description(PathParam)] string path,
         [Description(".NET regular expression applied per line.")] string pattern,
-        bool ignoreCase = true,
+        [Description("Case-insensitive regex matching (default true).")] bool ignoreCase = true,
         [Description("Also search members (methods, property accessors, actions, transitions).")] bool includeMembers = true,
         [Description("'declaration' or 'implementation'; empty = both.")] string? section = null)
         => session.RunAsync(s =>
@@ -299,7 +299,7 @@ public sealed class PouTools(XaeSession session)
         "Creates a parameter list (VAR_GLOBAL CONSTANT list usable for array bounds in libraries). Optional declaration.")]
     public Task<CallToolResult> CreateParamList(
         [Description("Name, e.g. 'Param_Machine'.")] string name,
-        string? declaration = null,
+        [Description("Optional full declaration text (VAR_GLOBAL CONSTANT ... END_VAR).")] string? declaration = null,
         [Description("Parent folder path. Default: '<project>^GVLs'.")] string? parentPath = null,
         [Description(ProjectParam)] string? project = null)
         => session.RunAsync(s =>
