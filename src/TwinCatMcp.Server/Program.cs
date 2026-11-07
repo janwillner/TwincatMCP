@@ -29,6 +29,7 @@ builder.Services
         o.ServerInstructions = ServerInstructions.Text;
     })
     .WithStdioServerTransport()
+    .WithRequestFilters(f => f.AddArgumentDiagnostics())
     .WithToolsFromAssembly()
     .WithResourcesFromAssembly()
     .WithPromptsFromAssembly();

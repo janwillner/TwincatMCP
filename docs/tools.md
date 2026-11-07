@@ -1,6 +1,6 @@
 # Tool catalog
 
-Generated from the server assembly – 164 tools. Regenerate with `TwinCatMcp.Server.exe --tool-catalog > docs/tools.md`.
+Generated from the server assembly – 203 tools. Regenerate with `TwinCatMcp.Server.exe --tool-catalog > docs/tools.md`.
 
 ## IDE session (`xae_*`, 8)
 
@@ -12,7 +12,7 @@ Generated from the server assembly – 164 tools. Regenerate with `TwinCatMcp.Se
 | `xae_list_instances` *(read-only)* | Lists running Visual Studio / TcXaeShell instances with their open solution. |  |
 | `xae_set_silent_mode` | Enables/disables the Automation Interface SilentMode (suppresses message boxes in the IDE). Enabled by default. | `silent` |
 | `xae_set_visible` | Shows or hides the IDE main window. | `visible` |
-| `xae_start` | Starts a new TwinCAT XAE IDE instance (TcXaeShell 4026 by default) and connects to it. Takes 20-60 s. Dialogs are suppressed (Automation Interface SilentMode). | `progId`?, `visible`?, `keepOpen`? |
+| `xae_start` | Starts a new TwinCAT XAE IDE instance (TcXaeShell 4026 by default) and connects to it. Takes 20-60 s. Dialogs are suppressed (Automation Interface SilentMode). | `progId`?, `visible`?, `keepOpen`?, `launchMode`? |
 | `xae_status` *(read-only)* | Shows the connected IDE, open solution, selected TwinCAT project and target AMS Net ID. |  |
 
 ## Solution (`solution_*`, 7)
@@ -57,6 +57,19 @@ Generated from the server assembly – 164 tools. Regenerate with `TwinCatMcp.Se
 | `tree_rename_item` | Renames a tree item. | `treePath`, `newName` |
 | `tree_set_comment` | Sets the comment of a tree item. | `treePath`, `comment` |
 | `tree_set_disabled` | Disables or enables a tree item (e.g. an I/O device, box, task or axis). | `treePath`, `disabled` |
+
+## PLC online (XAE) (`plc_online_*`, 8)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `plc_online_generate_boot_project` | Generates the PLC boot project (ITcPlcProject.GenerateBootProject). activate=true writes it to the target so the PLC starts from it after a TwinCAT restart (with autostart, see plc_online_set_autostart). | `plcProject`?, `activate`?, `timeoutSeconds`? |
+| `plc_online_login` | Logs the XAE into the PLC runtime of the target and downloads the application if needed (no dialogs). mode: 'auto' = online change when possible, otherwise download; 'download' = full download (PLC goes to Stop, values reset); 'onlineChange' = only online change. The target must be in Run mode (system_activate_configuration). Start the PLC with plc_online_start. | `plcProject`?, `mode`?, `rebuild`?, `timeoutSeconds`? |
+| `plc_online_logout` | Logs the XAE out of the PLC runtime (the PLC keeps running). | `plcProject`? |
+| `plc_online_reset` | Resets the PLC application (requires plc_online_login): 'cold' = all variables except RETAIN/PERSISTENT to initial values, 'origin' = everything incl. RETAIN/PERSISTENT and the application is removed from the runtime (login with download afterwards). | `type`?, `plcProject`? |
+| `plc_online_set_autostart` | Enables/disables 'Autostart Boot Project' of a PLC project (ITcPlcProject.BootProjectAutostart). Takes effect with the next activation / boot project. | `enabled`, `plcProject`? |
+| `plc_online_start` | Starts the PLC application (requires plc_online_login). | `plcProject`? |
+| `plc_online_state` *(read-only)* | Returns the online state of the PLC project in the XAE: logged in, application state (Run/Stop/...), operation state flags (e.g. BootProjectValid, Exception) and the boot project autostart setting. | `plcProject`? |
+| `plc_online_stop` | Stops the PLC application (requires plc_online_login). | `plcProject`? |
 
 ## PLC project (`plc_*`, 16)
 
@@ -135,6 +148,62 @@ Generated from the server assembly – 164 tools. Regenerate with `TwinCatMcp.Se
 | `archive_open` | Opens an archive. .tnzip (solution archive): extracted into targetFolder and opened as the current solution (ITcArchivePersist.LoadFromArchive) - the previously open solution is closed without saving, its first TwinCAT project is selected. .tszip (TwinCAT project archive): added as new TwinCAT project to the open solution (Solution.AddFromTemplate). For .tpzip PLC project archives use archive_import_plc_project. | `archivePath`, `targetFolder`, `projectName`?, `timeoutSeconds`? |
 | `archive_save_as_library` | Saves a PLC project as library file (ITcPlcIECProject6.SaveAsLibrary2). '.library' = source library, '.compiled-library' = protected compiled library. Optionally encrypted (needs a connected software protection / user database) and installed into the System repository. Set Company/Title/Version first with lib_set_project_info (required to install). | `filePath`, `install`?, `encrypt`?, `overwrite`?, `plcProject`?, `timeoutSeconds`? |
 | `archive_save_solution` | Saves the whole solution as a .tnzip archive (ITcArchivePersist.SaveAsArchive via DTE.GetObject("TcArchivePersist")): all project files plus the referenced libraries - restorable on another PC with archive_open. scope='twincatProject' instead writes only the selected TwinCAT project as .tszip (ITcSysManager.SaveAsArchive). Save first (solution_save). | `filePath`, `scope`?, `overwrite`?, `timeoutSeconds`? |
+
+## System & activation (`system_*`, 13)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `system_activate_configuration` | Activates the TwinCAT configuration on the target (ITcSysManager.ActivateConfiguration: writes the boot configuration incl. PLC boot projects) and, with restart=true (default), restarts TwinCAT in Run mode (StartRestartTwinCAT) without any dialog, then waits until the target reports ADS state Run. Build the solution first and make sure the target platform matches (system_get_info). Requires valid licenses on the target (license_list). | `restart`?, `waitSeconds`?, `skipLicenseCheck`?, `timeoutSeconds`? |
+| `system_get_info` *(read-only)* | Reads information about a TwinCAT target via ADS (no XAE needed): system state, device name, TwinCAT version, platform (e.g. 'TwinCAT RT (x64)' or 'TwinCAT OS (x64)') and whether it is a Usermode Runtime. Use the platform with system_set_target_platform. | `netId`? |
+| `system_get_state` *(read-only)* | Returns the state of the target TwinCAT system: ADS state of the system service (Run, Config, Stop, Invalid ...) and, with an XAE session, ITcSysManager.IsTwinCATStarted. Pass netId to query any target via ADS only (no XAE session needed). | `netId`? |
+| `system_get_target` *(read-only)* | Returns the target system of the selected TwinCAT project: AMS Net ID (ITcSysManager.GetTargetNetId) and its route name if known. Use before activating to make sure you deploy to the right runtime. |  |
+| `system_get_versions` *(read-only)* | Returns the TwinCAT XAE version in use and all installed Remote Manager versions (ITcRemoteManager), and whether the project is pinned to a TwinCAT version (TcVersionFixed / PinnedTcVersion). |  |
+| `system_list_target_platforms` *(read-only)* | Lists the build target platforms of the project (e.g. 'TwinCAT RT (x64)', 'TwinCAT OS (x64)', 'TwinCAT RT (x86)') and the active one. A Usermode Runtime / TwinCAT/BSD target needs 'TwinCAT OS (x64)'. |  |
+| `system_list_targets` *(read-only)* | Lists the target systems the XAE knows: the current target and the ADS routes of the local router (TIRR: actual, static and project routes, incl. local Usermode Runtime instances). Pass a route name or Net ID to system_set_target. |  |
+| `system_pin_version` | Pins (or unpins) the TwinCAT version of the project ('Pin Version' on the project's General tab). When pinned, the project always opens with the XAE version it was saved with. Save the solution afterwards. | `pin`? |
+| `system_restart` | Starts or restarts TwinCAT on the target in Run mode (ITcSysManager.StartRestartTwinCAT) with the configuration last activated on it, then waits for ADS state Run. Does NOT activate the current project - use system_activate_configuration for that. | `waitSeconds`?, `timeoutSeconds`? |
+| `system_set_config_mode` | Switches the target TwinCAT system to Config mode (stops real-time, PLC and I/O; needed for I/O scans or to free the target) via ADS (system service port 10000, state Reconfig = XAE 'Restart TwinCAT (Config Mode)') and waits for ADS state Config. Pass netId to address any target without an XAE session. | `netId`?, `waitSeconds`? |
+| `system_set_run_mode` | Restarts the target TwinCAT system in Run mode with its currently activated configuration (same as system_restart, but also works without an XAE session via ADS: system service port 10000, state Reset). Does NOT activate the current project. | `netId`?, `waitSeconds`? |
+| `system_set_target` | Sets the target system for activation/login (ITcSysManager.SetTargetNetId). Accepts an AMS Net ID (e.g. '199.4.42.250.1.1' for a local Usermode Runtime, '5.12.34.56.1.1' for a remote PLC), a route name as listed by system_list_targets, or 'local'. For remote targets an ADS route must exist (route_ tools). Does not change the runtime itself. | `target` |
+| `system_set_target_platform` | Sets the active target platform for compilation (ITcConfigManager.ActiveTargetPlatform), e.g. 'TwinCAT OS (x64)' for a Usermode Runtime or TwinCAT/BSD, 'TwinCAT RT (x64)' for Windows real-time. Rebuild afterwards. | `platform` |
+
+## Real-time (`rt_*`, 6)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `rt_get_settings` *(read-only)* | Returns the real-time settings of the project (TIRS): real-time cores (affinity), per-core base time (ms/us and 100 ns ticks), CPU load limit %, latency warning, router memory and the CPU info last read from the target. |  |
+| `rt_set_settings` | Changes real-time settings (TIRS RTimeSetDef). Only given values change. Example: cores=[0], baseTime=500, unit='us', loadLimitPercent=60. baseTime/loadLimitPercent/latencyWarningUs apply to every core in 'cores' (or to all current real-time cores if 'cores' is empty). Task cycle times must be multiples of the base time. Activate the configuration afterwards. | `cores`?, `baseTime`?, `unit`?, `loadLimitPercent`?, `latencyWarningUs`?, `maxCpus`?, `routerMemoryKb`? |
+| `rt_umrt_create` | Creates a new Usermode Runtime instance by copying the TC1700 template (UmRT_Template) to C:\ProgramData\Beckhoff\TwinCAT\3.1\Runtimes\<name>. Optionally pre-sets its AMS Net ID; otherwise the runtime picks one on first start (default 199.4.42.250.1.1, second byte incremented on collision). Start it with rt_umrt_start. | `name`, `netId`? |
+| `rt_umrt_list` *(read-only)* | Lists the Usermode Runtime instances of this PC (folders in C:\ProgramData\Beckhoff\TwinCAT\3.1\Runtimes) with AMS Net ID, running state (process / Windows service), ADS system state and license files (e.g. trial license with expiry). |  |
+| `rt_umrt_start` | Starts a Usermode Runtime instance (TcSystemServiceUm.exe, like its Start.bat; minimized console window) and waits until it answers via ADS. It starts in Config mode; then use system_set_target with the returned netId and system_activate_configuration. | `name`, `waitSeconds`? |
+| `rt_umrt_stop` | Stops a Usermode Runtime instance that was started as a process (sends 'x' to its console, kills it if it does not exit). An instance running as the Windows service TcSysSrv is not stopped. | `name`, `waitSeconds`? |
+
+## Tasks (`task_*`, 5)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `task_configure` | Changes cycle time, priority, autostart, CPU cores or 'I/O at task begin' of an existing real-time task (TaskDef XML). Only given values change. Returns the task as TwinCAT stored it plus warnings when TwinCAT adjusted a value (e.g. cycle time not a multiple of the base time). | `task`, `cycleTime`?, `unit`?, `priority`?, `autoStart`?, `cores`?, `ioAtBegin`? |
+| `task_create` | Creates a real-time task below TIRT and configures it in one step. Example: name='FastTask', cycleTime=1, unit='ms', priority=10. The cycle time must be a multiple of the real-time base time (rt_get_settings, default 1 ms). Link a PLC to it with task_link_plc. | `name`, `cycleTime`?, `unit`?, `priority`?, `withImage`?, `autoStart`?, `cores`? |
+| `task_delete` | Deletes a real-time task below TIRT. Unlink PLC task references first (task_link_plc). | `task` |
+| `task_link_plc` | Links a PLC task reference (the task object inside the PLC project, e.g. 'TIPC^Plc1^Plc1 Project^PlcTask') to a real-time task (ITcPlcTaskReference.LinkedTask). Example: plcTask='PlcTask', plcProject='Plc1', task='FastTask'. | `task`, `plcTask`?, `plcProject`? |
+| `task_list` *(read-only)* | Lists all real-time tasks (TIRT) with cycle time (ms/us and raw 100 ns ticks), priority, AMS port, autostart, CPU cores, and which PLC task references are linked to each task. |  |
+
+## Licenses (`license_*`, 3)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `license_activate_trial` | Prepares the 7-day trial license for the current target. TwinCAT protects trial generation with a captcha, so the final click must be done by a human: this tool checks whether the target already has a valid trial (local Usermode Runtimes), makes the XAE window visible, selects System > License and returns the exact steps. Afterwards call license_list to verify. |  |
+| `license_add` | Adds (or with remove=true removes) a license manually to/from a PLC project (IECProjectDef/LicenseSettings), e.g. for function licenses used by libraries (TF6250 Modbus TCP, TF6310 TCP/IP). The license becomes part of the project's required licenses and therefore of the 7-day trial / license request. Accepts an order number ('TF6250') or a license GUID. Licenses the configuration needs anyway (TC1200 PLC, TC1000 ADS, ...) are detected automatically by TwinCAT. | `license`, `plcProject`?, `remove`? |
+| `license_list` *(read-only)* | Shows license information: (1) licenses present on the target when it is a Usermode Runtime of this PC (license files incl. trial expiry), (2) the license request settings of the project (TIRC^License), (3) licenses added manually to PLC projects, and (4) with 'search', matching entries of the TwinCAT license catalog (e.g. 'TC1200' -> TC3 PLC with its license GUID). | `search`? |
+
+## Project variants (`variant_*`, 4)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `variant_define` | Defines the project variants (replaces the whole variant configuration). Example: variants=['Small','Large'], groups={'All':['Small','Large']}. Afterwards select one with variant_set_current and use tree_ tools / PlcCompilerDefines per variant. | `variants`, `groups`? |
+| `variant_get_current` *(read-only)* | Returns the currently selected project variant (empty = no variant management). |  |
+| `variant_list` *(read-only)* | Lists the project variants and variant groups of the TwinCAT project and the current variant. |  |
+| `variant_set_current` | Selects the current project variant by name ('Variant1') or a variant group in brackets ('[Group1]'). Rebuild/activate afterwards. | `variant` |
 
 ## I/O devices (`io_*`, 9)
 

@@ -162,6 +162,7 @@ public sealed class ArchiveTools(XaeSession session)
 
                     LibraryTools.Wrap(() => ((ITcArchivePersist)s.Dte.GetObject("TcArchivePersist")).LoadFromArchive(archive, folder),
                         "Opening the archive failed.", null);
+                    s.WaitUntilSolutionLoaded(TimeSpan.FromSeconds(120));
                     var tc = s.EnumerateTwinCatProjects().FirstOrDefault()
                              ?? throw new TcException("The archive was opened but contains no TwinCAT project.");
                     s.SelectProject(tc.Name);
@@ -183,7 +184,8 @@ public sealed class ArchiveTools(XaeSession session)
                     var name = string.IsNullOrWhiteSpace(projectName) ? Path.GetFileNameWithoutExtension(archive) : projectName;
                     LibraryTools.Wrap(() => s.Dte.Solution.AddFromTemplate(archive, Path.Combine(folder, name), name),
                         "Adding the TwinCAT project archive failed.", "The project name must be unique in the solution.");
-                    var tc = s.EnumerateTwinCatProjects().FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase))
+                    s.WaitUntilSolutionLoaded(TimeSpan.FromSeconds(120));
+                    var tc =s.EnumerateTwinCatProjects().FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase))
                              ?? s.EnumerateTwinCatProjects().Last();
                     s.SelectProject(tc.Name);
                     return new { solution = s.Dte.Solution.FullName, selectedProject = tc.Name, project = tc.FullName };

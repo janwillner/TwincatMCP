@@ -113,6 +113,18 @@ public sealed partial class ServerSurfaceTests(McpServerFixture fx)
         Assert.Contains("xae_start", json.GetProperty("hint").GetString());
     }
 
+    [Fact]
+    public async Task A_misspelled_argument_is_explained_instead_of_a_generic_error()
+    {
+        var (json, isError) = await fx.CallRaw("motion_get_axis_parameters", new { axis = "Axis 1" });
+
+        Assert.True(isError);
+        var error = json.GetProperty("error").GetString()!;
+        Assert.Contains("missing required: axes", error);
+        Assert.Contains("did you mean 'axes'", error);
+        Assert.Contains("axes: array (required)", json.GetProperty("hint").GetString());
+    }
+
     [GeneratedRegex("^[a-z][a-z0-9]*(_[a-z0-9]+)+$")]
     private static partial Regex SnakeCase();
 }

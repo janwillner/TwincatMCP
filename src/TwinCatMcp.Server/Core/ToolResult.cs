@@ -57,6 +57,11 @@ public static class ToolResult
                            "Call xae_status, close dialogs in the IDE if visible, or retry with a larger timeoutSeconds.";
         }
 
+        if (inner is not TcException && Environment.GetEnvironmentVariable("TWINCAT_MCP_DEBUG") == "1")
+        {
+            body["stackTrace"] = inner.StackTrace;
+        }
+
         if (!string.IsNullOrWhiteSpace(tcErrorLog))
         {
             body["twinCatErrors"] = tcErrorLog.Trim();

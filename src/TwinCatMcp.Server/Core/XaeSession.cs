@@ -558,10 +558,12 @@ public sealed class XaeSession : IDisposable
         }
 
         _project = null;
+        var loaded = WaitUntilSolutionLoaded(TimeSpan.FromSeconds(120));
         TrySelectFirstTwinCatProject();
         return new
         {
             solution = Dte.Solution.FullName,
+            fullyLoaded = loaded,
             selectedProject = _project?.Name,
             twinCatProjects = EnumerateTwinCatProjects().Select(p => new { name = p.Name, file = p.FullName }).ToArray(),
         };
@@ -681,6 +683,51 @@ public sealed class XaeSession : IDisposable
         }
     }
 
+    /// <summary>
+    /// Solution.Open returns before all projects are initialized: TwinCAT projects and the nested PLC projects
+    /// become available asynchronously. Polls until every TwinCAT project exposes its System Manager and every PLC
+    /// project root its nested project (or the timeout elapses).
+    /// </summary>
+    public bool WaitUntilSolutionLoaded(TimeSpan timeout)
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var stableSince = TimeSpan.Zero;
+        while (sw.Elapsed < timeout)
+        {
+            try
+            {
+                var projects = EnumerateAllProjects().ToList();
+                var tcProjects = EnumerateTwinCatProjects().ToList();
+                var allReady = projects.Count > 0 && tcProjects.All(p =>
+                {
+                    var sm = (ITcSysManager18)p.Object;
+                    var plcRoot = sm.LookupTreeItem("TIPC");
+                    return TreeInfo.Children(plcRoot).All(c => c is not ITcProjectRoot root || SafeGet(() => root.NestedProject) is not null);
+                });
+
+                // Solutions without a TwinCAT project: accept once the project list is stable for a moment.
+                if (allReady && (tcProjects.Count > 0 || sw.Elapsed - stableSince > TimeSpan.FromSeconds(5)))
+                {
+                    return true;
+                }
+
+                if (!allReady)
+                {
+                    stableSince = sw.Elapsed;
+                }
+            }
+            catch (Exception ex) when (ex is COMException or NullReferenceException or InvalidCastException)
+            {
+                stableSince = sw.Elapsed; // still loading
+            }
+
+            System.Threading.Thread.Sleep(500);
+        }
+
+        _logger.LogWarning("Solution did not report fully loaded within {Timeout}", timeout);
+        return false;
+    }
+
     public IEnumerable<Project> EnumerateAllProjects()
     {
         if (_dte is null || !_dte.Solution.IsOpen)
@@ -688,23 +735,27 @@ public sealed class XaeSession : IDisposable
             yield break;
         }
 
+        // While a solution is (re)loading, the collection can contain null entries or half-initialized projects.
         var stack = new Stack<Project>();
-        foreach (Project p in _dte.Solution.Projects)
+        foreach (Project? p in _dte.Solution.Projects)
         {
-            stack.Push(p);
+            if (p is not null)
+            {
+                stack.Push(p);
+            }
         }
 
         while (stack.Count > 0)
         {
             var p = stack.Pop();
             yield return p;
-            if (p.Kind == ProjectKinds.vsProjectKindSolutionFolder && p.ProjectItems is not null)
+            if (SafeGet(() => p.Kind) == ProjectKinds.vsProjectKindSolutionFolder && SafeGet(() => p.ProjectItems) is { } items)
             {
-                foreach (ProjectItem item in p.ProjectItems)
+                foreach (ProjectItem? item in items)
                 {
-                    if (item.SubProject is not null)
+                    if (SafeGet(() => item?.SubProject) is { } sub)
                     {
-                        stack.Push(item.SubProject);
+                        stack.Push(sub);
                     }
                 }
             }
