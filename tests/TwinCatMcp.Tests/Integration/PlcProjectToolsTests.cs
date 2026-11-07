@@ -1,0 +1,132 @@
+namespace TwinCatMcp.Tests.Integration;
+
+[Collection(PlcCollection.Name)]
+[Trait("Category", "Integration")]
+public sealed class PlcProjectToolsTests(PlcProjectFixture fx)
+{
+    [Fact]
+    public void Created_project_reports_root_nested_and_instance_paths()
+    {
+        var p = fx.CreatedProject;
+
+        Assert.Equal("TIPC^Plc1", p.GetProperty("rootPath").GetString());
+        Assert.Equal("TIPC^Plc1^Plc1 Project", p.GetProperty("projectPath").GetString());
+        Assert.Equal("TIPC^Plc1^Plc1 Instance", p.GetProperty("instancePath").GetString());
+    }
+
+    [Fact]
+    public async Task List_projects_returns_the_nested_project_path()
+    {
+        var list = await fx.Call("plc_list_projects");
+
+        var plc = list.GetProperty("projects").EnumerateArray().Single(p => p.GetProperty("name").GetString() == "Plc1");
+        Assert.Equal(fx.PlcProjectPath, plc.GetProperty("projectPath").GetString());
+    }
+
+    [Fact]
+    public async Task Build_succeeds_with_valid_code_and_reports_a_deliberate_syntax_error()
+    {
+        var fb = PlcProjectFixture.Unique("FB_Broken");
+        var path = (await fx.Call("pou_create", new { name = fb })).GetProperty("path").GetString()!;
+        await fx.Call("pou_write_code", new { path = "POUs^MAIN", declaration = $"PROGRAM MAIN\nVAR\n\tfbTest : {fb};\nEND_VAR\n", implementation = "fbTest();" });
+        try
+        {
+            var good = await fx.Call("build_solution", new { rebuild = false });
+            Assert.True(good.GetProperty("success").GetBoolean(), good.ToString());
+            Assert.Equal(0, good.GetProperty("diagnostics").GetProperty("errorCount").GetInt32());
+
+            await fx.Call("pou_write_code", new { path, implementation = "nUnknown := ;" });
+            var bad = await fx.Call("build_solution", new { rebuild = false });
+            Assert.False(bad.GetProperty("success").GetBoolean());
+
+            var check = await fx.Call("plc_check_all_objects", new { includeOutput = true });
+            Assert.False(check.GetProperty("ok").GetBoolean());
+            Assert.True(check.GetProperty("errors").GetArrayLength() > 0, check.ToString());
+            var error = check.GetProperty("errors")[0];
+            Assert.Equal(fb, error.GetProperty("object").GetString());
+            Assert.Equal("C0007", error.GetProperty("code").GetString()); // "Expression expected instead of ';'"
+
+            var compile = await fx.Call("plc_compile");
+            Assert.False(compile.GetProperty("ok").GetBoolean(), compile.ToString());
+        }
+        finally
+        {
+            await fx.CallRaw("pou_write_code", new { path = "POUs^MAIN", declaration = "PROGRAM MAIN\nVAR\nEND_VAR\n", implementation = "" });
+            await fx.CallRaw("pou_delete", new { paths = new[] { path } });
+        }
+
+        var fixedCheck = await fx.Call("plc_check_all_objects");
+        Assert.True(fixedCheck.GetProperty("ok").GetBoolean(), fixedCheck.ToString());
+    }
+
+    [Fact]
+    public async Task PlcOpen_export_and_import_round_trip_into_a_folder()
+    {
+        var fb = PlcProjectFixture.Unique("FB_Xml");
+        var path = (await fx.Call("pou_create", new { name = fb, implementation = "; // exported" })).GetProperty("path").GetString()!;
+        await fx.Call("pou_create_method", new { parentPath = path, name = "M_Run", implementation = "; // method body" });
+        var file = Path.Combine(fx.WorkDir, fb + ".xml");
+
+        var export = await fx.Call("plc_export_plcopen", new { filePath = file, selection = new[] { path } });
+        Assert.Equal([fb], export.GetProperty("objects").EnumerateArray().Select(o => o.GetString()));
+        Assert.True(File.Exists(file));
+
+        var (_, conflict) = await fx.CallRaw("plc_import_plcopen", new { filePath = file });
+        Assert.True(conflict); // default conflict handling 'error': names are unique in a PLC project
+
+        await fx.Call("pou_delete", new { paths = new[] { path } });
+        var folder = PlcProjectFixture.Unique("Imported");
+        await fx.Call("plc_import_plcopen", new { filePath = file, targetFolder = $"POUs^{folder}" });
+
+        var read = await fx.Call("pou_read_code", new { paths = new[] { $"{fx.Pous}^{folder}^{fb}^M_Run" } });
+        Assert.Contains("method body", read.GetProperty("objects")[0].GetProperty("implementation").GetString());
+
+        var renamed = await fx.Call("plc_import_plcopen", new { filePath = file, targetFolder = $"POUs^{folder}", conflict = "rename" });
+        var exists = await fx.Call("tree_exists", new { treePaths = new[] { $"{fx.Pous}^{folder}^{fb}_1" } });
+        Assert.True(exists.GetProperty($"{fx.Pous}^{folder}^{fb}_1").GetBoolean(), renamed.ToString());
+        await fx.Call("pou_delete", new { paths = new[] { $"{fx.Pous}^{folder}" } });
+    }
+
+    [Fact]
+    public async Task Settings_can_be_read_and_changed()
+    {
+        var before = await fx.Call("plc_get_settings");
+        Assert.False(before.GetProperty("bootProjectAutostart").GetBoolean());
+
+        var after = await fx.Call("plc_set_settings", new { bootProjectAutostart = true, tmcFileCopy = true });
+        Assert.True(after.GetProperty("bootProjectAutostart").GetBoolean());
+        Assert.True(after.GetProperty("tmcFileCopy").GetBoolean());
+        Assert.Equal("None", after.GetProperty("bootProjectEncryption").GetString());
+
+        await fx.Call("plc_set_settings", new { bootProjectAutostart = false, tmcFileCopy = false });
+    }
+
+    [Fact]
+    public async Task Task_reference_links_PlcTask_to_the_realtime_task()
+    {
+        var get = await fx.Call("plc_get_task_reference");
+        var task = get.GetProperty("tasks")[0];
+        Assert.Equal($"{fx.PlcProjectPath}^PlcTask", task.GetProperty("path").GetString());
+        Assert.Equal("TIRT^PlcTask", task.GetProperty("linkedTask").GetString());
+        Assert.Contains("MAIN", task.GetProperty("programs").EnumerateArray().Select(p => p.GetString()));
+
+        var set = await fx.Call("plc_set_task_reference", new { linkedTask = "TIRT^PlcTask" });
+        Assert.Equal("TIRT^PlcTask", set.GetProperty("linkedTask").GetString());
+
+        var (bad, isError) = await fx.CallRaw("plc_set_task_reference", new { linkedTask = "TIRT^NoSuchTask" });
+        Assert.True(isError, bad.ToString());
+    }
+
+    [Fact]
+    public async Task Static_analysis_and_compile_run()
+    {
+        var sarif = Path.Combine(fx.WorkDir, "san.sarif.json");
+
+        var san = await fx.Call("plc_run_static_analysis", new { sarifPath = sarif });
+        var compile = await fx.Call("plc_compile");
+
+        Assert.True(san.GetProperty("ok").GetBoolean(), san.ToString());
+        Assert.Equal(sarif, san.GetProperty("sarifFile").GetString());
+        Assert.True(compile.GetProperty("ok").GetBoolean(), compile.ToString());
+    }
+}
