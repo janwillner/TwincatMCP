@@ -60,7 +60,7 @@ public static class CoeValue
             default:
                 var n = ParseInteger(v);
                 var signed = type is "SINT" or "INT" or "DINT" or "LINT" or "INT8" or "INT16" or "INT32" or "INT64";
-                CheckRange(n, size, signed, value, type);
+                CheckRange(n, size, signed, v, type);
                 var buffer = new byte[8];
                 BinaryPrimitives.WriteInt64LittleEndian(buffer, n);
                 Array.Copy(buffer, bytes, size);

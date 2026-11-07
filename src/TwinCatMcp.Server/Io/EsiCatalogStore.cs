@@ -112,7 +112,7 @@ public static class EsiCatalogStore
 
     private static string Signature(IEnumerable<string> files)
     {
-        var sb = new StringBuilder("v1|");
+        var sb = new StringBuilder("v2|");
         foreach (var f in files)
         {
             var fi = new FileInfo(f);

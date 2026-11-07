@@ -132,7 +132,7 @@ public sealed class MappingTools(XaeSession session)
 
                 var sa = IoTreeHelpers.TryGetVarInfo(s.Lookup(l.A));
                 var sb = IoTreeHelpers.TryGetVarInfo(s.Lookup(l.B));
-                if (sa is not null && sb is not null && l.BitSize is null && sa.BitSize != sb.BitSize)
+                if (sa is not null && sb is not null && l.BitSize is null && !IoXml.AreLinkCompatible(sa, sb))
                 {
                     problems.Add(new { l.A, l.B, problem = $"bit size mismatch ({sa.Type}:{sa.BitSize} vs {sb.Type}:{sb.BitSize})" });
                 }
@@ -168,7 +168,7 @@ public sealed class MappingTools(XaeSession session)
                 var b = ioParent.TrimEnd('^') + "^" + kv.Value.TrimStart('^');
                 if (a is null)
                 {
-                    return (object)new { a = kv.Key, b, linked = false, error = $"PLC variable '{kv.Key}' not found in the process image of '{plcInstance}'. Build the PLC and declare it with AT %I*/%Q*." };
+                    return (object)new { a = kv.Key, b, ok = false, error = $"PLC variable '{kv.Key}' not found in the process image of '{plcInstance}'. Build the PLC and declare it with AT %I*/%Q*." };
                 }
 
                 return Try(new LinkRequest { A = a, B = b }, () => s.SysManager.LinkVariables(a, b));

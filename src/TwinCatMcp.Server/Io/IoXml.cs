@@ -85,6 +85,16 @@ public static class IoXml
             UIntOrNull(ads?.Element("IndexOffset")));
     }
 
+    /// <summary>
+    /// True when two linked variables have matching sizes. A PLC BOOL (8 bit) linked to an I/O BIT (1 bit) is the normal case
+    /// for digital channels and therefore compatible.
+    /// </summary>
+    public static bool AreLinkCompatible(VarInfo a, VarInfo b)
+    {
+        static bool IsBool(VarInfo v) => v.Type.Equals("BOOL", StringComparison.OrdinalIgnoreCase) || v.Type.Equals("BIT", StringComparison.OrdinalIgnoreCase) || v.BitSize == 1;
+        return a.BitSize == b.BitSize || (IsBool(a) && IsBool(b));
+    }
+
     public static SlaveInfo? ParseSlaveInfo(string xml)
     {
         var slave = XElement.Parse(xml).Element("EtherCAT")?.Element("Slave");

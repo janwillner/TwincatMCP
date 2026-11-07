@@ -11,8 +11,16 @@ public sealed record EsiDevice(
     uint ProductCode,
     uint RevisionNo,
     string? Group,
-    string File)
+    string File,
+    bool Invisible = false)
 {
+    /// <summary>
+    /// Ordering key for "latest revision": visible before invisible, regular revisions before special ones
+    /// (Beckhoff ESI files contain e.g. EK1100 #x270b0000 = "-9995", which the XAE does not pick), then highest RevisionNo.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public (bool Visible, bool Regular, uint RevisionNo) Preference => (!Invisible, RevisionNo >> 16 < 9000, RevisionNo);
+
     /// <summary>Beckhoff product revision ("EL1008-0000-0018"), null for devices without Beckhoff naming.</summary>
     [System.Text.Json.Serialization.JsonIgnore]
     public string? ProductRevision => VendorId == ProductType.BeckhoffVendorId && ProductType.IsProductName(Type)
@@ -135,6 +143,7 @@ public static class EsiParser
         string? type = null;
         uint productCode = 0, revisionNo = 0;
         string? english = null, anyName = null, group = null;
+        var invisible = reader.GetAttribute("Invisible") is "1" or "true";
         var depth = reader.Depth;
         reader.Read();
         while (!(reader.NodeType == XmlNodeType.EndElement && reader.Depth == depth) && !reader.EOF)
@@ -172,7 +181,7 @@ public static class EsiParser
 
         return string.IsNullOrEmpty(type)
             ? null
-            : new EsiDevice(type, english ?? anyName ?? type, vendorId, vendorName, productCode, revisionNo, group, fileName);
+            : new EsiDevice(type, english ?? anyName ?? type, vendorId, vendorName, productCode, revisionNo, group, fileName, invisible);
     }
 }
 
@@ -208,7 +217,7 @@ public static class EsiCatalog
             .Where(d => string.Equals(d.Type, p.TypeName, StringComparison.OrdinalIgnoreCase)
                         || string.Equals(d.Type, text, StringComparison.OrdinalIgnoreCase))
             .OrderByDescending(d => d.VendorId == ProductType.BeckhoffVendorId)
-            .ThenByDescending(d => d.RevisionNo)
+            .ThenByDescending(d => d.Preference)
             .FirstOrDefault();
     }
 
@@ -233,7 +242,7 @@ public static class EsiCatalog
             .GroupBy(d => (d.VendorId, Type: d.Type.ToUpperInvariant()))
             .Select(g =>
             {
-                var ordered = g.OrderByDescending(d => d.RevisionNo).ToList();
+                var ordered = g.OrderByDescending(d => d.Preference).ToList();
                 var latest = ordered[0];
                 return new EsiSearchHit(
                     latest.Type,

@@ -116,6 +116,28 @@ public sealed class IoEsiCatalogTests
     }
 
     [Fact]
+    public void Latest_revision_ignores_special_9995_revisions_and_invisible_devices()
+    {
+        // The TwinCAT 4026 ESI files contain e.g. EK1100 with RevisionNo #x270b0000 ("EK1100-0000-9995"); the XAE picks EK1100-0000-0018.
+        const string xml = """
+            <EtherCATInfo><Vendor><Id>2</Id><Name>Beckhoff</Name></Vendor><Descriptions><Devices>
+              <Device Physics="YY"><Type ProductCode="#x044c2c52" RevisionNo="#x00110000">EK1100</Type><Name LcId="1033">EK1100 EtherCAT Coupler</Name></Device>
+              <Device Physics="YY"><Type ProductCode="#x044c2c52" RevisionNo="#x00120000">EK1100</Type><Name LcId="1033">EK1100 EtherCAT Coupler</Name></Device>
+              <Device Physics="YY" Invisible="1"><Type ProductCode="#x044c2c52" RevisionNo="#x00130000">EK1100</Type><Name LcId="1033">EK1100 hidden</Name></Device>
+              <Device Physics="YKY"><Type ProductCode="#x044c2c52" RevisionNo="#x270b0000">EK1100</Type><Name LcId="1033">EK1100 Ethernet Coupler Terminal</Name></Device>
+            </Devices></Descriptions></EtherCATInfo>
+            """;
+        var devices = Load(xml);
+
+        Assert.True(devices[2].Invisible);
+        Assert.Equal("EK1100-0000-0018", EsiCatalog.Resolve(devices, "EK1100")!.ProductRevision);
+        var hit = Assert.Single(EsiCatalog.Search(devices, "EK1100", null, 5));
+        Assert.Equal("EK1100-0000-0018", hit.Latest);
+        Assert.Equal("EK1100 EtherCAT Coupler", hit.Name);
+        Assert.Equal("EK1100-0000-9995", EsiCatalog.Resolve(devices, "EK1100-0000-9995")!.ProductRevision);
+    }
+
+    [Fact]
     public void Resolve_full_product_revision_picks_that_revision()
         => Assert.Equal(0x00100000u, EsiCatalog.Resolve(Catalog(), "EL1008-0000-0016")!.RevisionNo);
 
