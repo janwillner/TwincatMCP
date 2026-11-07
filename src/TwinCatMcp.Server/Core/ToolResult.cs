@@ -87,9 +87,13 @@ public static class HResults
         0x98510001 => "TSM_E_ITEMNOTFOUND",
         0x98510002 => "TSM_E_INVALIDITEMTYPE",
         0x98510003 => "TSM_E_INVALIDITEMSUBTYPE",
-        0x98510004 => "TSM_E_CORRUPTEDLINK",
-        0x98510005 => "TSM_E_MISMATCHINGITEMS",
-        0x98510006 => "TSM_E_ITEMHASCHILDREN",
+        // Values from TCatSysManagerLib.TCSYSMANAGERHRESULTS (see docs/reference/TCatSysManagerLib-api.txt).
+        0x98510004 => "TSM_E_MISMATCHINGITEMS",
+        0x98510005 => "TSM_E_CORRUPTEDLINK",
+        0x98510006 => "TSM_E_ITEMREFERENCED",
+        0x98510007 => "TSM_E_ITEMDELETED",
+        0x98510008 => "TSM_E_XMLERROR",
+        0x98510009 => "TSM_E_INVALIDVINFO",
         _ => null,
     };
 }

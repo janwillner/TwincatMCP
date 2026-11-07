@@ -221,7 +221,7 @@ public sealed class IoTools(XaeSession session)
         [Description("Filter: 'input', 'output' or empty for both.")] string? direction = null,
         [Description("Also include variables of boxes below this item (e.g. all terminals below a coupler).")] bool includeSubBoxes = false,
         [Description("Include links (requires reading the project mapping once).")] bool includeLinks = true,
-        int maxVariables = 500)
+        [Description("Upper limit of returned variables (default 500).")] int maxVariables = 500)
         => session.RunAsync(s =>
         {
             var root = s.Lookup(treePath);

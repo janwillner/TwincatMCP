@@ -250,7 +250,7 @@ public sealed class EcatTools(XaeSession session, AdsSessionManager ads)
         "details=true adds EtherCAT addresses and previous port (slower: reads the XML of every box).")]
     public Task<CallToolResult> GetTopology(
         [Description("Optional master name/path; empty = all EtherCAT masters.")] string? master = null,
-        bool details = false)
+        [Description("Also return EtherCAT addresses and identity (vendor/product/revision) per box.")] bool details = false)
         => session.RunAsync(s =>
         {
             var masters = string.IsNullOrWhiteSpace(master)

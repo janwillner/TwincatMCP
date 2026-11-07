@@ -86,7 +86,7 @@ public class McpServerFixture : IAsyncLifetime
 public sealed class ToolFailedException(string tool, string body) : Exception($"Tool '{tool}' failed: {body}");
 
 /// <summary>
-/// Fixture with a live TcXaeShell and a fresh solution "McpIt" containing one PLC project "Plc1".
+/// Fixture with a live TcXaeShell and a fresh, empty solution "McpIt" (no PLC project – subclasses add what they need).
 /// Shared by all XAE integration tests of a collection (starting the IDE takes ~30-60 s).
 /// </summary>
 public class XaeProjectFixture : McpServerFixture
