@@ -116,6 +116,9 @@ public sealed class LibraryPackagingToolsTests(LibraryFixture fx)
         {
             await fx.CallRaw("lib_remove_repository", new { name = repoName });
         }
+
+        var after = await fx.Call("lib_list_repositories");
+        Assert.DoesNotContain(after.GetProperty("repositories").EnumerateArray(), r => r.GetProperty("name").GetString() == repoName);
     }
 
     [Fact]
@@ -166,6 +169,45 @@ public sealed class LibraryPackagingToolsTests(LibraryFixture fx)
         {
             await fx.Call("solution_open", new { path = originalSolution });
         }
+    }
+
+    [Fact]
+    public async Task Save_twincat_project_archive_as_tszip()
+    {
+        var tszip = fx.NewPath("McpIt.tszip");
+
+        await fx.Call("archive_save_solution", new { filePath = tszip, scope = "twincatProject" });
+
+        using var zip = ZipFile.OpenRead(tszip);
+        Assert.Contains(zip.Entries, e => e.FullName == "McpIt.tsproj");
+        Assert.Contains(zip.Entries, e => e.FullName.EndsWith("Plc1.plcproj"));
+    }
+
+    [Fact]
+    public async Task Import_exported_plc_project_as_second_plc()
+    {
+        var tpzip = fx.NewPath("Plc1.tpzip");
+        await fx.Call("archive_export_plc_project", new { plcName = XaeProjectFixture.PlcName, filePath = tpzip });
+        try
+        {
+            var created = await fx.Call("archive_import_plc_project", new { filePath = tpzip, name = "PlcImported" });
+
+            Assert.Equal("TIPC^PlcImported", created.GetProperty("path").GetString());
+            var refs = await fx.Call("lib_list_references", new { plcProject = "PlcImported" });
+            Assert.Equal("TIPC^PlcImported^PlcImported Project", refs.GetProperty("plcProject").GetString());
+
+            // with two PLC projects the PLC must be named explicitly
+            var (json, isError) = await fx.CallRaw("lib_list_references");
+            Assert.True(isError);
+            Assert.Contains("Several PLC projects", json.GetProperty("error").GetString());
+        }
+        finally
+        {
+            await fx.CallRaw("tree_delete_item", new { treePath = "TIPC^PlcImported" });
+        }
+
+        var exists = await fx.Call("tree_exists", new { treePaths = new[] { "TIPC^PlcImported" } });
+        Assert.False(exists.GetProperty("TIPC^PlcImported").GetBoolean());
     }
 
     [Fact]
