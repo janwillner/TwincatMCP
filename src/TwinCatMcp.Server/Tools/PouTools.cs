@@ -109,7 +109,7 @@ public sealed class PouTools(XaeSession session)
 
     // ------------------------------------------------------------------ write / replace
 
-    [McpServerTool(Name = "pou_write_code"), Description(
+    [McpServerTool(Name = "pou_write_code", Destructive = true), Description(
         "Replaces the whole declaration and/or implementation of a PLC object. Pass only the area(s) you want to change. " +
         "The declaration must start with the matching header (e.g. 'FUNCTION_BLOCK FB_Motor', 'METHOD M_Start : BOOL', 'TYPE ST_Data :', 'VAR_GLOBAL'). " +
         "For small changes prefer pou_replace_code. Afterwards check with plc_check_all_objects or build_solution.")]

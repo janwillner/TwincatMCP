@@ -164,12 +164,22 @@ public sealed class MotionToolsTests(MotionFixture fx)
     {
         var axis = await AddAxisAsync("StepperAxis");
         var master = await fx.Call("tree_create_child", new { parentPath = "TIID", name = "EcMotion", subType = 111 });
-        var ek = await fx.Call("tree_create_child", new { parentPath = master.GetProperty("path").GetString(), name = "Term 1 (EK1100)", subType = 9099, info = "EK1100-0000-0017" });
-        var el = await fx.Call("tree_create_child", new { parentPath = ek.GetProperty("path").GetString(), name = "Term 2 (EL7041)", subType = 9099, info = "EL7041-0000-0016" });
-        var elPath = el.GetProperty("path").GetString()!;
+        JsonElement link, unlink;
+        string elPath;
+        try
+        {
+            var ek = await fx.Call("tree_create_child", new { parentPath = master.GetProperty("path").GetString(), name = "Term 1 (EK1100)", subType = 9099, info = "EK1100-0000-0017" });
+            var el = await fx.Call("tree_create_child", new { parentPath = ek.GetProperty("path").GetString(), name = "Term 2 (EL7041)", subType = 9099, info = "EL7041-0000-0016" });
+            elPath = el.GetProperty("path").GetString()!;
 
-        var link = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = elPath });
-        var unlink = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = "" });
+            link = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = elPath });
+            unlink = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = "" });
+        }
+        finally
+        {
+            // Two adapter-less EtherCAT masters in one project fail TwinCAT's "Check config" - leave the shared project clean.
+            await fx.CallRaw("io_remove_device", new { device = master.GetProperty("path").GetString() });
+        }
 
         var a = link.GetProperty("axis");
         Assert.Equal(elPath, a.GetProperty("ioLink").GetString());
@@ -189,7 +199,15 @@ public sealed class MotionToolsTests(MotionFixture fx)
         var drive = await fx.Call("tree_create_child", new { parentPath = master.GetProperty("path").GetString(), name = "Drive 1 (AX5203)", subType = 9099, info = "AX5203-0000-0214" });
         var drivePath = drive.GetProperty("path").GetString()!;
 
-        var link = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = drivePath, channel = 1 });
+        JsonElement link;
+        try
+        {
+            link = await fx.Call("motion_link_axis_to_drive", new { axis, ioPath = drivePath, channel = 1 });
+        }
+        finally
+        {
+            await fx.CallRaw("io_remove_device", new { device = master.GetProperty("path").GetString() });
+        }
 
         var a = link.GetProperty("axis");
         Assert.Equal(drivePath, a.GetProperty("ioLink").GetString());

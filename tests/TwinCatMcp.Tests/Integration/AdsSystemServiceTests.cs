@@ -68,8 +68,8 @@ public sealed class AdsSystemServiceTests(AdsFixture fx)
         var file = Path.Combine(dir, "hello.txt");
         try
         {
-            await fx.Call("ads_write_file", new { path = file, content = "Hallo ADS\nZeile 2" });
-            await fx.Call("ads_write_file", new { path = file, content = "!", append = true });
+            await fx.Call("ads_write_file", new { path = file, content = "Hallo ADS\nZeile 2", allowLocalSystem = true });
+            await fx.Call("ads_write_file", new { path = file, content = "!", append = true, allowLocalSystem = true });
             Assert.Equal("Hallo ADS\nZeile 2!", File.ReadAllText(file));
 
             var read = await fx.Call("ads_read_file", new { path = file });
@@ -81,15 +81,15 @@ public sealed class AdsSystemServiceTests(AdsFixture fx)
             Assert.Equal("hello.txt", entry.GetProperty("name").GetString());
             Assert.Equal(18, entry.GetProperty("size").GetInt64());
 
-            await fx.Call("ads_delete_file", new { path = file });
+            await fx.Call("ads_delete_file", new { path = file, allowLocalSystem = true });
             Assert.False(File.Exists(file));
-            await fx.Call("ads_delete_file", new { path = dir, isDirectory = true });
+            await fx.Call("ads_delete_file", new { path = dir, isDirectory = true, allowLocalSystem = true });
             Assert.False(Directory.Exists(dir));
         }
         finally
         {
-            await fx.CallRaw("ads_delete_file", new { path = file });
-            await fx.CallRaw("ads_delete_file", new { path = dir, isDirectory = true });
+            await fx.CallRaw("ads_delete_file", new { path = file, allowLocalSystem = true });
+            await fx.CallRaw("ads_delete_file", new { path = dir, isDirectory = true, allowLocalSystem = true });
         }
     }
 

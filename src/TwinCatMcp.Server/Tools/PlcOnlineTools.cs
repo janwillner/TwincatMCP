@@ -14,7 +14,11 @@ namespace TwinCatMcp.Tools;
 [McpServerToolType]
 public sealed class PlcOnlineTools(XaeSession session)
 {
-    private const string PlcProjectDescription = "PLC project name (e.g. 'Plc1') or its tree path. Empty = first PLC project.";
+    private const string PlcProjectDescription = "PLC project name (e.g. 'Plc1') or its tree path. Empty = the only PLC project (required when there are several).";
+
+    private const string AllowLocalDescription =
+        "Required (true) when the target is this PC's own TwinCAT system (<Local>), which may run another application. " +
+        "Normally set a dedicated target with system_set_target instead.";
 
     [McpServerTool(Name = "plc_online_login"), Description(
         "Logs the XAE into the PLC runtime of the target and downloads the application if needed (no dialogs). " +
@@ -24,9 +28,11 @@ public sealed class PlcOnlineTools(XaeSession session)
         [Description(PlcProjectDescription)] string? plcProject = null,
         [Description("'auto', 'download' or 'onlineChange'.")] string mode = "auto",
         [Description("Compile the code before login (PLC_LOGIN_FLAGS_FORCECOMPILECODE).")] bool rebuild = false,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false,
         int timeoutSeconds = 300)
         => session.RunAsync(s =>
         {
+            LocalTargetGuard.Ensure(XaeRuntime.TargetNetId(s), allowLocalSystem, "log into / download the PLC");
             var flags = PlcOnline.LoginFlags(mode, rebuild);
             var (path, online) = Online(s, plcProject);
             online.Login((PLC_LOGIN_FLAGS)flags);
@@ -47,18 +53,24 @@ public sealed class PlcOnlineTools(XaeSession session)
         });
 
     [McpServerTool(Name = "plc_online_start"), Description("Starts the PLC application (requires plc_online_login).")]
-    public Task<CallToolResult> Start([Description(PlcProjectDescription)] string? plcProject = null)
+    public Task<CallToolResult> Start(
+        [Description(PlcProjectDescription)] string? plcProject = null,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false)
         => session.RunAsync(s =>
         {
+            LocalTargetGuard.Ensure(XaeRuntime.TargetNetId(s), allowLocalSystem, "start the PLC");
             var (path, online) = Online(s, plcProject, requireLogin: true);
             online.Start();
             return State(path, online, s);
         });
 
-    [McpServerTool(Name = "plc_online_stop"), Description("Stops the PLC application (requires plc_online_login).")]
-    public Task<CallToolResult> Stop([Description(PlcProjectDescription)] string? plcProject = null)
+    [McpServerTool(Name = "plc_online_stop", Destructive = true), Description("Stops the PLC application (requires plc_online_login).")]
+    public Task<CallToolResult> Stop(
+        [Description(PlcProjectDescription)] string? plcProject = null,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false)
         => session.RunAsync(s =>
         {
+            LocalTargetGuard.Ensure(XaeRuntime.TargetNetId(s), allowLocalSystem, "stop the PLC");
             var (path, online) = Online(s, plcProject, requireLogin: true);
             online.Stop();
             return State(path, online, s);
@@ -69,9 +81,11 @@ public sealed class PlcOnlineTools(XaeSession session)
         "'origin' = everything incl. RETAIN/PERSISTENT and the application is removed from the runtime (login with download afterwards).")]
     public Task<CallToolResult> Reset(
         [Description("'cold' or 'origin'.")] string type = "cold",
-        [Description(PlcProjectDescription)] string? plcProject = null)
+        [Description(PlcProjectDescription)] string? plcProject = null,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false)
         => session.RunAsync(s =>
         {
+            LocalTargetGuard.Ensure(XaeRuntime.TargetNetId(s), allowLocalSystem, "reset the PLC");
             var resetType = PlcOnline.ResetType(type);
             var (path, online) = Online(s, plcProject, requireLogin: true);
             online.Reset((PLC_RESET_TYPE)resetType);
@@ -86,34 +100,6 @@ public sealed class PlcOnlineTools(XaeSession session)
         {
             var (path, online) = Online(s, plcProject);
             return State(path, online, s);
-        });
-
-    [McpServerTool(Name = "plc_online_generate_boot_project"), Description(
-        "Generates the PLC boot project (ITcPlcProject.GenerateBootProject). activate=true writes it to the target so the PLC starts " +
-        "from it after a TwinCAT restart (with autostart, see plc_online_set_autostart).")]
-    public Task<CallToolResult> GenerateBootProject(
-        [Description(PlcProjectDescription)] string? plcProject = null,
-        [Description("Activate the boot project on the target.")] bool activate = true,
-        int timeoutSeconds = 300)
-        => session.RunAsync(s =>
-        {
-            var root = XaeRuntime.PlcRootPath(s, plcProject ?? "");
-            var project = AsPlcProject(s.Lookup(root), root);
-            project.GenerateBootProject(activate);
-            return new { plcProject = root, bootProjectGenerated = true, activated = activate, autostart = project.BootProjectAutostart };
-        }, timeoutSeconds);
-
-    [McpServerTool(Name = "plc_online_set_autostart", Idempotent = true), Description(
-        "Enables/disables 'Autostart Boot Project' of a PLC project (ITcPlcProject.BootProjectAutostart). Takes effect with the next activation / boot project.")]
-    public Task<CallToolResult> SetAutostart(
-        [Description("true = the PLC starts automatically from its boot project.")] bool enabled,
-        [Description(PlcProjectDescription)] string? plcProject = null)
-        => session.RunAsync(s =>
-        {
-            var root = XaeRuntime.PlcRootPath(s, plcProject ?? "");
-            var project = AsPlcProject(s.Lookup(root), root);
-            project.BootProjectAutostart = enabled;
-            return new { plcProject = root, autostart = project.BootProjectAutostart };
         });
 
     // ------------------------------------------------------------------ helpers

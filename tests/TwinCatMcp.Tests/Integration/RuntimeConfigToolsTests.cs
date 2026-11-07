@@ -89,16 +89,17 @@ public sealed class RuntimeConfigToolsTests(RuntimeProjectFixture fx)
         var state = await fx.Call("plc_online_state", new { plcProject = XaeProjectFixture.PlcName });
         Assert.False(state.GetProperty("loggedIn").GetBoolean());
 
-        var on = await fx.Call("plc_online_set_autostart", new { enabled = true, plcProject = XaeProjectFixture.PlcName });
-        Assert.True(on.GetProperty("autostart").GetBoolean());
-        var off = await fx.Call("plc_online_set_autostart", new { enabled = false });
-        Assert.False(off.GetProperty("autostart").GetBoolean());
+        var on = await fx.Call("plc_set_settings", new { project = XaeProjectFixture.PlcName, bootProjectAutostart = true });
+        Assert.True(on.GetProperty("bootProjectAutostart").GetBoolean());
+        var off = await fx.Call("plc_set_settings", new { bootProjectAutostart = false });
+        Assert.False(off.GetProperty("bootProjectAutostart").GetBoolean());
     }
 
     [Fact]
     public async Task Start_without_login_is_rejected_with_a_hint()
     {
-        var (json, isError) = await fx.CallRaw("plc_online_start", new { plcProject = XaeProjectFixture.PlcName });
+        // allowLocalSystem only lets the call pass the local-system guard; it fails at the login check before touching anything.
+        var (json, isError) = await fx.CallRaw("plc_online_start", new { plcProject = XaeProjectFixture.PlcName, allowLocalSystem = true });
 
         Assert.True(isError);
         Assert.Contains("plc_online_login", json.GetProperty("hint").GetString());

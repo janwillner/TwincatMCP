@@ -16,7 +16,7 @@ public sealed class RuntimeActivationFixture : RuntimeProjectFixture
     public override Task DisposeAsync() => RuntimeFactAttribute.Enabled ? base.DisposeAsync() : Task.CompletedTask;
 }
 
-[CollectionDefinition(Name)]
+[CollectionDefinition(Name, DisableParallelization = true)] // changes machine-wide state (library repositories / runtimes)
 public sealed class RuntimeActivationCollection : ICollectionFixture<RuntimeActivationFixture>
 {
     public const string Name = "RuntimeActivation";

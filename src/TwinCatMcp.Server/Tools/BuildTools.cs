@@ -34,11 +34,17 @@ public sealed class BuildTools(XaeSession session)
             });
             var failedProjects = sb.LastBuildInfo;
             var diagnostics = BuildDiagnostics.Combine(output, ErrorList.ReadItems(s.Dte), includeWarnings, includeMessages);
+            var success = failedProjects == 0 && diagnostics.ErrorCount == 0;
             return new
             {
-                success = failedProjects == 0 && diagnostics.ErrorCount == 0,
+                success,
                 failedProjects,
                 diagnostics,
+                // "Check config failed!" (TwinCAT project build) carries its details only in the System Manager error log.
+                twinCatErrors = success ? null : NullIfBlank(s.TryGetLastErrorMessages()),
+                hint = diagnostics.Errors.Any(e => e.Message.Contains("Check config failed", StringComparison.OrdinalIgnoreCase))
+                    ? CheckConfigHint
+                    : null,
             };
         }, timeoutSeconds);
 
@@ -65,6 +71,15 @@ public sealed class BuildTools(XaeSession session)
                 diagnostics,
             };
         }, timeoutSeconds);
+
+    private static string? NullIfBlank(string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
+
+    /// <summary>"Check config failed!" comes without details in automation; these are the causes seen in practice.</summary>
+    public const string CheckConfigHint =
+        "The TwinCAT configuration check failed (PLC code compiled fine). Typical causes: several I/O devices (e.g. two EtherCAT masters) " +
+        "without or with the same network adapter -> io_list_devices / io_set_device_adapter or io_remove_device; " +
+        "broken or size-mismatched variable links -> mapping_check; tasks without valid cycle time/priority -> task_list. " +
+        "Fix the configuration and build again.";
 
     [McpServerTool(Name = "build_clean"), Description("Cleans the solution.")]
     public Task<CallToolResult> Clean()
@@ -170,8 +185,6 @@ public static class BuildDiagnostics
 
 public static class ErrorList
 {
-    public sealed record Diagnostic(string Level, string Description, string? File, int Line, int Column, string? Project);
-
     /// <summary>Error List entries in the uniform <see cref="PlcDiagnostic"/> shape.</summary>
     public static IReadOnlyList<PlcDiagnostic> ReadItems(DTE2 dte)
     {
@@ -201,50 +214,6 @@ public static class ErrorList
 
         return result;
     }
-
-    public static object Read(DTE2 dte, bool includeWarnings, bool includeMessages)
-    {
-        var errors = new List<Diagnostic>();
-        var warnings = new List<Diagnostic>();
-        var messages = new List<Diagnostic>();
-        var window = dte.ToolWindows.ErrorList;
-        try
-        {
-            window.ShowErrors = true;
-            window.ShowWarnings = true;
-            window.ShowMessages = true;
-        }
-        catch
-        {
-            // not supported in all shells
-        }
-
-        var items = window.ErrorItems;
-        for (var i = 1; i <= items.Count; i++)
-        {
-            var e = items.Item(i);
-            var level = e.ErrorLevel switch
-            {
-                vsBuildErrorLevel.vsBuildErrorLevelHigh => "error",
-                vsBuildErrorLevel.vsBuildErrorLevelMedium => "warning",
-                _ => "message",
-            };
-            var d = new Diagnostic(level, e.Description, NullIfEmpty(Safe(() => e.FileName)), Safe(() => e.Line), Safe(() => e.Column), NullIfEmpty(Safe(() => e.Project)));
-            (level == "error" ? errors : level == "warning" ? warnings : messages).Add(d);
-        }
-
-        return new
-        {
-            errorCount = errors.Count,
-            warningCount = warnings.Count,
-            messageCount = messages.Count,
-            errors,
-            warnings = includeWarnings ? warnings : null,
-            messages = includeMessages ? messages : null,
-        };
-    }
-
-    private static string? NullIfEmpty(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
 
     private static T Safe<T>(Func<T> f)
     {

@@ -22,10 +22,10 @@ public static class Guides
         10. Motion: `motion_create_nc_task`, `motion_add_axis`, `motion_set_axis_parameters`, `motion_link_axis_to_drive`, `motion_link_axis_to_plc`.
 
         ## 4. Deploy
-        11. `system_set_target { netId }` (route must exist: `route_list`, `route_add`).
+        11. `system_set_target { target }` – a route name or AMS Net ID (route must exist: `route_list`, `route_add`). Activating/writing on this PC's own TwinCAT system additionally needs `allowLocalSystem: true`.
         12. `license_list` – a TC1200 (PLC) license (trial or real) must exist on the target.
         13. `system_activate_configuration` → target switches to Run mode.
-        14. `plc_online_login` (download), `plc_online_start`; optional `plc_online_generate_boot_project`.
+        14. `plc_online_login` (download), `plc_online_start`; optional boot project: `plc_set_settings { bootProjectAutostart: true }` + `plc_generate_boot_project { activate: true }`.
         15. Verify online with ADS: `ads_read_state`, `ads_browse_symbols`, `ads_read_symbols`, `ads_write_symbols`, `ads_monitor`.
 
         ## 5. Manage

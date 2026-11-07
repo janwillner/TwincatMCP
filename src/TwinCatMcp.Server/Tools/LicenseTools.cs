@@ -48,7 +48,7 @@ public sealed class LicenseTools(XaeSession session)
         "needs anyway (TC1200 PLC, TC1000 ADS, ...) are detected automatically by TwinCAT.")]
     public Task<CallToolResult> Add(
         [Description("Order number ('TF6250') or license GUID ('{...}').")] string license,
-        [Description("PLC project name (e.g. 'Plc1'). Empty = first PLC project.")] string? plcProject = null,
+        [Description("PLC project name (e.g. 'Plc1'). Empty = the only PLC project (required when there are several).")] string? plcProject = null,
         [Description("true = remove the license from the PLC project instead.")] bool remove = false)
         => session.RunAsync(s =>
         {
@@ -68,7 +68,7 @@ public sealed class LicenseTools(XaeSession session)
             };
         });
 
-    [McpServerTool(Name = "license_activate_trial"), Description(
+    [McpServerTool(Name = "license_activate_trial", Destructive = true), Description(
         "Prepares the 7-day trial license for the current target. TwinCAT protects trial generation with a captcha, so the final click must be " +
         "done by a human: this tool checks whether the target already has a valid trial (local Usermode Runtimes), makes the XAE window visible, " +
         "selects System > License and returns the exact steps. Afterwards call license_list to verify.")]

@@ -116,7 +116,8 @@ public sealed class AdsTools(AdsSessionManager ads)
         [Description(NetIdDesc)] string? netId = null,
         [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort,
         [Description("Device state to send along (normally 0).")] int deviceState = 0,
-        [Description("Must be true to change the state of the system service (port 10000) - restarts/stops the whole TwinCAT runtime.")] bool confirmSystemService = false)
+        [Description("Must be true to change the state of the system service (port 10000) - restarts/stops the whole TwinCAT runtime.")] bool confirmSystemService = false,
+        [Description(AdsLocal.Description)] bool allowLocalSystem = false)
         => ads.Run(() =>
         {
             var isSystem = port == AdsSessionManager.SystemServicePort;
@@ -128,6 +129,7 @@ public sealed class AdsTools(AdsSessionManager ads)
                 };
             }
 
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "change the ADS state", port);
             var requested = AdsStateText.ParseCommand(state, isSystem);
             var c = ads.Get(netId, port);
             c.TryReadState(out var before);
@@ -192,9 +194,11 @@ public sealed class AdsTools(AdsSessionManager ads)
         [Description("Bytes to write (hex or base64).")] string data,
         [Description("'hex' (default) or 'base64'.")] string format = "hex",
         [Description(NetIdDesc)] string? netId = null,
-        [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort)
+        [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort,
+        [Description(AdsLocal.Description)] bool allowLocalSystem = false)
         => ads.Run(() =>
         {
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "write raw ADS data", port);
             var ig = ParseNumber(indexGroup, nameof(indexGroup));
             var io = ParseNumber(indexOffset, nameof(indexOffset));
             var bytes = Bytes(data, format);
@@ -378,9 +382,11 @@ public sealed class AdsTools(AdsSessionManager ads)
         [Description("'text' (UTF-8, default) or 'base64'.")] string encoding = "text",
         [Description("Append instead of overwrite.")] bool append = false,
         [Description(RootDesc)] string root = "generic",
-        [Description(SysNetIdDesc)] string? netId = null)
+        [Description(SysNetIdDesc)] string? netId = null,
+        [Description(AdsLocal.Description)] bool allowLocalSystem = false)
         => ads.Run(() =>
         {
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "write files");
             byte[] bytes;
             try
             {
@@ -402,9 +408,11 @@ public sealed class AdsTools(AdsSessionManager ads)
         [Description("File or directory path (absolute for root 'generic').")] string path,
         [Description(RootDesc)] string root = "generic",
         [Description("Remove an empty directory instead of a file.")] bool isDirectory = false,
-        [Description(SysNetIdDesc)] string? netId = null)
+        [Description(SysNetIdDesc)] string? netId = null,
+        [Description(AdsLocal.Description)] bool allowLocalSystem = false)
         => ads.Run(() =>
         {
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "delete files");
             var sys = new SystemServiceClient(ads.Get(netId, AdsSessionManager.SystemServicePort));
             if (isDirectory)
             {

@@ -47,36 +47,16 @@ public static class XaeRuntime
     }
 
     /// <summary>"Plc1" -> "TIPC^Plc1^Plc1 Project" (nested project); full paths are returned unchanged.</summary>
+    /// <remarks>
+    /// Delegates to the single canonical resolver <see cref="Plc.PlcTree.ResolveProject"/>: an empty name is only accepted
+    /// when exactly one PLC project exists, so online operations can never silently pick the wrong PLC.
+    /// </remarks>
     public static string NestedProjectPath(XaeSession s, string plcProject)
-    {
-        if (string.IsNullOrWhiteSpace(plcProject))
-        {
-            return NestedProjects(s).FirstOrDefault()?.PathName ?? throw NoPlc();
-        }
-
-        var p = plcProject.Trim();
-        var parts = p.Split('^');
-        if (parts.Length > 2)
-        {
-            return p;
-        }
-
-        var rootPath = parts.Length == 2 ? p : $"TIPC^{p}";
-        var nested = Try(() => (s.Lookup(rootPath) as ITcProjectRoot)?.NestedProject?.PathName);
-        return nested ?? $"{rootPath}^{rootPath[(rootPath.LastIndexOf('^') + 1)..]} Project";
-    }
+        => Plc.PlcTree.ResolveProject(s, plcProject).ProjectPath;
 
     /// <summary>"Plc1" or any path below it -> "TIPC^Plc1" (project root, implements ITcPlcProject).</summary>
     public static string PlcRootPath(XaeSession s, string plcProject)
-    {
-        if (string.IsNullOrWhiteSpace(plcProject))
-        {
-            return FirstPlcRoot(s) ?? throw NoPlc();
-        }
-
-        var parts = plcProject.Trim().Split('^');
-        return parts.Length >= 2 ? $"{parts[0]}^{parts[1]}" : $"TIPC^{parts[0]}";
-    }
+        => Plc.PlcTree.ResolveProject(s, plcProject).RootPath;
 
     /// <summary>
     /// All nested PLC projects ("TIPC^P^P Project"). They are not enumerated as children of the project root
@@ -93,11 +73,6 @@ public static class XaeRuntime
             }
         }
     }
-
-    private static string? FirstPlcRoot(XaeSession s)
-        => TreeInfo.Children(s.Lookup("TIPC")).Select(c => c.PathName).FirstOrDefault();
-
-    private static TcException NoPlc() => new("The project has no PLC project.") { Hint = "Create one first (plc_create_project or tree_create_child on TIPC)." };
 
     public static string? LastXmlError(ITcSmTreeItem item)
     {

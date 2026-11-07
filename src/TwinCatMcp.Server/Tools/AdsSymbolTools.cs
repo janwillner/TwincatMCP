@@ -117,9 +117,11 @@ public sealed class AdsSymbolTools(AdsSessionManager ads)
         [Description("JSON object: symbol path -> value.")] JsonElement values,
         [Description("Read the values back after writing and return them.")] bool readBack = true,
         [Description(NetIdDesc)] string? netId = null,
-        [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort)
+        [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort,
+        [Description(AdsLocal.Description)] bool allowLocalSystem = false)
         => ads.Run(() =>
         {
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "write PLC symbols", port);
             if (values.ValueKind != JsonValueKind.Object)
             {
                 throw new TcException("'values' must be a JSON object mapping symbol paths to values.") { Hint = "Example: {\"MAIN.nSetpoint\": 42, \"MAIN.bEnable\": true}" };
@@ -396,9 +398,11 @@ public sealed class AdsSymbolTools(AdsSessionManager ads)
         [Description("Method name.")] string method,
         [Description("In-parameters: JSON object {name: value} or array [value, ...]. Omit for none.")] JsonElement? args = null,
         [Description(NetIdDesc)] string? netId = null,
-        [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort)
+        [Description(PortDesc)] int port = AdsSessionManager.DefaultPlcPort,
+        [Description(AdsLocal.Description)] bool allowLocalSystem = false)
         => ads.Run(() =>
         {
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "invoke PLC methods", port);
             var s = ads.Resolve(netId, port, [symbol])[0];
             var loader = ads.Symbols(netId, port);
             var rpcType = s.DataType as IRpcCallableType;

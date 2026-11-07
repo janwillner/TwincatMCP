@@ -114,6 +114,27 @@ public sealed partial class ServerSurfaceTests(McpServerFixture fx)
     }
 
     [Fact]
+    public async Task Every_tool_that_changes_a_runtime_requires_explicit_permission_for_the_own_system()
+    {
+        // Safety contract: these tools refuse to act on this PC's own TwinCAT system unless allowLocalSystem=true
+        // (LocalTargetGuard, unit-tested). Verified via the schema so that a broken guard can never harm the PC in a test.
+        string[] guarded =
+        [
+            "system_activate_configuration", "system_restart", "system_set_config_mode", "system_set_run_mode",
+            "plc_online_login", "plc_online_start", "plc_online_stop", "plc_online_reset",
+            "ads_write_control", "ads_write_symbols", "ads_write_raw", "ads_write_file", "ads_delete_file", "ads_invoke_rpc",
+        ];
+        var tools = (await fx.Client.ListToolsAsync()).ToDictionary(t => t.Name);
+
+        foreach (var name in guarded)
+        {
+            Assert.True(tools.ContainsKey(name), name);
+            var props = tools[name].JsonSchema.GetProperty("properties");
+            Assert.True(props.TryGetProperty("allowLocalSystem", out _), $"{name} lacks allowLocalSystem");
+        }
+    }
+
+    [Fact]
     public async Task A_misspelled_argument_is_explained_instead_of_a_generic_error()
     {
         var (json, isError) = await fx.CallRaw("motion_get_axis_parameters", new { axis = "Axis 1" });

@@ -103,7 +103,7 @@ public sealed class TaskTools(XaeSession session)
     public Task<CallToolResult> LinkPlc(
         [Description("Real-time task name or path ('FastTask' / 'TIRT^FastTask').")] string task,
         [Description("PLC task reference name inside the nested PLC project (default 'PlcTask' of the Standard PLC template) or its full path.")] string plcTask = "PlcTask",
-        [Description("PLC project name (e.g. 'Plc1'). Empty = first PLC project. Ignored when plcTask is a full path.")] string? plcProject = null)
+        [Description("PLC project name (e.g. 'Plc1'). Empty = the only PLC project (required when there are several). Ignored when plcTask is a full path.")] string? plcProject = null)
         => session.RunAsync(s =>
         {
             var taskPath = XaeRuntime.TaskPath(task);

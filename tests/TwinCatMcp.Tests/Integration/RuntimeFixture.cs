@@ -97,7 +97,7 @@ public class RuntimeProjectFixture : McpServerFixture
     }
 }
 
-[CollectionDefinition(Name)]
+[CollectionDefinition(Name, DisableParallelization = true)] // changes machine-wide state (library repositories / runtimes)
 public sealed class RuntimeCollection : ICollectionFixture<RuntimeProjectFixture>
 {
     public const string Name = "Runtime";

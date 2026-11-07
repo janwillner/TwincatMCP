@@ -43,10 +43,10 @@ public sealed class TwinCatPrompts
             Deploy the open TwinCAT project to target {netId}:
             1. build_solution – must have 0 errors.
             2. route_list – make sure a route to {netId} exists (route_add if not).
-            3. system_set_target {"{"} netId: "{netId}" {"}"}, then license_list – a valid TC1200 license is required.
-            4. system_activate_configuration (restart in run mode).
-            5. plc_online_login, plc_online_start, then ads_read_state on port 851 to verify the PLC is in Run.
-            6. Optionally plc_online_generate_boot_project so the program survives a restart.
+            3. system_set_target (target = "{netId}"), then license_list – a valid TC1200 license is required.
+            4. system_activate_configuration (restart in run mode). If {netId} is this PC's own TwinCAT system, allowLocalSystem = true is required.
+            5. plc_online_login (mode = "download"), plc_online_start, then ads_read_state (netId = "{netId}", port = 851) to verify the PLC is in Run.
+            6. Optionally plc_set_settings (bootProjectAutostart = true) and plc_generate_boot_project (activate = true) so the program survives a restart.
             Report each step's result.
             """;
 

@@ -22,7 +22,7 @@ public sealed class LibraryFixture : XaeProjectFixture
     public string NewPath(string fileName) => Path.Combine(OutDir, Guid.NewGuid().ToString("N")[..6], fileName);
 }
 
-[CollectionDefinition(Name)]
+[CollectionDefinition(Name, DisableParallelization = true)] // changes machine-wide state (library repositories / runtimes)
 public sealed class LibraryCollection : ICollectionFixture<LibraryFixture>
 {
     public const string Name = "XAE-Libraries";

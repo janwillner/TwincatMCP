@@ -16,6 +16,10 @@ namespace TwinCatMcp.Tools;
 [McpServerToolType]
 public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
 {
+    private const string AllowLocalDescription =
+        "Required (true) when the target is this PC's own TwinCAT system (<Local>), which may run another application. " +
+        "Normally set a dedicated target with system_set_target instead.";
+
     [McpServerTool(Name = "system_get_target", ReadOnly = true), Description(
         "Returns the target system of the selected TwinCAT project: AMS Net ID (ITcSysManager.GetTargetNetId) and its route name if known. " +
         "Use before activating to make sure you deploy to the right runtime.")]
@@ -83,10 +87,12 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         [Description("Restart TwinCAT in Run mode after activation (the XAE question 'Restart TwinCAT in Run mode?' answered with yes).")] bool restart = true,
         [Description("Seconds to wait for the target to reach Run mode.")] int waitSeconds = 60,
         [Description("Skip the license pre-check for local Usermode Runtimes (license file with TC1200 when a PLC is configured).")] bool skipLicenseCheck = false,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false,
         int timeoutSeconds = 300)
         => XaeRuntime.RunThenAsync(session, s =>
         {
             var netId = XaeRuntime.TargetNetId(s);
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "activate the configuration");
             if (restart && !skipLicenseCheck)
             {
                 CheckLocalLicenses(s, netId);
@@ -123,10 +129,14 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
     [McpServerTool(Name = "system_restart", Destructive = true), Description(
         "Starts or restarts TwinCAT on the target in Run mode (ITcSysManager.StartRestartTwinCAT) with the configuration last activated on it, " +
         "then waits for ADS state Run. Does NOT activate the current project - use system_activate_configuration for that.")]
-    public Task<CallToolResult> Restart([Description("Seconds to wait for the target to reach Run mode after the restart.")] int waitSeconds = 60, int timeoutSeconds = 180)
+    public Task<CallToolResult> Restart(
+        [Description("Seconds to wait for the target to reach Run mode after the restart.")] int waitSeconds = 60,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false,
+        int timeoutSeconds = 180)
         => XaeRuntime.RunThenAsync(session, s =>
         {
             var netId = XaeRuntime.TargetNetId(s);
+            LocalTargetGuard.Ensure(netId, allowLocalSystem, "restart TwinCAT");
             s.SysManager.StartRestartTwinCAT();
             return netId;
         }, async netId =>
@@ -141,9 +151,11 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         "Pass netId to address any target without an XAE session.")]
     public Task<CallToolResult> SetConfigMode(
         [Description("Optional AMS Net ID. Empty = target of the current XAE project.")] string? netId = null,
-        [Description("Seconds to wait until the target reports Config mode.")] int waitSeconds = 30)
+        [Description("Seconds to wait until the target reports Config mode.")] int waitSeconds = 30,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false)
         => WithTarget(netId, async target =>
         {
+            LocalTargetGuard.Ensure(target, allowLocalSystem, "switch TwinCAT to Config mode");
             TargetState.WriteControl(ads, target, AdsState.Reconfig);
             return await WaitResult(target, "Config", waitSeconds);
         });
@@ -153,9 +165,11 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         "without an XAE session via ADS: system service port 10000, state Reset). Does NOT activate the current project.")]
     public Task<CallToolResult> SetRunMode(
         [Description("Optional AMS Net ID. Empty = target of the current XAE project.")] string? netId = null,
-        [Description("Seconds to wait until the target reports Run mode.")] int waitSeconds = 60)
+        [Description("Seconds to wait until the target reports Run mode.")] int waitSeconds = 60,
+        [Description(AllowLocalDescription)] bool allowLocalSystem = false)
         => WithTarget(netId, async target =>
         {
+            LocalTargetGuard.Ensure(target, allowLocalSystem, "restart TwinCAT in Run mode");
             TargetState.WriteControl(ads, target, AdsState.Reset);
             return await WaitResult(target, "Run", waitSeconds);
         });
