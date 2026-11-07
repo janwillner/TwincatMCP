@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "twincat": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": ["artifacts/twincat-mcp/TwinCatMcp.Server.dll"],
+      "env": {
+        "TWINCAT_MCP_LOGLEVEL": "Warning"
+      }
+    }
+  }
+}

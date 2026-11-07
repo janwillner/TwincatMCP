@@ -54,6 +54,15 @@ public sealed class XaeSession : IDisposable
             var payload = await _sta.InvokeAsync(() => work(this), timeout ?? DefaultTimeout, ct).ConfigureAwait(false);
             return ToolResult.Ok(payload);
         }
+        catch (Exception ex) when (IsIdeGone(ex))
+        {
+            _logger.LogWarning(ex, "IDE process is no longer reachable - dropping session");
+            await _sta.InvokeAsync(ReleaseDte, TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+            return ToolResult.Error(new TcException("The TwinCAT XAE process is no longer reachable (crashed or closed). The session was reset.", ex)
+            {
+                Hint = "Call xae_start (or xae_attach) and solution_open again.",
+            });
+        }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Tool execution failed");
@@ -74,20 +83,40 @@ public sealed class XaeSession : IDisposable
         }
     }
 
+    private static bool IsIdeGone(Exception ex)
+    {
+        for (var e = ex; e is not null; e = e.InnerException)
+        {
+            if (e is COMException com && unchecked((uint)com.HResult) is 0x800706BA or 0x800706BE or 0x80010108)
+            {
+                return true; // RPC_S_SERVER_UNAVAILABLE, RPC_S_CALL_FAILED, RPC_E_DISCONNECTED
+            }
+
+            if (e is InvalidComObjectException)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>Like <see cref="RunAsync"/> but takes a timeout in seconds (0 or less = default).</summary>
     public Task<CallToolResult> RunAsync(Func<XaeSession, object?> work, int timeoutSeconds, CancellationToken ct = default)
         => RunAsync(work, timeoutSeconds > 0 ? TimeSpan.FromSeconds(timeoutSeconds) : null, ct);
 
     // ------------------------------------------------------------------ accessors (STA only)
 
-    public DTE2 Dte => _dte ?? throw new TcException("No TwinCAT XAE instance is connected.")
+    public DTE2 Dte => _dte ?? throw NotConnected();
+
+    private static TcException NotConnected() => new("No TwinCAT XAE instance is connected.")
     {
         Hint = "Call xae_start (new IDE) or xae_attach (running IDE) first, then solution_open or solution_create.",
     };
 
     public Solution2 Solution => (Solution2)Dte.Solution;
 
-    public Project Project => _project ?? throw new TcException("No TwinCAT project (.tsproj) is selected.")
+    public Project Project => _project ?? (_dte is null ? throw NotConnected() : (Project?)null) ?? throw new TcException("No TwinCAT project (.tsproj) is selected.")
     {
         Hint = "Call solution_open or solution_create, or solution_select_project if the solution has several TwinCAT projects.",
     };
@@ -302,7 +331,6 @@ public sealed class XaeSession : IDisposable
         }
 
         string? targetNetId = null;
-        bool? twinCatStarted = null;
         if (_project is not null)
         {
             try { targetNetId = SysManager.GetTargetNetId(); } catch { /* ignore */ }
@@ -320,7 +348,6 @@ public sealed class XaeSession : IDisposable
             solution,
             project = _project is null ? null : new { name = _project.Name, file = _project.FullName },
             targetNetId,
-            twinCatStarted,
             twinCatProjects = solutionOpen ? EnumerateTwinCatProjects().Select(p => p.Name).ToArray() : [],
         };
     }
