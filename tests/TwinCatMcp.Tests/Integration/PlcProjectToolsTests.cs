@@ -96,15 +96,24 @@ public sealed class PlcProjectToolsTests(PlcProjectFixture fx)
     [Fact]
     public async Task Settings_can_be_read_and_changed()
     {
+        // Independent of the starting state (the shared fixture project may have been changed by other tests).
         var before = await fx.Call("plc_get_settings");
-        Assert.False(before.GetProperty("bootProjectAutostart").GetBoolean());
+        var autostart = before.GetProperty("bootProjectAutostart").GetBoolean();
+        var tmcCopy = before.GetProperty("tmcFileCopy").GetBoolean();
+        try
+        {
+            var after = await fx.Call("plc_set_settings", new { bootProjectAutostart = !autostart, tmcFileCopy = !tmcCopy });
+            var reread = await fx.Call("plc_get_settings");
 
-        var after = await fx.Call("plc_set_settings", new { bootProjectAutostart = true, tmcFileCopy = true });
-        Assert.True(after.GetProperty("bootProjectAutostart").GetBoolean());
-        Assert.True(after.GetProperty("tmcFileCopy").GetBoolean());
-        Assert.Equal("None", after.GetProperty("bootProjectEncryption").GetString());
-
-        await fx.Call("plc_set_settings", new { bootProjectAutostart = false, tmcFileCopy = false });
+            Assert.Equal(!autostart, after.GetProperty("bootProjectAutostart").GetBoolean());
+            Assert.Equal(!tmcCopy, after.GetProperty("tmcFileCopy").GetBoolean());
+            Assert.Equal("None", after.GetProperty("bootProjectEncryption").GetString());
+            Assert.Equal(!autostart, reread.GetProperty("bootProjectAutostart").GetBoolean());
+        }
+        finally
+        {
+            await fx.Call("plc_set_settings", new { bootProjectAutostart = autostart, tmcFileCopy = tmcCopy });
+        }
     }
 
     [Fact]

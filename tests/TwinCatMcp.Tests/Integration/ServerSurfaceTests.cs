@@ -113,6 +113,20 @@ public sealed partial class ServerSurfaceTests(McpServerFixture fx)
         Assert.Contains("xae_start", json.GetProperty("hint").GetString());
     }
 
+    [Theory]
+    [InlineData("tree_get_children", """{"treePaths":["TIRT","TIPC"]}""")]
+    [InlineData("tree_exists", """{"treePaths":["TIRT"]}""")]
+    [InlineData("pou_read_code", """{"paths":["TIPC^P^P Project^POUs^MAIN"]}""")]
+    [InlineData("mapping_link", """{"links":[{"a":"x","b":"y"}]}""")]
+    public async Task Batch_tools_without_session_fail_as_a_whole_instead_of_per_item(string tool, string args)
+    {
+        // A missing (or crashed) IDE is not an item-level problem: the client must see isError and the way out.
+        var (json, isError) = await fx.CallRaw(tool, System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(args));
+
+        Assert.True(isError, json.ToString());
+        Assert.Contains("xae_start", json.GetProperty("hint").GetString());
+    }
+
     [Fact]
     public async Task Every_tool_that_changes_a_runtime_requires_explicit_permission_for_the_own_system()
     {

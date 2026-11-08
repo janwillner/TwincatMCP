@@ -31,6 +31,7 @@ public sealed class SessionToolsTests(XaeProjectFixture fx)
         var status = await fx.Call("xae_status");
 
         Assert.True(status.GetProperty("ownsInstance").GetBoolean());
+        Assert.Equal("com", status.GetProperty("launchedAs").GetString()); // default launch mode
         var pid = status.GetProperty("processId").GetInt32();
         using var process = System.Diagnostics.Process.GetProcessById(pid);
         Assert.Equal("TcXaeShell", process.ProcessName);

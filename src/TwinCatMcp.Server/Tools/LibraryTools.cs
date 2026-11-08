@@ -108,7 +108,7 @@ public sealed class LibraryTools(XaeSession session)
 
                     results.Add(new { reference = text, ok = true, removed = target.Version is null ? target.Name : target.DisplayName });
                 }
-                catch (Exception ex) when (ex is TcException or COMException or ArgumentException or AmbiguousLibraryException)
+                catch (Exception ex) when ((ex is TcException or COMException or ArgumentException or AmbiguousLibraryException) && !XaeSession.IsSessionFatal(ex))
                 {
                     results.Add(new { reference = text, ok = false, error = ex.Message });
                 }
@@ -502,7 +502,7 @@ public sealed class LibraryTools(XaeSession session)
         {
             return new { library = text, ok = true, added = id?.DisplayName, alreadyReferenced = true };
         }
-        catch (Exception ex) when (ex is TcException or COMException or ArgumentException or FormatException)
+        catch (Exception ex) when ((ex is TcException or COMException or ArgumentException or FormatException) && !XaeSession.IsSessionFatal(ex))
         {
             return new { library = text, ok = false, error = ex.Message };
         }

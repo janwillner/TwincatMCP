@@ -175,7 +175,7 @@ public sealed class MappingTools(XaeSession session)
             action();
             return new { a = l.A, b = l.B, ok = true };
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
         {
             return new { a = l.A, b = l.B, ok = false, error = ex.Message };
         }

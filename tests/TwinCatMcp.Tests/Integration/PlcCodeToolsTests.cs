@@ -142,6 +142,58 @@ public sealed class PlcCodeToolsTests(PlcProjectFixture fx)
     }
 
     [Fact]
+    public async Task Interface_property_accessors_are_read_and_grepped_without_crashing_the_IDE()
+    {
+        // Reading the code of an interface property accessor used to kill TcXaeShell (RPC_S_SERVER_UNAVAILABLE).
+        var itf = PlcProjectFixture.Unique("I_Valve");
+        var itfPath = (await fx.Call("pou_create_interface", new { name = itf })).GetProperty("path").GetString()!;
+        await fx.Call("pou_create_property", new { parentPath = itfPath, name = "IsOpen", type = "BOOL", readOnly = true });
+
+        var read = await fx.Call("pou_read_code", new { paths = new[] { $"{itfPath}^IsOpen^Get" } });
+        var memberRead = await fx.Call("pou_read_code", new { paths = new[] { itfPath }, includeMemberCode = true });
+        var grep = await fx.Call("plc_grep", new { pattern = "IsOpen" });
+        var status = await fx.Call("xae_status");
+
+        var get = read.GetProperty("objects")[0];
+        Assert.False(get.TryGetProperty("error", out _), get.ToString());
+        Assert.Equal("PROPERTY_GET", get.GetProperty("kind").GetString());
+        Assert.DoesNotContain("error", memberRead.ToString());
+        Assert.Contains(grep.GetProperty("matches").EnumerateArray(), m => m.GetProperty("path").GetString() == $"{itfPath}^IsOpen");
+        Assert.True(status.GetProperty("connected").GetBoolean());
+    }
+
+    [Fact]
+    public async Task Login_that_does_not_reach_the_PLC_is_a_tool_error()
+    {
+        // UmRT_McpTest is not running during the tests: the XAE cannot log in, which must not be reported as success.
+        var original = (await fx.Call("system_get_target")).GetProperty("netId").GetString()!;
+        await fx.Call("system_set_target", new { target = "199.4.42.250.1.1" });
+        try
+        {
+            var (json, isError) = await fx.CallRaw("plc_online_login", new { mode = "download" }, TimeSpan.FromMinutes(5));
+
+            Assert.True(isError, json.ToString());
+            Assert.False(string.IsNullOrEmpty(json.GetProperty("hint").GetString()));
+        }
+        finally
+        {
+            await fx.Call("system_set_target", new { target = original });
+        }
+    }
+
+    [Fact]
+    public async Task Writing_a_declaration_without_the_object_header_is_rejected_and_nothing_changes()
+    {
+        var fb = await NewFb();
+
+        var (json, isError) = await fx.CallRaw("pou_write_code", new { path = fb, declaration = "VAR\n\tnBroken : INT;\nEND_VAR\n" });
+
+        Assert.True(isError);
+        Assert.Contains("FUNCTION_BLOCK", json.GetProperty("error").GetString());
+        Assert.StartsWith("FUNCTION_BLOCK", await ReadDecl(fb));
+    }
+
+    [Fact]
     public async Task Function_with_return_type_and_ld_program_are_created()
     {
         var f = PlcProjectFixture.Unique("F_Scale");

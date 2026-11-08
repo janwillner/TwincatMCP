@@ -76,7 +76,7 @@ public sealed class EcatTools(XaeSession session, AdsSessionManager ads)
                 {
                     box = CreateBox(current, products[i], names is not null && i < names.Length ? names[i] : null, null, catalog);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
                 {
                     return new { complete = false, created, failed = new { product = products[i], index = i, error = ex.Message } };
                 }
@@ -120,7 +120,7 @@ public sealed class EcatTools(XaeSession session, AdsSessionManager ads)
                     mailbox = info.MailboxProtocols,
                 };
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
             {
                 return new { error = ex.Message };
             }
@@ -183,7 +183,7 @@ public sealed class EcatTools(XaeSession session, AdsSessionManager ads)
                     var hex = Convert.ToHexString(result.Data.ToArray()).ToLowerInvariant();
                     online.Add(new { @object = obj, data = hex, value = CoeValue.Decode(hex, onlineDataType) });
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
                 {
                     online.Add(new { @object = obj, error = ex.Message });
                 }

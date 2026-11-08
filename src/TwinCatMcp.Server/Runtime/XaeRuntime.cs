@@ -117,6 +117,31 @@ public static class XaeRuntime
         }
     }
 
+    /// <summary>
+    /// Runs an ITcSysManager runtime command (activate / restart), retrying E_ACCESSDENIED for a while: right after the
+    /// target was restarted by someone else (e.g. via ADS) the XAE refuses these commands until it has noticed the new
+    /// runtime state (verified on 4026: StartRestartTwinCAT directly after an ADS Reset -> E_ACCESSDENIED).
+    /// </summary>
+    public static void WhenXaeIsReady(Action command, TimeSpan? timeout = null)
+    {
+        var deadline = DateTime.UtcNow + (timeout ?? TimeSpan.FromSeconds(20));
+        while (true)
+        {
+            try
+            {
+                command();
+                return;
+            }
+            catch (Exception ex) when (IsAccessDenied(ex) && DateTime.UtcNow < deadline)
+            {
+                System.Threading.Thread.Sleep(1000);
+            }
+        }
+    }
+
+    private static bool IsAccessDenied(Exception ex)
+        => ex is UnauthorizedAccessException || (ex is COMException com && unchecked((uint)com.HResult) == 0x80070005);
+
     public static T? Try<T>(Func<T> f)
     {
         try

@@ -39,6 +39,12 @@ public sealed class XaeSession : IDisposable
 
     public int? ProcessId { get; private set; }
 
+    /// <summary>How xae_start launched the IDE: "process" (dedicated process) or "com" (COM activation); null when attached.</summary>
+    public string? LaunchedAs { get; private set; }
+
+    /// <summary>SilentMode of an attached (foreign) IDE before the server enabled it; restored on detach.</summary>
+    private bool? _silentModeBeforeAttach;
+
     public bool IsConnected => _dte is not null;
 
     // ------------------------------------------------------------------ execution
@@ -104,6 +110,13 @@ public sealed class XaeSession : IDisposable
         return false;
     }
 
+    /// <summary>
+    /// True for failures of the whole session (IDE crashed/closed, nothing connected). Tools that report errors per item
+    /// must let these propagate (<c>catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))</c>) so the client sees a
+    /// tool error, and a crashed IDE resets the session.
+    /// </summary>
+    public static bool IsSessionFatal(Exception ex) => IsIdeGone(ex) || ex is XaeNotConnectedException;
+
     private static bool IsIdeGone(Exception ex)
     {
         for (var e = ex; e is not null; e = e.InnerException)
@@ -130,7 +143,7 @@ public sealed class XaeSession : IDisposable
 
     public DTE2 Dte => _dte ?? throw NotConnected();
 
-    private static TcException NotConnected() => new("No TwinCAT XAE instance is connected.")
+    private static TcException NotConnected() => new XaeNotConnectedException("No TwinCAT XAE instance is connected.")
     {
         Hint = "Call xae_start (new IDE) or xae_attach (running IDE) first, then solution_open or solution_create.",
     };
@@ -181,9 +194,10 @@ public sealed class XaeSession : IDisposable
     // ------------------------------------------------------------------ lifecycle (STA only)
 
     /// <summary>
-    /// Starts a new IDE. Default launch mode "process" starts the IDE executable as a dedicated process and attaches to
-    /// exactly that process via the ROT. Plain COM activation ("com") can be routed by Windows to an already running
-    /// TcXaeShell (it registers its class object) and then blocks while that foreign IDE is busy.
+    /// Starts a new IDE. Default launch mode "com": COM activation lets Windows start a new TcXaeShell (-Embedding);
+    /// its process is identified by the main window and owned only if it is new. Launch mode "process" starts the
+    /// executable with -Embedding itself and attaches via the ROT - such an unclaimed automation server quits after
+    /// ~8 s, so the ROT is polled quickly (verified on 4026: registration after 2-5 s on a cold start).
     /// </summary>
     public object Start(string? progId, bool visible, bool keepOpenAfterExit, string? launchMode = null)
     {
@@ -199,10 +213,31 @@ public sealed class XaeSession : IDisposable
                        Hint = "Use TcXaeShell.DTE.17.0 (TwinCAT XAE Shell 4026) or VisualStudio.DTE.17.0/18.0 (VS integration).",
                    };
 
-        var useProcess = !string.Equals(launchMode, "com", StringComparison.OrdinalIgnoreCase);
-        if (useProcess && LocalServerExe(type) is { } exe)
+        var mode = string.IsNullOrWhiteSpace(launchMode) ? "com" : launchMode.Trim().ToLowerInvariant();
+        if (mode is not ("com" or "process"))
         {
-            return StartAsProcess(progId, exe, visible, keepOpenAfterExit);
+            throw new TcException($"Unknown launchMode '{launchMode}'.") { Hint = "Use 'com' (default) or 'process'." };
+        }
+
+        var useProcess = mode == "process";
+        if (useProcess && ComRegistration.LocalServerExe(type.GUID) is { } exe)
+        {
+            try
+            {
+                return StartAsProcess(progId, exe, visible, keepOpenAfterExit);
+            }
+            catch (Exception ex) when (IsIdeGone(ex) || ex is IdeStartupExitedException)
+            {
+                // A cold start occasionally ends the first process during initialization - one fresh attempt.
+                _logger.LogWarning(ex, "IDE process ended during startup - starting a new one");
+                ReleaseDte();
+                return StartAsProcess(progId, exe, visible, keepOpenAfterExit);
+            }
+        }
+
+        if (useProcess)
+        {
+            _logger.LogWarning("LocalServer32 executable of {ProgId} not found - falling back to COM activation", progId);
         }
 
         _logger.LogInformation("Starting {ProgId} via COM activation (visible={Visible})", progId, visible);
@@ -221,6 +256,7 @@ public sealed class XaeSession : IDisposable
         OwnsInstance = isNewProcess;
         if (isNewProcess)
         {
+            LaunchedAs = "com";
             dte.SuppressUI = !visible;
             dte.MainWindow.Visible = visible;
             dte.UserControl = keepOpenAfterExit;
@@ -228,6 +264,7 @@ public sealed class XaeSession : IDisposable
         else
         {
             _logger.LogWarning("CreateInstance returned an already running IDE (pid {Pid}); it is treated as attached, not owned.", pid);
+            _silentModeBeforeAttach = TryGetSilentMode();
         }
 
         ConfigureSilentMode(true);
@@ -239,22 +276,13 @@ public sealed class XaeSession : IDisposable
     /// <summary>Seconds to wait for a freshly started IDE process to register its DTE in the ROT.</summary>
     public static int StartupTimeoutSeconds { get; set; } = 240;
 
-    private object StartAsProcess(string progId, string exe, bool visible, bool keepOpenAfterExit)
+    private static RunningObjectTable.DteEntry WaitForRotEntry(System.Diagnostics.Process process, DateTime deadline)
     {
-        _logger.LogInformation("Starting {Exe} as dedicated process (visible={Visible})", exe, visible);
-        var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(exe)
-        {
-            UseShellExecute = true,
-            WindowStyle = visible ? System.Diagnostics.ProcessWindowStyle.Normal : System.Diagnostics.ProcessWindowStyle.Minimized,
-        }) ?? throw new TcException($"Could not start {exe}.");
-
-        var deadline = DateTime.UtcNow.AddSeconds(StartupTimeoutSeconds);
-        RunningObjectTable.DteEntry? entry = null;
-        while (entry is null)
+        while (true)
         {
             if (process.HasExited)
             {
-                throw new TcException($"The IDE process exited during startup (exit code {process.ExitCode}).");
+                throw new IdeStartupExitedException($"The IDE process exited during startup (exit code {process.ExitCode}).") { Hint = "Retry xae_start." };
             }
 
             if (DateTime.UtcNow > deadline)
@@ -266,44 +294,60 @@ public sealed class XaeSession : IDisposable
                 };
             }
 
-            System.Threading.Thread.Sleep(1000);
-            entry = RunningObjectTable.GetDteInstances().FirstOrDefault(e => e.ProcessId == process.Id);
+            System.Threading.Thread.Sleep(200);
+            if (RunningObjectTable.GetDteInstances().FirstOrDefault(e => e.ProcessId == process.Id) is { } entry)
+            {
+                return entry;
+            }
         }
-
-        var dte = (DTE2)entry.Dte;
-        _dte = dte;
-        _ownedProcess = process;
-        ProgId = entry.ProgId.Length > 0 ? entry.ProgId : progId;
-        ProcessId = process.Id;
-        OwnsInstance = true;
-
-        // The shell may still be initializing its packages - the message filter retries rejected calls.
-        dte.SuppressUI = !visible;
-        dte.MainWindow.Visible = visible;
-        dte.UserControl = keepOpenAfterExit;
-        ConfigureSilentMode(true);
-        return Status();
     }
 
-    /// <summary>Executable registered as LocalServer32 for the ProgID's CLSID (null if not resolvable).</summary>
-    private static string? LocalServerExe(Type comType)
+    private object StartAsProcess(string progId, string exe, bool visible, bool keepOpenAfterExit)
     {
-        try
-        {
-            using var key = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey($@"CLSID\{{{comType.GUID}}}\LocalServer32");
-            var raw = (key?.GetValue(null) as string)?.Trim();
-            if (string.IsNullOrEmpty(raw))
-            {
-                return null;
-            }
+        _logger.LogInformation("Starting {Exe} as dedicated process (visible={Visible})", exe, visible);
 
-            var path = raw.StartsWith('"') ? raw[1..raw.IndexOf('"', 1)] : raw.Split(' ')[0];
-            return File.Exists(path) ? path : null;
-        }
-        catch
+        // "-Embedding" starts the shell as automation server exactly like COM activation does (not under user control,
+        // so the window can be hidden; it exits when the server releases it) - but we know its process id.
+        // Started without it, the shell is user-controlled and its window cannot be hidden (DTE refuses).
+        var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(exe, "-Embedding")
         {
-            return null;
+            UseShellExecute = true,
+            WindowStyle = visible ? System.Diagnostics.ProcessWindowStyle.Normal : System.Diagnostics.ProcessWindowStyle.Minimized,
+        }) ?? throw new TcException($"Could not start {exe}.");
+
+        var deadline = DateTime.UtcNow.AddSeconds(StartupTimeoutSeconds);
+        DTE2 dte;
+        string entryProgId;
+        while (true)
+        {
+            var entry = WaitForRotEntry(process, deadline);
+            try
+            {
+                // The shell may still be initializing its packages - the message filter retries rejected calls.
+                dte = (DTE2)entry.Dte;
+                dte.SuppressUI = !visible;
+                dte.MainWindow.Visible = visible;
+                dte.UserControl = keepOpenAfterExit;
+                entryProgId = entry.ProgId;
+                break;
+            }
+            catch (Exception ex) when (IsIdeGone(ex) && !process.HasExited && DateTime.UtcNow < deadline)
+            {
+                // On a cold start the DTE registered first is disconnected while the shell finishes initializing
+                // (RPC_E_DISCONNECTED) - wait for its final registration.
+                _logger.LogInformation("DTE of pid {Pid} was disconnected during startup - waiting for re-registration", process.Id);
+                System.Threading.Thread.Sleep(200);
+            }
         }
+
+        _dte = dte;
+        _ownedProcess = process;
+        ProgId = entryProgId.Length > 0 ? entryProgId : progId;
+        ProcessId = process.Id;
+        OwnsInstance = true;
+        LaunchedAs = "process";
+        ConfigureSilentMode(true);
+        return Status();
     }
 
     /// <summary>After Quit(): make sure a process this server started really ends (never touches foreign IDEs).</summary>
@@ -382,6 +426,7 @@ public sealed class XaeSession : IDisposable
             {
                 try
                 {
+                    using var shortRetries = MessageFilter.ShortRetries(3000);
                     var full = ((DTE2)i.Dte).Solution.FullName;
                     return !string.IsNullOrEmpty(full) && string.Equals(Path.GetFullPath(full), wanted, StringComparison.OrdinalIgnoreCase);
                 }
@@ -401,6 +446,7 @@ public sealed class XaeSession : IDisposable
         ProgId = match.ProgId;
         ProcessId = match.ProcessId;
         OwnsInstance = false;
+        _silentModeBeforeAttach = TryGetSilentMode();
         ConfigureSilentMode(true);
         TrySelectFirstTwinCatProject();
         return Status();
@@ -430,6 +476,10 @@ public sealed class XaeSession : IDisposable
                 }
 
                 _dte.Quit();
+            }
+            else
+            {
+                RestoreSilentMode();
             }
         }
         finally
@@ -468,6 +518,30 @@ public sealed class XaeSession : IDisposable
         ProgId = null;
         ProcessId = null;
         OwnsInstance = false;
+        LaunchedAs = null;
+        _silentModeBeforeAttach = null;
+    }
+
+    /// <summary>Gives an attached (foreign) IDE back the SilentMode it had before the server connected.</summary>
+    private void RestoreSilentMode()
+    {
+        if (_silentModeBeforeAttach is { } before)
+        {
+            ConfigureSilentMode(before);
+        }
+    }
+
+    private bool? TryGetSilentMode()
+    {
+        try
+        {
+            return ((ITcAutomationSettings)Dte.GetObject("TcAutomationSettings")).SilentMode;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "TcAutomationSettings not available");
+            return null;
+        }
     }
 
     public void ConfigureSilentMode(bool silent)
@@ -514,6 +588,9 @@ public sealed class XaeSession : IDisposable
             progId = ProgId,
             processId = ProcessId,
             ownsInstance = OwnsInstance,
+            launchedAs = LaunchedAs,
+            silentMode = TryGetSilentMode(),
+            silentModeBeforeAttach = _silentModeBeforeAttach,
             version = _dte.Version,
             visible = SafeGet(() => _dte.MainWindow.Visible),
             solutionOpen,
@@ -652,6 +729,12 @@ public sealed class XaeSession : IDisposable
                           string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase) ||
                           string.Equals(Path.GetFileName(p.FullName), name, StringComparison.OrdinalIgnoreCase))
                       ?? throw new TcException($"TwinCAT project '{name}' not found in solution.");
+        return SelectProject(project);
+    }
+
+    /// <summary>Selects a project object directly (e.g. one just added, before the solution enumerates it).</summary>
+    public object SelectProject(Project project)
+    {
         _project = project;
         return new { selectedProject = project.Name, file = project.FullName };
     }
@@ -775,7 +858,7 @@ public sealed class XaeSession : IDisposable
             }
         });
 
-    private static T? SafeGet<T>(Func<T> f)
+    public static T? SafeGet<T>(Func<T> f)
     {
         try
         {
@@ -801,6 +884,11 @@ public sealed class XaeSession : IDisposable
                     {
                         try { _dte.Quit(); } catch { /* ignore */ }
                     }
+                }
+
+                if (!quit && _dte is not null)
+                {
+                    RestoreSilentMode();
                 }
 
                 ReleaseDte();

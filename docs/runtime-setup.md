@@ -9,7 +9,7 @@ real-time kernel from entering Run mode.
 | Runtime | Folder | AMS Net ID | How it runs | Used by tests? |
 |---|---|---|---|---|
 | `UmRT_Default` | `C:\ProgramData\Beckhoff\TwinCAT\3.1\Runtimes\UmRT_Default` | `169.254.123.103.1.1` (= "local") | Windows service **TcSysSrv** (`TcSystemServiceUm.exe -s TcSysSrv ...`) | **No** - it is the PC's own TwinCAT system and runs your application (PLC port 852). |
-| `UmRT_McpTest` | `C:\ProgramData\Beckhoff\TwinCAT\3.1\Runtimes\UmRT_McpTest` | **`199.4.42.250.1.1`** | user process `TcSystemServiceUm.exe -t bin -i path -n UmRT_McpTest -c .\3.1` (minimized console) | **Yes** - the dedicated test target. |
+| `UmRT_McpTest` | `C:\ProgramData\Beckhoff\TwinCAT\3.1\Runtimes\UmRT_McpTest` | **`199.4.42.250.1.1`** | user process `TcSystemServiceUm.exe -t bin -i 199.4.42.250.1.1 -n UmRT_McpTest -c .\3.1` (minimized console; `rt_umrt_start` passes the Net ID from TcRegistry.xml, Start.bat uses `-i path`) | **Yes** - the dedicated test target. |
 
 `UmRT_McpTest` was created by copying `C:\Program Files (x86)\Beckhoff\TwinCAT\3.1\Runtimes\UmRT_Template` (what
 `rt_umrt_create` does). On its first start the runtime wrote the documented default Net ID `199.4.42.250.1.1` into

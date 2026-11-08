@@ -182,12 +182,32 @@ public sealed class ArchiveTools(XaeSession session)
                     }
 
                     var name = string.IsNullOrWhiteSpace(projectName) ? Path.GetFileNameWithoutExtension(archive) : projectName;
-                    LibraryTools.Wrap(() => s.Dte.Solution.AddFromTemplate(archive, Path.Combine(folder, name), name),
+                    EnvDTE.Project? added = null;
+                    LibraryTools.Wrap(() => added = s.Dte.Solution.AddFromTemplate(archive, Path.Combine(folder, name), name),
                         "Adding the TwinCAT project archive failed.", "The project name must be unique in the solution.");
                     s.WaitUntilSolutionLoaded(TimeSpan.FromSeconds(120));
-                    var tc =s.EnumerateTwinCatProjects().FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase))
-                             ?? s.EnumerateTwinCatProjects().Last();
-                    s.SelectProject(tc.Name);
+
+                    // The new project shows up in the solution with a delay; never fall back to another project.
+                    var tc = added is not null && XaeSession.SafeGet(() => added.Name) is { Length: > 0 } ? added : null;
+                    var deadline = DateTime.UtcNow.AddSeconds(60);
+                    while (tc is null && DateTime.UtcNow < deadline)
+                    {
+                        tc = s.EnumerateTwinCatProjects().FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+                        if (tc is null)
+                        {
+                            System.Threading.Thread.Sleep(500);
+                        }
+                    }
+
+                    if (tc is null)
+                    {
+                        throw new TcException($"The archive was added, but project '{name}' did not appear in the solution.")
+                        {
+                            Hint = "Check solution_list_projects and select it with solution_select_project.",
+                        };
+                    }
+
+                    s.SelectProject(tc);
                     return new { solution = s.Dte.Solution.FullName, selectedProject = tc.Name, project = tc.FullName };
                 }
 

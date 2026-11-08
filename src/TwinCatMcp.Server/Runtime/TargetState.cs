@@ -1,17 +1,12 @@
-using System.Text;
 using TwinCAT.Ads;
 using TwinCatMcp.Ads;
 
 namespace TwinCatMcp.Runtime;
 
-/// <summary>ADS access to the TwinCAT system service of a target (port 10000) and the real-time target info (port 200).</summary>
+/// <summary>ADS access to the TwinCAT system service of a target (port 10000).</summary>
 public static class TargetState
 {
     public const int SystemServicePort = 10000;
-    public const int RealTimePort = 200;
-    private const uint SystemServiceTargetInfo = 0x700;
-    private const uint TargetInfoTargetType = 2;
-    private const uint TargetInfoPlatform = 4;
 
     public sealed record SystemState(string NetId, bool Reachable, string? AdsState, int? DeviceState, string? Error);
 
@@ -59,6 +54,35 @@ public static class TargetState
         return (state, string.Equals(state.AdsState, wanted, StringComparison.OrdinalIgnoreCase), Math.Round((DateTime.UtcNow - start).TotalSeconds, 1), aborted);
     }
 
+    /// <summary>Snapshot of the system state taken right before a restart is requested (see <see cref="WaitForRestartAsync{T}"/>).</summary>
+    public static RestartTracker BeginRestart(AdsSessionManager ads, string netId) => new(Read(ads, netId).AdsState);
+
+    /// <summary>Waits until the restart observed by <paramref name="tracker"/> has completed in Run mode.</summary>
+    public static async Task<(SystemState State, bool Reached, double Seconds, T? Abort)> WaitForRestartAsync<T>(
+        AdsSessionManager ads, string netId, RestartTracker tracker, TimeSpan timeout, Func<T?>? abort) where T : class
+    {
+        var start = DateTime.UtcNow;
+        while (true)
+        {
+            var state = Read(ads, netId, 1000);
+            if (tracker.Observe(state.Reachable ? state.AdsState : null))
+            {
+                return (state, true, Math.Round((DateTime.UtcNow - start).TotalSeconds, 1), null);
+            }
+
+            if (DateTime.UtcNow - start >= timeout)
+            {
+                return (state, false, Math.Round((DateTime.UtcNow - start).TotalSeconds, 1), null);
+            }
+
+            await Task.Delay(200).ConfigureAwait(false); // the Stop phase of a Usermode Runtime restart lasts only ~1 s
+            if (abort?.Invoke() is { } aborted)
+            {
+                return (Read(ads, netId), false, Math.Round((DateTime.UtcNow - start).TotalSeconds, 1), aborted);
+            }
+        }
+    }
+
     /// <summary>Sets the system state via ADS WriteControl on port 10000 (AdsState.Reconfig = config mode, AdsState.Reset = restart in run mode).</summary>
     public static void WriteControl(AdsSessionManager ads, string netId, AdsState state)
         => ads.Get(netId, SystemServicePort, 5000).WriteControl(new StateInfo(state, 0));
@@ -69,7 +93,7 @@ public static class TargetState
         string? DeviceName,
         string? TwinCatVersion,
         string? Platform,
-        bool? IsUsermodeRuntime,
+        bool? UsermodeRuntime,
         string? LocalUsermodeRuntime,
         string? Error,
         string? Note);
@@ -80,7 +104,7 @@ public static class TargetState
         var state = Read(ads, netId);
         if (!state.Reachable)
         {
-            return new TargetInfo(netId, state, null, null, null, null, LocalInstance(netId), state.Error, null);
+            return new TargetInfo(netId, state, null, null, null, null, LocalInstance(ads, netId), state.Error, null);
         }
 
         string? name = null, version = null, platform = null, error = null, note = null;
@@ -96,28 +120,23 @@ public static class TargetState
             error = ex.Message;
         }
 
-        foreach (var port in new[] { SystemServicePort, RealTimePort })
+        // Same source as ads_get_system_info: system service target info (index group 700 decimal).
+        try
         {
-            try
+            var sys = new SystemServiceClient(ads.Get(netId, SystemServicePort));
+            platform = sys.TryReadString(SystemServiceProtocol.TargetInfo, SystemServiceProtocol.TargetInfoPlatform);
+            umrt = sys.TryRead(SystemServiceProtocol.TargetInfo, SystemServiceProtocol.TargetInfoIsUmRuntime, 4) is { Length: > 0 } um ? um[0] != 0 : null;
+            if (string.IsNullOrEmpty(platform))
             {
-                using var rt = new AdsClient { Timeout = 2000 };
-                rt.Connect(AdsSessionManager.ParseNetId(netId), port);
-                var platformResult = rt.ReadAsResult(SystemServiceTargetInfo, TargetInfoPlatform, 256);
-                platformResult.ThrowOnError();
-                platform = Encoding.ASCII.GetString(platformResult.Data.Span).TrimEnd('\0');
-                var typeResult = rt.ReadAsResult(SystemServiceTargetInfo, TargetInfoTargetType, 4);
-                typeResult.ThrowOnError();
-                umrt = BitConverter.ToUInt32(typeResult.Data.Span) == 1;
-                error = null;
-                break;
-            }
-            catch (Exception ex)
-            {
-                note = $"Platform/runtime type not provided by this runtime (ADS port {port}, IG 0x700: {ex.Message}).";
+                note = "Platform not provided by this target's system service (older TwinCAT version?).";
             }
         }
+        catch (Exception ex)
+        {
+            note = $"Platform/runtime type not readable: {ex.Message}";
+        }
 
-        var local = LocalInstance(netId);
+        var local = LocalInstance(ads, netId);
         if (platform is null && local is not null)
         {
             umrt ??= true;
@@ -127,11 +146,13 @@ public static class TargetState
         return new TargetInfo(netId, state, name, version, string.IsNullOrEmpty(platform) ? null : platform, umrt, local, error, note?.Trim());
     }
 
-    private static string? LocalInstance(string netId)
+    private static string? LocalInstance(AdsSessionManager ads, string netId)
     {
         try
         {
-            return UmrtManager.List().FirstOrDefault(i => string.Equals(i.NetId, netId, StringComparison.OrdinalIgnoreCase))?.Name;
+            // "local" / "" stand for this PC's router Net ID.
+            var resolved = ads.Get(netId, SystemServicePort).Address?.NetId.ToString() ?? netId;
+            return UmrtManager.List().FirstOrDefault(i => string.Equals(i.NetId, resolved, StringComparison.OrdinalIgnoreCase))?.Name;
         }
         catch
         {

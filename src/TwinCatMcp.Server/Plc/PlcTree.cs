@@ -170,6 +170,13 @@ public static class PlcTree
 
     public static PouText ReadText(ITcSmTreeItem item)
     {
+        // Accessors of interface properties have no code. Touching DeclarationText/ImplementationText/Language on them
+        // crashes TcXaeShell 4026 (RPC_S_SERVER_UNAVAILABLE), so they are never read.
+        if (HasNoCode(item))
+        {
+            return new PouText(null, null);
+        }
+
         string? decl = null;
         string? impl = null;
         if (item is ITcPlcDeclaration d)
@@ -199,9 +206,12 @@ public static class PlcTree
         return new PouText(decl, impl);
     }
 
+    private static bool HasNoCode(ITcSmTreeItem item)
+        => TypeOf(item) is PlcObjects.InterfacePropertyGet or PlcObjects.InterfacePropertySet;
+
     public static string? LanguageOf(ITcSmTreeItem item)
     {
-        if (item is ITcPlcImplementation i)
+        if (!HasNoCode(item) && item is ITcPlcImplementation i)
         {
             try
             {
@@ -221,25 +231,33 @@ public static class PlcTree
         var current = ReadText(item);
         if (declaration is not null)
         {
-            if (current.Declaration is null || item is not ITcPlcDeclaration d)
+            if (current.Declaration is null || item is not ITcPlcDeclaration)
             {
                 throw new TcException($"'{item.PathName}' ({PlcObjects.KindOf(TypeOf(item))}) has no declaration area.");
             }
 
-            d.DeclarationText = declaration;
+            if (StDeclaration.HeaderError(TypeOf(item), declaration) is { } headerError)
+            {
+                throw new TcException(headerError) { Hint = "Nothing was written. Re-read the object with pou_read_code and keep its header line." };
+            }
+        }
+
+        if (implementation is not null && (current.Implementation is null || item is not ITcPlcImplementation))
+        {
+            throw new TcException($"'{item.PathName}' ({PlcObjects.KindOf(TypeOf(item))}) has no implementation area.")
+            {
+                Hint = "DUTs, GVLs, interfaces and property nodes have no implementation. For properties write the Get/Set children.",
+            };
+        }
+
+        if (declaration is not null)
+        {
+            ((ITcPlcDeclaration)item).DeclarationText = declaration;
         }
 
         if (implementation is not null)
         {
-            if (current.Implementation is null || item is not ITcPlcImplementation i)
-            {
-                throw new TcException($"'{item.PathName}' ({PlcObjects.KindOf(TypeOf(item))}) has no implementation area.")
-                {
-                    Hint = "DUTs, GVLs, interfaces and property nodes have no implementation. For properties write the Get/Set children.",
-                };
-            }
-
-            i.ImplementationText = implementation;
+            ((ITcPlcImplementation)item).ImplementationText = implementation;
         }
     }
 

@@ -70,7 +70,11 @@ The acceptance test [CompleteProjectTests](tests/TwinCatMcp.Tests/Integration/Co
 ## Design notes
 
 - **One COM apartment.** Every Automation Interface call runs on a dedicated STA thread with a message pump and an OLE message filter. The filter retries "application busy".
-- **The IDE is a dedicated process.** `xae_start` launches its own TcXaeShell process and attaches to exactly that PID. A plain COM activation could be routed to some other, possibly busy, TcXaeShell. The server only quits IDEs it started.
+- **Own IDE vs. attached IDE.**
+  - `xae_start` lets Windows start a new TcXaeShell by COM activation and identifies its process by the main window. `launchMode: "process"` starts the executable itself (`-Embedding`) and attaches by process ID.
+  - The server only quits IDEs it started.
+  - `xae_attach` connects to a running IDE such as the user's own. On `xae_close` that IDE gets back the SilentMode it had before.
+- **Restarts are really awaited.** Activating, restarting and switching to Run mode wait until the target has left Run and come back. Right after the request the target still reports the old Run state. `plc_online_login` checks that the login really happened and retries while the XAE catches up with a restarted runtime.
 - **The own PC is protected.** A new TwinCAT project targets `<Local>`, which is the PC's own TwinCAT system and may run another application. Activating, restarting, switching mode, PLC login/start/stop/reset and writing ADS tools refuse to act on it unless the call passes `allowLocalSystem: true`. Set a dedicated target with `system_set_target` instead (for example a Usermode Runtime instance from `rt_umrt_list`). Customer ADS servers (port ≥ 25000) are exempt.
 - **Errors are actionable.** Every error is JSON with `error`, an optional `hint` and the TwinCAT error log. Open modal IDE dialogs (for example *license not found*) are returned as `xaeDialogs`. Misspelled or missing arguments are explained, with suggestions and the expected parameters.
 - **Hidden IDE quirks are handled:**
@@ -108,3 +112,6 @@ dotnet test tests/TwinCatMcp.Tests --filter "Category=Runtime"
 - **Library declarations:** `lib_get_declaration` builds declarations from library signatures. They contain VAR blocks only, without struct members or FB methods.
 - **Unused objects are not compiled:** objects that nothing references are skipped by `build_solution`. Use `plc_check_all_objects` for those.
 - **ITcSmCommands is not available** in TcXaeShell 4026 automation. Config/Run mode switching goes through ADS instead.
+- **Variant management cannot be removed again.** `variant_define` needs at least one variant.
+- **File tools on a Usermode Runtime** run under its service account. It cannot see user profile folders, so use for example `C:\ProgramData\...` or the `boot` root.
+- **Interface property accessors have no code.** Reading their code crashes TcXaeShell 4026, so the code tools skip them.

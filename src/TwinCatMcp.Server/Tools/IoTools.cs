@@ -130,7 +130,7 @@ public sealed class IoTools(XaeSession session)
             string? reloadError = null;
             if (reload)
             {
-                try { tiid.ConsumeXml(IoXml.ReloadDevicesXml); } catch (Exception ex) { reloadError = ex.Message; }
+                try { tiid.ConsumeXml(IoXml.ReloadDevicesXml); } catch (Exception ex) when (!XaeSession.IsSessionFatal(ex)) { reloadError = ex.Message; }
             }
 
             string xml;
@@ -267,7 +267,7 @@ public sealed class IoTools(XaeSession session)
                         linkedTo = MappingInfo.LinkedTo(links, v.Path).ToArray(),
                     };
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
                 {
                     return new { error = ex.Message };
                 }

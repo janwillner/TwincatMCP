@@ -15,8 +15,8 @@ public sealed class SessionTools(XaeSession session)
         [Description("COM ProgID. Default 'TcXaeShell.DTE.17.0'. Alternatives: 'VisualStudio.DTE.17.0' (VS 2022), 'VisualStudio.DTE.18.0' (VS 2026).")] string? progId = null,
         [Description("Show the IDE main window (useful for watching what happens).")] bool visible = false,
         [Description("Keep the IDE running after the MCP server exits.")] bool keepOpen = false,
-        [Description("'process' (default): start a dedicated IDE process and attach to exactly that one – robust when other TcXaeShell instances run. " +
-                     "'com': plain COM activation (may be routed to an already running IDE, which is then treated as attached, not owned).")] string launchMode = "process")
+        [Description("'com' (default): COM activation - Windows starts a new IDE process; the server identifies it by its main window and owns it. " +
+                     "'process': the server starts the IDE executable itself (-Embedding) and attaches to that process id via the Running Object Table.")] string launchMode = "com")
         => session.RunAsync(s => s.Start(progId, visible, keepOpen, launchMode), TimeSpan.FromMinutes(5));
 
     [McpServerTool(Name = "xae_attach"), Description(
@@ -30,10 +30,16 @@ public sealed class SessionTools(XaeSession session)
     public Task<CallToolResult> ListInstances()
         => session.RunAsync(_ => RunningObjectTable.GetDteInstances().Select(i =>
         {
+            // An IDE that is starting up or busy rejects calls - report it as busy instead of waiting for it.
             string? sln = null;
-            try { sln = ((EnvDTE80.DTE2)i.Dte).Solution.FullName; } catch { /* busy */ }
-            return new { progId = i.ProgId, processId = i.ProcessId, solution = string.IsNullOrEmpty(sln) ? null : sln };
-        }).ToArray(), TimeSpan.FromSeconds(30));
+            var busy = false;
+            using (MessageFilter.ShortRetries(3000))
+            {
+                try { sln = ((EnvDTE80.DTE2)i.Dte).Solution.FullName; } catch { busy = true; }
+            }
+
+            return new { progId = i.ProgId, processId = i.ProcessId, solution = string.IsNullOrEmpty(sln) ? null : sln, busy = busy ? true : (bool?)null };
+        }).ToArray(), TimeSpan.FromSeconds(60));
 
     [McpServerTool(Name = "xae_status", ReadOnly = true), Description("Shows the connected IDE, open solution, selected TwinCAT project and target AMS Net ID.")]
     public Task<CallToolResult> Status()
@@ -49,7 +55,8 @@ public sealed class SessionTools(XaeSession session)
         });
 
     [McpServerTool(Name = "xae_set_silent_mode"), Description(
-        "Enables/disables the Automation Interface SilentMode (suppresses message boxes in the IDE). Enabled by default.")]
+        "Enables/disables the Automation Interface SilentMode (suppresses message boxes in the IDE). Enabled by default. " +
+        "An attached IDE gets back the SilentMode it had before xae_attach when the server disconnects (xae_close).")]
     public Task<CallToolResult> SetSilentMode(bool silent)
         => session.RunAsync(s => { s.ConfigureSilentMode(silent); return new { silent }; });
 

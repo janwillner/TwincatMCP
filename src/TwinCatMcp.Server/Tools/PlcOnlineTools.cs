@@ -35,7 +35,28 @@ public sealed class PlcOnlineTools(XaeSession session)
             LocalTargetGuard.Ensure(XaeRuntime.TargetNetId(s), allowLocalSystem, "log into / download the PLC");
             var flags = PlcOnline.LoginFlags(mode, rebuild);
             var (path, online) = Online(s, plcProject);
+            // Login() returns without error when the XAE could not reach the PLC runtime - verify and retry. Right after an
+            // activation the XAE notices the restarted runtime only after a few seconds (IsTwinCATStarted still false).
+            var deadline = DateTime.UtcNow.AddSeconds(30);
             online.Login((PLC_LOGIN_FLAGS)flags);
+            while (!online.IsLoggedIn && DateTime.UtcNow < deadline)
+            {
+                System.Threading.Thread.Sleep(2000);
+                if (!online.IsLoggedIn)
+                {
+                    online.Login((PLC_LOGIN_FLAGS)flags);
+                }
+            }
+
+            if (!online.IsLoggedIn)
+            {
+                throw new TcException($"Login to '{path}' failed: the XAE is not logged in (target {XaeRuntime.TargetNetId(s)}).")
+                {
+                    Hint = "The target must be reachable, in Run mode and running the activated configuration of this project " +
+                           "(system_get_state, system_activate_configuration). ads_list_plc_runtimes shows whether the PLC runtime port (851...) exists.",
+                };
+            }
+
             return State(path, online, s);
         }, timeoutSeconds);
 

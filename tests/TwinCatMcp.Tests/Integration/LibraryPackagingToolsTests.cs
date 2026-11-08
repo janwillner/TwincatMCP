@@ -184,6 +184,29 @@ public sealed class LibraryPackagingToolsTests(LibraryFixture fx)
     }
 
     [Fact]
+    public async Task Opening_a_tszip_adds_the_project_to_the_solution_and_selects_it()
+    {
+        var tszip = fx.NewPath("McpIt-open.tszip");
+        await fx.Call("solution_save");
+        await fx.Call("archive_save_solution", new { filePath = tszip, scope = "twincatProject" });
+        var originalSolution = (await fx.Call("xae_status")).GetProperty("solution").GetString()!;
+        try
+        {
+            var opened = await fx.Call("archive_open", new { archivePath = tszip, targetFolder = Path.Combine(fx.OutDir, "tszip-" + Guid.NewGuid().ToString("N")[..6]), projectName = "McpRestored" });
+            var status = await fx.Call("xae_status");
+
+            Assert.Equal("McpRestored", opened.GetProperty("selectedProject").GetString());
+            Assert.EndsWith("McpRestored.tsproj", opened.GetProperty("project").GetString());
+            Assert.Equal("McpRestored", status.GetProperty("project").GetProperty("name").GetString());
+        }
+        finally
+        {
+            await fx.Call("solution_close", new { save = false });
+            await fx.Call("solution_open", new { path = originalSolution });
+        }
+    }
+
+    [Fact]
     public async Task Import_exported_plc_project_as_second_plc()
     {
         var tpzip = fx.NewPath("Plc1.tpzip");

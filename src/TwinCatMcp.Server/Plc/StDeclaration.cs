@@ -44,6 +44,48 @@ public static partial class StDeclaration
     [GeneratedRegex(@"^(?<names>.+?)(\s+AT\s+(?<addr>\S+))?\s*:(?!=)\s*(?<rest>.+)$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
     private static partial Regex VarRegex();
 
+    /// <summary>First keyword a declaration of the given object type must start with (null = no fixed header, e.g. accessors).</summary>
+    private static string? RequiredHeader(int itemType) => itemType switch
+    {
+        PlcObjects.Program => "PROGRAM",
+        PlcObjects.FunctionBlock => "FUNCTION_BLOCK",
+        PlcObjects.Function => "FUNCTION",
+        PlcObjects.Method or PlcObjects.InterfaceMethod => "METHOD",
+        PlcObjects.Property or PlcObjects.InterfaceProperty => "PROPERTY",
+        PlcObjects.Interface => "INTERFACE",
+        PlcObjects.Struct or PlcObjects.Enum or PlcObjects.Union or PlcObjects.Alias => "TYPE",
+        PlcObjects.Gvl or PlcObjects.ParameterList => "VAR_GLOBAL",
+        _ => null,
+    };
+
+    /// <summary>
+    /// Null when the declaration starts with the header the object type requires (pragmas and comments may precede it),
+    /// otherwise an explanation. TwinCAT itself stores a declaration without header silently and the object breaks.
+    /// </summary>
+    public static string? HeaderError(int itemType, string declaration)
+    {
+        if (RequiredHeader(itemType) is not { } required)
+        {
+            return null;
+        }
+
+        var firstLine = StripComments(StCode.Normalize(declaration ?? "")).Select(l => l.Code.Trim()).FirstOrDefault(l => l.Length > 0);
+        var found = firstLine is null ? "nothing" : Regex.Match(firstLine, @"^[A-Za-z_][A-Za-z0-9_]*").Value is { Length: > 0 } word ? word.ToUpperInvariant() : firstLine;
+        if (found == required)
+        {
+            return null;
+        }
+
+        var example = required switch
+        {
+            "VAR_GLOBAL" => "VAR_GLOBAL",
+            "TYPE" => "TYPE <name> :",
+            "METHOD" or "PROPERTY" or "FUNCTION" => $"{required} <name> : <type>",
+            _ => $"{required} <name>",
+        };
+        return $"The declaration of a {PlcObjects.KindOf(itemType)} must start with '{example}' (pragmas and comments may come before it), but found '{found}'.";
+    }
+
     public static StDeclarationInfo Parse(string declaration)
     {
         var lines = StripComments(StCode.Normalize(declaration ?? ""));

@@ -98,21 +98,25 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
                 CheckLocalLicenses(s, netId);
             }
 
-            s.SysManager.ActivateConfiguration();
+            XaeRuntime.WhenXaeIsReady(() => s.SysManager.ActivateConfiguration());
+
+            // Snapshot after the activation (it already bumps the restart counter) and before the asynchronous restart.
+            var tracker = TargetState.BeginRestart(ads, netId);
             if (restart)
             {
-                s.SysManager.StartRestartTwinCAT();
+                XaeRuntime.WhenXaeIsReady(() => s.SysManager.StartRestartTwinCAT());
             }
 
-            return netId;
-        }, async netId =>
+            return (netId, tracker);
+        }, async t =>
         {
+            var (netId, tracker) = t;
             if (!restart)
             {
                 return new { activated = true, restarted = false, netId, state = TargetState.Read(ads, netId) };
             }
 
-            var r = await WaitForRun(netId, waitSeconds);
+            var r = await WaitForRun(netId, tracker, waitSeconds);
             return new
             {
                 activated = true,
@@ -137,11 +141,13 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         {
             var netId = XaeRuntime.TargetNetId(s);
             LocalTargetGuard.Ensure(netId, allowLocalSystem, "restart TwinCAT");
-            s.SysManager.StartRestartTwinCAT();
-            return netId;
-        }, async netId =>
+            var tracker = TargetState.BeginRestart(ads, netId);
+            XaeRuntime.WhenXaeIsReady(() => s.SysManager.StartRestartTwinCAT());
+            return (netId, tracker);
+        }, async t =>
         {
-            var r = await WaitForRun(netId, waitSeconds);
+            var (netId, tracker) = t;
+            var r = await WaitForRun(netId, tracker, waitSeconds);
             return new { netId, reached = r.Reached, waitedSeconds = r.Seconds, state = r.State, xaeDialog = r.Dialog, hint = r.Hint };
         }, timeoutSeconds);
 
@@ -170,8 +176,10 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
         => WithTarget(netId, async target =>
         {
             LocalTargetGuard.Ensure(target, allowLocalSystem, "restart TwinCAT in Run mode");
+            var tracker = TargetState.BeginRestart(ads, target);
             TargetState.WriteControl(ads, target, AdsState.Reset);
-            return await WaitResult(target, "Run", waitSeconds);
+            var (state, reached, seconds, _) = await TargetState.WaitForRestartAsync<object>(ads, target, tracker, TimeSpan.FromSeconds(Math.Max(1, waitSeconds)), null);
+            return new { netId = target, reached, wanted = "Run", waitedSeconds = seconds, state };
         });
 
     [McpServerTool(Name = "system_get_state", ReadOnly = true), Description(
@@ -263,10 +271,10 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
     private sealed record RunWait(TargetState.SystemState State, bool Reached, double Seconds, XaeWindows.Dialog? Dialog, string? Hint);
 
     /// <summary>Waits for Run mode; stops early (and reports it) when the XAE shows a modal message box, e.g. "license not found".</summary>
-    private async Task<RunWait> WaitForRun(string netId, int waitSeconds)
+    private async Task<RunWait> WaitForRun(string netId, RestartTracker tracker, int waitSeconds)
     {
         var pid = session.ProcessId;
-        var (state, reached, seconds, dialog) = await TargetState.WaitForAsync(ads, netId, "Run", TimeSpan.FromSeconds(Math.Max(1, waitSeconds)),
+        var (state, reached, seconds, dialog) = await TargetState.WaitForRestartAsync(ads, netId, tracker, TimeSpan.FromSeconds(Math.Max(1, waitSeconds)),
             () => XaeWindows.ModalDialogs(pid).FirstOrDefault());
         string? hint = null;
         if (dialog is not null)

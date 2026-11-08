@@ -27,7 +27,7 @@ public sealed class TreeTools(XaeSession session)
             {
                 return (object)TreeInfo.Children(s.Lookup(p)).Select(c => TreeInfo.Describe(c)).ToArray();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
             {
                 return new { error = ex.Message };
             }

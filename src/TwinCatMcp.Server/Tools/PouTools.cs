@@ -97,11 +97,11 @@ public sealed class PouTools(XaeSession session)
         {
             return f();
         }
-        catch (TcException ex)
+        catch (TcException ex) when (!XaeSession.IsSessionFatal(ex))
         {
             return new { path, error = ex.Message, hint = ex.Hint };
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!XaeSession.IsSessionFatal(ex))
         {
             return new { path, error = ex.Message };
         }

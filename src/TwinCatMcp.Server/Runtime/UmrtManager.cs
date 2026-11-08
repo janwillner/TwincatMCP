@@ -110,7 +110,7 @@ public static class UmrtManager
             UseShellExecute = true,
             WindowStyle = ProcessWindowStyle.Minimized,
         };
-        foreach (var a in new[] { "-t", "bin", "-i", "path", "-n", name, "-c", @".\3.1" })
+        foreach (var a in StartArguments(name, inst.NetId))
         {
             psi.ArgumentList.Add(a);
         }
@@ -118,6 +118,13 @@ public static class UmrtManager
         var p = Process.Start(psi) ?? throw new TcException("TcSystemServiceUm.exe could not be started.");
         return p.Id;
     }
+
+    /// <summary>
+    /// Command line of TcSystemServiceUm.exe. Start.bat passes "-i path" (the runtime picks a Net ID on its first start and
+    /// ignores an AmsNetId preset in TcRegistry.xml); a configured Net ID is therefore passed explicitly with "-i".
+    /// </summary>
+    public static string[] StartArguments(string name, string? netId)
+        => ["-t", "bin", "-i", string.IsNullOrWhiteSpace(netId) ? "path" : netId.Trim(), "-n", name, "-c", @".\3.1"];
 
     /// <summary>Stops a user-started instance: sends 'x' (exit) to its console, then kills it if it is still running.</summary>
     public static object Stop(string name, TimeSpan wait)

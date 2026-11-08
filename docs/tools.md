@@ -10,7 +10,7 @@ Generated from the server assembly – 201 tools. Regenerate with `TwinCatMcp.Se
 | `xae_close` | Disconnects from the IDE. An IDE started by xae_start is closed; an attached IDE is only closed when quitIde=true. | `saveAll`?, `quitIde`? |
 | `xae_execute_command` | Executes a Visual Studio IDE command by name (e.g. 'File.SaveAll', 'Build.RebuildSolution'). Advanced escape hatch. | `command`, `args`? |
 | `xae_list_instances` *(read-only)* | Lists running Visual Studio / TcXaeShell instances with their open solution. |  |
-| `xae_set_silent_mode` | Enables/disables the Automation Interface SilentMode (suppresses message boxes in the IDE). Enabled by default. | `silent` |
+| `xae_set_silent_mode` | Enables/disables the Automation Interface SilentMode (suppresses message boxes in the IDE). Enabled by default. An attached IDE gets back the SilentMode it had before xae_attach when the server disconnects (xae_close). | `silent` |
 | `xae_set_visible` | Shows or hides the IDE main window. | `visible` |
 | `xae_start` | Starts a new TwinCAT XAE IDE instance (TcXaeShell 4026 by default) and connects to it. Takes 20-60 s. Dialogs are suppressed (Automation Interface SilentMode). | `progId`?, `visible`?, `keepOpen`?, `launchMode`? |
 | `xae_status` *(read-only)* | Shows the connected IDE, open solution, selected TwinCAT project and target AMS Net ID. |  |
