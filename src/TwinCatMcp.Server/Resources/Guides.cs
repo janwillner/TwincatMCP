@@ -1,9 +1,15 @@
+using TwinCatMcp.Core;
+
 namespace TwinCatMcp.Resources;
 
 public static class Guides
 {
     public const string Workflow = """
         # TwinCAT MCP – complete project workflow
+
+
+        """ + ServerInstructions.TwinCatOnlyRule + """
+
 
         ## 1. Engineering session
         1. `xae_start` (new TcXaeShell 4026, hidden) or `xae_attach` (running IDE).

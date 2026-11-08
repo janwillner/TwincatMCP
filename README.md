@@ -1,117 +1,120 @@
 # TwinCAT MCP Server
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server for **Beckhoff TwinCAT 3.1 Build 4026**. With it, an AI agent (Claude Code, Claude Desktop, any MCP client) can create, program, build, wire, download and manage a complete TwinCAT project. Nobody has to click through the IDE.
+A [Model Context Protocol](https://modelcontextprotocol.io) server for **Beckhoff TwinCAT 3.1 Build 4026**. An AI agent such as Claude Code can use it to create, program, build, wire, activate and run a complete TwinCAT project without anyone clicking through the IDE.
 
-- **201 tools** in 21 areas: IDE session, solution, build, the System Manager tree, PLC projects & ST code, libraries, archives, real-time & tasks, licenses, activation, PLC online, project variants, I/O devices, EtherCAT, variable mapping, motion (NC), TcCOM, ADS online and ADS routes.
-- **Two channels:**
-  - **Automation Interface** (engineering, through a TcXaeShell started or attached by the server).
-  - **ADS** (runtime: symbols, state, files and routes; needs no IDE).
-- **Resources:** workflow guide, tree-path cheat sheet, ST naming conventions, live session status and tree view.
-- **Prompts:** create a project, fix build errors, deploy to a target, add EtherCAT I/O.
+The server works through two channels:
 
-The full tool list is in [docs/tools.md](docs/tools.md). It is generated from the code.
+- **Automation Interface:** engineering in a TcXaeShell that the server starts or attaches to.
+- **ADS:** runtime access to symbols, state, files and routes. This channel needs no IDE.
 
-## Requirements
+Actions on the PC's own TwinCAT system (`<Local>`) are refused unless the call passes `allowLocalSystem: true`.
 
-| Component | Version |
-|---|---|
-| Windows 10/11 x64 | |
-| TwinCAT 3.1 XAE | 4026.x (TcXaeShell64, `TcXaeShell.DTE.17.0`) |
-| .NET SDK / runtime | 10.0 |
-| Target for deployment | any TwinCAT 3.1 runtime reachable via ADS, e.g. a local **Usermode Runtime** |
+**Rule for agents:** every action that concerns TwinCAT goes through this server's tools:
 
-The server references the Automation Interface (`TCatSysManagerLib` 3.4) installed with TwinCAT; its interop types are embedded. It uses `Beckhoff.TwinCAT.Ads` 7.0.389 from nuget.org.
+- Agents do not read or edit project files (`.tsproj`, `.TcPOU`, `.TcGVL`, …) directly.
+- Agents do not control TcXaeShell, runtimes or ADS through their own scripts.
+- If no tool fits a step, the agent tells the user instead of working around the server.
 
-## Build & register
+The server sends this rule to every MCP client in its instructions and in the `twincat://guide/workflow` guide.
+
+## Installation
+
+**Requirements**
+
+- Windows 10/11 x64
+- TwinCAT 3.1.4026 XAE. The build needs its Automation Interface (`TCatSysManagerLib`).
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- git
+
+**1. Clone and build**
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\publish.ps1   # -> artifacts\twincat-mcp\
+git clone https://github.com/janwillner/TwincatMCP.git C:\Tools\TwincatMCP
+cd C:\Tools\TwincatMCP
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1
 ```
 
-`.mcp.json` in the repo root registers the server for Claude Code as **`twincat`**: `dotnet artifacts/twincat-mcp/TwinCatMcp.Server.dll`.
+The server is built into `artifacts\twincat-mcp\`. If the build reports several hundred errors about `TCatSysManagerLib`, the TwinCAT XAE is missing.
 
-For other MCP clients:
+**2. Register with Claude Code**
+
+```powershell
+claude mcp add --scope user twincat -- dotnet C:\Tools\TwincatMCP\artifacts\twincat-mcp\TwinCatMcp.Server.dll
+```
+
+Restart Claude Code. `claude mcp get twincat` should then show `Connected`.
+
+The `.mcp.json` in this repo only registers the server when Claude Code is started inside the repo folder.
+
+**Other MCP clients** (such as Claude Desktop) need this entry in their configuration file:
 
 ```json
 {
   "mcpServers": {
     "twincat": {
       "command": "dotnet",
-      "args": ["C:\\path\\to\\TwincatMCP\\artifacts\\twincat-mcp\\TwinCatMcp.Server.dll"]
+      "args": ["C:\\Tools\\TwincatMCP\\artifacts\\twincat-mcp\\TwinCatMcp.Server.dll"]
     }
   }
 }
 ```
 
-| Environment variable | Effect |
+Optional environment variables:
+
+- `TWINCAT_MCP_LOGLEVEL`: `Trace` to `Warning`; logs go to stderr.
+- `TWINCAT_MCP_DEBUG=1`: adds stack traces to unexpected errors.
+
+**Update**
+
+Run `git pull`, then run `scripts\publish.ps1` again.
+
+## Commands
+
+### Prompts
+
+In Claude Code these appear as slash commands:
+
+| Command | Purpose |
 |---|---|
-| `TWINCAT_MCP_LOGLEVEL` | `Trace` … `Warning` (logs go to stderr) |
-| `TWINCAT_MCP_DEBUG=1` | adds stack traces to unexpected tool errors |
+| `/mcp__twincat__create_twincat_project` | Create a complete project from a functional description (PLC code, tasks, I/O, build) |
+| `/mcp__twincat__fix_build_errors` | Build and fix all compiler errors |
+| `/mcp__twincat__deploy_to_target` | Activate the configuration on a target and download and start the PLC |
+| `/mcp__twincat__add_ethercat_io` | Add an EtherCAT configuration and link it to PLC variables |
 
-## A complete project in one session
+### Tools (201)
 
-```text
-xae_start                                   -> dedicated, hidden TcXaeShell process
-solution_create  { directory, name }
-plc_create_project { name: "Plc1" }
-lib_add { libraries: ["Tc2_MC2"] }          ; lib_get_declaration { objects: ["MC_Power"] }
-pou_create_dut / pou_create_gvl / pou_create / pou_create_method / pou_write_code
-build_solution                              -> errors with code, object and line
-task_configure { task: "PlcTask", cycleTime: 5, unit: "ms" }
-io_add_device + ecat_add_terminals ["EK1100","EL1008","EL2008"] + mapping_link
-motion_create_nc_task + motion_add_axis + motion_link_axis_to_plc
-system_set_target -> system_activate_configuration -> plc_online_login -> plc_online_start
-ads_read_symbols / ads_write_symbols / ads_monitor
-solution_save / archive_save_solution
-```
+You don't need to call the tools yourself: describe the task and the agent picks them. A typical session starts with `xae_start` or `xae_attach`, followed by `solution_open` or `solution_create`.
 
-The acceptance test [CompleteProjectTests](tests/TwinCatMcp.Tests/Integration/CompleteProjectTests.cs) runs exactly this flow (minus deployment) against a live TcXaeShell. It only uses MCP calls.
+| Area | Tools |
+|---|---|
+| IDE session | `xae_start` `xae_attach` `xae_close` `xae_status` `xae_list_instances` `xae_set_visible` `xae_set_silent_mode` `xae_execute_command` |
+| Solution | `solution_create` `solution_open` `solution_save` `solution_close` `solution_list_projects` `solution_select_project` `solution_add_twincat_project` |
+| Build | `build_solution` `build_project` `build_clean` `build_get_errors` `build_get_output` `build_list_configurations` `build_set_configuration` |
+| System Manager tree | `tree_get_item` `tree_get_children` `tree_find` `tree_exists` `tree_create_child` `tree_delete_child` `tree_delete_item` `tree_rename_item` `tree_set_comment` `tree_set_disabled` `tree_produce_xml` `tree_consume_xml` `tree_export_child` `tree_import_child` |
+| PLC project | `plc_create_project` `plc_delete_project` `plc_list_projects` `plc_find_elements` `plc_grep` `plc_create_folder` `plc_compile` `plc_check_all_objects` `plc_run_static_analysis` `plc_get_settings` `plc_set_settings` `plc_get_task_reference` `plc_set_task_reference` `plc_generate_boot_project` `plc_export_plcopen` `plc_import_plcopen` |
+| POUs & code | `pou_create` `pou_create_method` `pou_create_property` `pou_create_action` `pou_create_transition` `pou_create_interface` `pou_create_dut` `pou_create_gvl` `pou_create_param_list` `pou_create_text_list` `pou_read_code` `pou_get_declaration` `pou_write_code` `pou_replace_code` `pou_multi_replace` `pou_grep` `pou_rename` `pou_move` `pou_delete` |
+| PLC online | `plc_online_login` `plc_online_logout` `plc_online_start` `plc_online_stop` `plc_online_reset` `plc_online_state` |
+| Libraries | `lib_add` `lib_remove` `lib_list_references` `lib_add_placeholder` `lib_set_resolution` `lib_freeze_placeholders` `lib_get_declaration` `lib_get_signatures` `lib_list_installed` `lib_install` `lib_uninstall` `lib_scan` `lib_list_repositories` `lib_insert_repository` `lib_move_repository` `lib_remove_repository` `lib_get_project_info` `lib_set_project_info` |
+| Archives & export | `archive_save_solution` `archive_open` `archive_export_plc_project` `archive_import_plc_project` `archive_save_as_library` |
+| System & activation | `system_set_target` `system_get_target` `system_list_targets` `system_set_target_platform` `system_list_target_platforms` `system_activate_configuration` `system_restart` `system_set_run_mode` `system_set_config_mode` `system_get_state` `system_get_info` `system_get_versions` `system_pin_version` |
+| Real-time & Usermode Runtime | `rt_get_settings` `rt_set_settings` `rt_umrt_list` `rt_umrt_create` `rt_umrt_start` `rt_umrt_stop` |
+| Tasks | `task_list` `task_create` `task_configure` `task_delete` `task_link_plc` |
+| Licenses | `license_list` `license_add` `license_activate_trial` |
+| Project variants | `variant_list` `variant_define` `variant_get_current` `variant_set_current` |
+| I/O devices | `io_add_device` `io_remove_device` `io_list_devices` `io_list_variables` `io_get_variable_info` `io_list_network_adapters` `io_set_device_adapter` `io_scan_devices` `io_scan_boxes` |
+| EtherCAT | `ecat_add_box` `ecat_add_terminals` `ecat_search_catalog` `ecat_get_topology` `ecat_get_slave_info` `ecat_get_coe` `ecat_set_startup_parameter` |
+| Variable mapping | `mapping_link` `mapping_unlink` `mapping_auto_link` `mapping_list_links` `mapping_check` `mapping_clear` `mapping_produce` `mapping_consume` |
+| Motion (NC) | `motion_create_nc_task` `motion_set_nc_task` `motion_add_axis` `motion_remove_axis` `motion_list_axes` `motion_get_axis_parameters` `motion_set_axis_parameters` `motion_get_axis_xml` `motion_set_axis_simulation` `motion_link_axis_to_plc` `motion_unlink_axis_from_plc` `motion_link_axis_to_drive` `motion_find_plc_axis_refs` |
+| TcCOM | `tccom_list_classes` `tccom_list_objects` `tccom_create_object` `tccom_delete_object` `tccom_get_parameters` `tccom_set_parameters` `tccom_set_context` |
+| ADS online | `ads_connect` `ads_disconnect` `ads_list_connections` `ads_list_plc_runtimes` `ads_read_state` `ads_write_control` `ads_read_device_info` `ads_get_system_info` `ads_browse_symbols` `ads_get_symbol_info` `ads_read_symbols` `ads_write_symbols` `ads_monitor` `ads_wait_for_value` `ads_invoke_rpc` `ads_read_raw` `ads_write_raw` `ads_list_dir` `ads_read_file` `ads_write_file` `ads_delete_file` |
+| ADS routes | `route_list` `route_add` `route_add_remote` `route_remove` `route_broadcast_search` |
 
-## Design notes
+Descriptions and parameters of every tool are in [docs/tools.md](docs/tools.md).
 
-- **One COM apartment.** Every Automation Interface call runs on a dedicated STA thread with a message pump and an OLE message filter. The filter retries "application busy".
-- **Own IDE vs. attached IDE.**
-  - `xae_start` lets Windows start a new TcXaeShell by COM activation and identifies its process by the main window. `launchMode: "process"` starts the executable itself (`-Embedding`) and attaches by process ID.
-  - The server only quits IDEs it started.
-  - `xae_attach` connects to a running IDE such as the user's own. On `xae_close` that IDE gets back the SilentMode it had before.
-- **Restarts are really awaited.** Activating, restarting and switching to Run mode wait until the target has left Run and come back. Right after the request the target still reports the old Run state. `plc_online_login` checks that the login really happened and retries while the XAE catches up with a restarted runtime.
-- **The own PC is protected.** A new TwinCAT project targets `<Local>`, which is the PC's own TwinCAT system and may run another application. Activating, restarting, switching mode, PLC login/start/stop/reset and writing ADS tools refuse to act on it unless the call passes `allowLocalSystem: true`. Set a dedicated target with `system_set_target` instead (for example a Usermode Runtime instance from `rt_umrt_list`). Customer ADS servers (port ≥ 25000) are exempt.
-- **Errors are actionable.** Every error is JSON with `error`, an optional `hint` and the TwinCAT error log. Open modal IDE dialogs (for example *license not found*) are returned as `xaeDialogs`. Misspelled or missing arguments are explained, with suggestions and the expected parameters.
-- **Hidden IDE quirks are handled:**
-  - The Error List stays empty in a hidden IDE, so build diagnostics are parsed from the Build pane.
-  - Solutions load asynchronously; `solution_open` waits until the nested PLC projects are ready.
-- **TwinCAT 4026 specifics:** these were verified live and documented by each work package in its code and tests:
-  - CreateChild sub types and vInfo formats
-  - the link path syntax
-  - the CoE startup XML
-  - the axis simulation flag
-  - UmRT handling
+The server also provides these resources:
 
-Architecture and conventions are in [docs/spec.md](docs/spec.md). The reflected Automation Interface of TwinCAT 4026.22 is in [docs/reference/TCatSysManagerLib-api.txt](docs/reference/TCatSysManagerLib-api.txt).
-
-## Tests
-
-```powershell
-dotnet test tests/TwinCatMcp.Tests --filter "FullyQualifiedName~Unit"   # pure logic, seconds
-dotnet test tests/TwinCatMcp.Tests                                       # + live TcXaeShell integration
-```
-
-- **Unit tests** cover the pure logic: ST text editing, XML builders and parsers, the ESI catalog, ADS value conversion, protocol packets, and build-output parsing.
-- **Integration tests** start the real server over stdio and drive a real TcXaeShell 4026. The ADS tests use an in-process symbolic ADS server and the local system service.
-- **Runtime tests** (activation, download, PLC start/stop, live symbols) are skipped until a licensed target exists. See [docs/runtime-setup.md](docs/runtime-setup.md):
-
-```powershell
-$env:TWINCAT_MCP_RUNTIME_TESTS = '1'
-dotnet test tests/TwinCatMcp.Tests --filter "Category=Runtime"
-```
-
-## Known limitations
-
-- **No trial license by automation.** A 7-day trial license cannot be generated through automation (captcha). `license_activate_trial` prepares the IDE and lists the manual steps.
-- **No hardware tests.** No EtherCAT hardware or drives were attached during development. Scans, online CoE and adapter binding to real NICs fail cleanly but are not verified against real devices.
-- **Library declarations:** `lib_get_declaration` builds declarations from library signatures. They contain VAR blocks only, without struct members or FB methods.
-- **Unused objects are not compiled:** objects that nothing references are skipped by `build_solution`. Use `plc_check_all_objects` for those.
-- **ITcSmCommands is not available** in TcXaeShell 4026 automation. Config/Run mode switching goes through ADS instead.
-- **Variant management cannot be removed again.** `variant_define` needs at least one variant.
-- **File tools on a Usermode Runtime** run under its service account. It cannot see user profile folders, so use for example `C:\ProgramData\...` or the `boot` root.
-- **Interface property accessors have no code.** Reading their code crashes TcXaeShell 4026, so the code tools skip them.
+- `twincat://guide/workflow`
+- `twincat://guide/tree-paths`
+- `twincat://guide/st-conventions`
+- `twincat://session/status`
+- `twincat://tree/{path}`

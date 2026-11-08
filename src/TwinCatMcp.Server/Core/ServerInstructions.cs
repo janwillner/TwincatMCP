@@ -5,6 +5,10 @@ public static class ServerInstructions
     public const string Text = """
         TwinCAT 3.1 (Build 4026) engineering + runtime MCP server.
 
+
+        """ + TwinCatOnlyRule + """
+
+
         Two independent channels:
         1. XAE / Automation Interface (engineering): tools prefixed xae_, solution_, tree_, build_, plc_, plc_online_, pou_, lib_, archive_, task_, rt_ (incl. rt_umrt_* Usermode Runtime), io_, ecat_, mapping_, motion_, tccom_, system_, license_, variant_.
            Requires an IDE session: xae_start (new TcXaeShell) or xae_attach (running IDE), then solution_create or solution_open.
@@ -26,5 +30,16 @@ public static class ServerInstructions
 
         Every tool returns JSON. Errors come back with isError=true, a message, an optional hint and the TwinCAT error log.
         After changing ST code always run build_solution (or plc_check_all_objects) and fix reported errors before activating.
+        """;
+
+    /// <summary>Mandatory rule: every TwinCAT action goes through this server (also part of the workflow guide).</summary>
+    public const string TwinCatOnlyRule = """
+        MANDATORY RULE - every action that concerns TwinCAT goes through the tools of this server:
+        - This covers the IDE, solutions and projects, PLC code, configuration, I/O, motion, activation, runtimes, ADS, routes and licenses.
+        - Never read or change TwinCAT project files (.sln, .tsproj, .xti, .plcproj, .TcPOU, .TcDUT, .TcGVL, .TcIO, .TcTTO, .TcSMC, ...) with file tools, shell commands or scripts.
+          Read with pou_read_code / pou_grep / plc_grep / tree_get_item / tree_produce_xml; change with pou_write_code / pou_replace_code / tree_consume_xml.
+        - Never start, script or control TcXaeShell, the TwinCAT system service, Usermode Runtimes or ADS by other means
+          (PowerShell or COM scripts, TcXaeShell.exe, TcSystemServiceUm.exe, Start.bat, own ADS clients). Use xae_start / xae_attach, system_*, rt_umrt_*, ads_*, route_*.
+        - If no specific tool covers a step, use the generic tools (tree_*, xae_execute_command). If that is not possible either, tell the user what is missing instead of working around the server.
         """;
 }
