@@ -62,7 +62,7 @@ Generated from the server assembly – 201 tools. Regenerate with `TwinCatMcp.Se
 
 | Tool | Description | Parameters |
 |---|---|---|
-| `plc_online_login` | Logs the XAE into the PLC runtime of the target and downloads the application if needed (no dialogs). mode: 'auto' = online change when possible, otherwise download; 'download' = full download (PLC goes to Stop, values reset); 'onlineChange' = only online change. The target must be in Run mode (system_activate_configuration). Start the PLC with plc_online_start. | `plcProject`?, `mode`?, `rebuild`?, `allowLocalSystem`?, `timeoutSeconds`? |
+| `plc_online_login` | Logs the XAE into the PLC runtime of the target and downloads the application if needed (no dialogs). mode: 'auto' = online change when possible, otherwise download; 'download' = full download (PLC goes to Stop, values reset); 'onlineChange' = only online change. The target must be in Run mode (system_activate_configuration). Start the PLC with plc_online_start. While logged in nothing may be changed or built: every tool that is not read-only (except plc_online_*, ads_*, route_*) first logs the XAE out automatically. | `plcProject`?, `mode`?, `rebuild`?, `allowLocalSystem`?, `timeoutSeconds`? |
 | `plc_online_logout` | Logs the XAE out of the PLC runtime (the PLC keeps running). | `plcProject`? |
 | `plc_online_reset` | Resets the PLC application (requires plc_online_login): 'cold' = all variables except RETAIN/PERSISTENT to initial values, 'origin' = everything incl. RETAIN/PERSISTENT and the application is removed from the runtime (login with download afterwards). | `type`?, `plcProject`?, `allowLocalSystem`? |
 | `plc_online_start` | Starts the PLC application (requires plc_online_login). | `plcProject`?, `allowLocalSystem`? |

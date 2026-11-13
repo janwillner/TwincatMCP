@@ -29,7 +29,7 @@ builder.Services
         o.ServerInstructions = ServerInstructions.Text;
     })
     .WithStdioServerTransport()
-    .WithRequestFilters(f => f.AddArgumentDiagnostics())
+    .WithRequestFilters(f => f.AddArgumentDiagnostics().AddAutoLogout())
     .WithToolsFromAssembly()
     .WithResourcesFromAssembly()
     .WithPromptsFromAssembly();
