@@ -30,6 +30,8 @@ public static class ServerInstructions
 
         Every tool returns JSON. Errors come back with isError=true, a message, an optional hint and the TwinCAT error log.
         After changing ST code always run build_solution (or plc_check_all_objects) and fix reported errors before activating.
+        While the XAE is logged in to a PLC nothing may be changed, built or activated: every tool that is not read-only (except plc_online_*, ads_*, route_*)
+        logs the XAE out of all PLC projects first and reports this as "autoLogout" in its result. Log in again with plc_online_login when needed.
         """;
 
     /// <summary>Mandatory rule: every TwinCAT action goes through this server (also part of the workflow guide).</summary>

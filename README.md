@@ -111,6 +111,8 @@ You don't need to call the tools yourself: describe the task and the agent picks
 
 Descriptions and parameters of every tool are in [docs/tools.md](docs/tools.md).
 
+**No changes while logged in:** while the XAE is logged in to a PLC, nothing may be changed, built or activated. Every tool that is not read-only (except `plc_online_*`, `ads_*`, `route_*` and `xae_start` / `xae_attach` / `xae_set_visible` / `xae_set_silent_mode`) first logs the XAE out of all PLC projects. The result then contains an extra `autoLogout` entry listing them. The PLC keeps running.
+
 The server also provides these resources:
 
 - `twincat://guide/workflow`
