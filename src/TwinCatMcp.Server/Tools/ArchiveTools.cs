@@ -64,7 +64,7 @@ public sealed class ArchiveTools(XaeSession session)
                 }
                 else
                 {
-                    throw new InvalidOperationException("Encrypted libraries need ITcPlcIECProject6 (TwinCAT 4026+).");
+                    ComCapability.Require<ITcPlcIECProject6>(ctx.NestedProject, "Saving an encrypted library");
                 }
             }, "Saving as library failed.", "Build the project first (build_solution) and fix compile errors.");
 

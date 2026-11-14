@@ -90,7 +90,7 @@ public sealed class LicenseTools(XaeSession session)
             }
 
             var visible = XaeRuntime.Try(() => { s.Dte.MainWindow.Visible = true; s.Dte.MainWindow.Activate(); return true; });
-            var selected = XaeRuntime.Try(() => { s.SysManager.SelectTreeItem("TIRC^License"); return true; });
+            var selected = XaeRuntime.Try(() => { s.SysManagerAs<ITcSysManager18>("Selecting a tree item").SelectTreeItem("TIRC^License"); return true; });
             return new
             {
                 targetNetId = netId,
@@ -113,8 +113,7 @@ public sealed class LicenseTools(XaeSession session)
     private static string? NullIfEmpty(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
 
     private static ITcLicenseManager2 Manager(XaeSession s)
-        => s.SysManager.GetModuleManager() as ITcLicenseManager2
-           ?? throw new TcException("The license catalog (ITcLicenseManager2) is not available.");
+        => ComCapability.Require<ITcLicenseManager2>(s.SysManager.GetModuleManager(), "The license catalog");
 
     private static object[] Catalog(XaeSession s, string search)
     {

@@ -3,7 +3,9 @@ namespace TwinCatMcp.Core;
 public static class ServerInstructions
 {
     public const string Text = """
-        TwinCAT 3.1 (Build 4026) engineering + runtime MCP server.
+        TwinCAT 3.1 (Build 4026; Build 4024 with limits) engineering + runtime MCP server.
+        On 4024, tools that need a newer Automation Interface (project variants, licenses, SARIF, encrypted libraries) fail with
+        "... is not supported by this TwinCAT XAE" and a hint naming the TwinCAT version needed. Usermode Runtimes (rt_umrt_*) need 4026.
 
 
         """ + TwinCatOnlyRule + """

@@ -72,7 +72,7 @@ public static class UmrtManager
 
         if (!Directory.Exists(TemplateDir))
         {
-            throw new TcException($"Usermode Runtime template not found: {TemplateDir}.") { Hint = "Install TC1700 (TwinCAT 3 Usermode Runtime) with the TwinCAT Package Manager." };
+            throw new TcException($"Usermode Runtime template not found: {TemplateDir}.") { Hint = "Install TC1700 (TwinCAT 3 Usermode Runtime, TwinCAT 3.1.4026 or newer) with the TwinCAT Package Manager." };
         }
 
         if (netId is not null)
@@ -101,7 +101,7 @@ public static class UmrtManager
 
         if (!File.Exists(Executable))
         {
-            throw new TcException($"TcSystemServiceUm.exe not found: {Executable}.") { Hint = "Install TC1700 (TwinCAT 3 Usermode Runtime)." };
+            throw new TcException($"TcSystemServiceUm.exe not found: {Executable}.") { Hint = "Install TC1700 (TwinCAT 3 Usermode Runtime, TwinCAT 3.1.4026 or newer)." };
         }
 
         var psi = new ProcessStartInfo(Executable)

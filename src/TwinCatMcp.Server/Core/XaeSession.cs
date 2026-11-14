@@ -15,7 +15,6 @@ namespace TwinCatMcp.Core;
 /// </summary>
 public sealed class XaeSession : IDisposable
 {
-    public const string DefaultProgId = "TcXaeShell.DTE.17.0";
     public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
 
     private readonly StaComThread _sta;
@@ -155,7 +154,14 @@ public sealed class XaeSession : IDisposable
         Hint = "Call solution_open or solution_create, or solution_select_project if the solution has several TwinCAT projects.",
     };
 
-    public ITcSysManager18 SysManager => (ITcSysManager18)Project.Object;
+    /// <summary>
+    /// System Manager of the selected project, typed as the lowest interface version that covers the common members
+    /// (TwinCAT 3.1.4024 does not implement every newer ITcSysManagerN). Newer members go through <see cref="SysManagerAs{T}"/>.
+    /// </summary>
+    public ITcSysManager12 SysManager => ComCapability.Require<ITcSysManager12>(Project.Object, "This TwinCAT Automation Interface version");
+
+    /// <summary>System Manager as a newer interface version, or a TcException naming the feature that needs it.</summary>
+    public T SysManagerAs<T>(string feature) where T : class => ComCapability.Require<T>(Project.Object, feature);
 
     public bool HasProject => _project is not null;
 
@@ -206,11 +212,12 @@ public sealed class XaeSession : IDisposable
             throw new TcException("An XAE instance is already connected.") { Hint = "Call xae_close first." };
         }
 
-        progId = string.IsNullOrWhiteSpace(progId) ? DefaultProgId : progId;
+        progId = string.IsNullOrWhiteSpace(progId) ? XaeProgIds.SelectDefault() : progId;
         var type = Type.GetTypeFromProgID(progId)
                    ?? throw new TcException($"ProgID '{progId}' is not registered.")
                    {
-                       Hint = "Use TcXaeShell.DTE.17.0 (TwinCAT XAE Shell 4026) or VisualStudio.DTE.17.0/18.0 (VS integration).",
+                       Hint = $"Use {XaeProgIds.Shell4026} (TwinCAT XAE Shell 4026), {XaeProgIds.Shell4024} (TwinCAT XAE Shell 4024) " +
+                              "or VisualStudio.DTE.15.0/16.0/17.0/18.0 (VS integration).",
                    };
 
         var mode = string.IsNullOrWhiteSpace(launchMode) ? "com" : launchMode.Trim().ToLowerInvariant();
@@ -783,7 +790,7 @@ public sealed class XaeSession : IDisposable
                 var tcProjects = EnumerateTwinCatProjects().ToList();
                 var allReady = projects.Count > 0 && tcProjects.All(p =>
                 {
-                    var sm = (ITcSysManager18)p.Object;
+                    var sm = (ITcSysManager)p.Object;
                     var plcRoot = sm.LookupTreeItem("TIPC");
                     return TreeInfo.Children(plcRoot).All(c => c is not ITcProjectRoot root || SafeGet(() => root.NestedProject) is not null);
                 });

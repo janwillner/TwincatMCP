@@ -1,6 +1,6 @@
 # TwinCAT MCP Server – Spec
 
-Goal: an MCP server for **TwinCAT 3.1 Build 4026** with which an agent can create, program, build, download and manage a complete TwinCAT project without touching the IDE by hand.
+Goal: an MCP server for **TwinCAT 3.1 Build 4026** (Build 4024 supported with limits, see README and issue #3) with which an agent can create, program, build, download and manage a complete TwinCAT project without touching the IDE by hand.
 
 Stack: C# / .NET 10 (`net10.0-windows`, x64), `ModelContextProtocol` 2.4.0 (stdio), TwinCAT Automation Interface (`TCatSysManagerLib` 3.4, embedded interop), EnvDTE 17.14, `Beckhoff.TwinCAT.Ads` 7.0.389.
 

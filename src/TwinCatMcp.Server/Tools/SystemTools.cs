@@ -223,7 +223,7 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
                 xaeVersion = rm is null ? null : XaeRuntime.Try(() => rm.Version),
                 installedVersions = rm is null ? null : XaeRuntime.Try(() => rm.Versions),
                 projectPinned = s.HasProject ? XaeRuntime.Try<bool?>(() => s.SysManager.TcVersionFixed) : null,
-                pinnedVersion = s.HasProject ? XaeRuntime.Try(() => s.SysManager.PinnedTcVersion) is { Length: > 0 } v ? v : null : null,
+                pinnedVersion = s.HasProject ? PinnedVersion(s) : null,
             };
         });
 
@@ -238,7 +238,7 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
             return new
             {
                 projectPinned = s.SysManager.TcVersionFixed,
-                pinnedVersion = XaeRuntime.Try(() => s.SysManager.PinnedTcVersion) is { Length: > 0 } v ? v : null,
+                pinnedVersion = PinnedVersion(s),
             };
         });
 
@@ -347,6 +347,10 @@ public sealed class SystemTools(XaeSession session, AdsSessionManager ads)
 
         return await ads.RunAsync(() => action(target));
     }
+
+    /// <summary>Pinned TwinCAT version (ITcSysManager14); null when not pinned or not available on this XAE.</summary>
+    private static string? PinnedVersion(XaeSession s)
+        => XaeRuntime.Try(() => s.SysManagerAs<ITcSysManager14>("Reading the pinned TwinCAT version").PinnedTcVersion) is { Length: > 0 } v ? v : null;
 
     private static RouteList? Routes(XaeSession s) => XaeRuntime.Try(() => RouteXml.Parse(s.Lookup("TIRR").ProduceXml(false)));
 

@@ -11,9 +11,22 @@ public sealed record InstalledLibrary(string Repository, string Distributor, str
 /// </summary>
 public static class LibraryRepositoryScanner
 {
-    /// <summary>Default "System" repository of TwinCAT 3.1.4026.</summary>
+    /// <summary>Default "System" repository of the TwinCAT version installed on this PC.</summary>
     public static string DefaultSystemRepositoryFolder =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Beckhoff\TwinCAT\PlcEngineering\Managed Libraries");
+        SystemRepositoryFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Core.XaeSession.TwinCatDir, Directory.Exists);
+
+    /// <summary>
+    /// "System" repository: below ProgramData on TwinCAT 3.1.4026, below the installation folder on 4024.
+    /// The first existing one wins; the 4026 location is returned when none exists.
+    /// </summary>
+    public static string SystemRepositoryFolder(string commonAppData, string twinCatDir, Func<string, bool> directoryExists)
+    {
+        var repo4026 = Path.Combine(commonAppData, @"Beckhoff\TwinCAT\PlcEngineering\Managed Libraries");
+        var repo4024 = Path.Combine(twinCatDir, @"Components\Plc\Managed Libraries");
+        return directoryExists(repo4026) ? repo4026
+            : directoryExists(repo4024) ? repo4024
+            : repo4026;
+    }
 
     public static List<InstalledLibrary> Scan(string repositoryName, string rootFolder)
     {
