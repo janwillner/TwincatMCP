@@ -15,7 +15,8 @@ public sealed class TcComTools(XaeSession session)
 
     [McpServerTool(Name = "tccom_list_classes", ReadOnly = true), Description(
         "Lists TcCOM module classes installed on this PC (read from the TMC files in TwinCAT Config\\Modules, CustomConfig\\Modules " +
-        "and the module repository C:\\ProgramData\\Beckhoff\\TwinCAT\\3.1\\Repository). Returns name, classId, class factory, group, " +
+        "and the module repository: C:\\ProgramData\\Beckhoff\\TwinCAT\\3.1\\Repository on 4026, %TWINCAT3DIR%Repository on 4024). " +
+        "Returns name, classId, class factory, group, " +
         "parameter names. Use name or classId with tccom_create_object. Example filter: 'SoftDrive', 'Kinematic', 'Xts'.")]
     public Task<CallToolResult> ListClasses(
         [Description("Case-insensitive substring of name, group, class factory, vendor or classId. Empty = all.")] string? filter = null,
@@ -55,7 +56,7 @@ public sealed class TcComTools(XaeSession session)
     public Task<CallToolResult> ListObjects([Description("Also list system modules (tasks, NC, PLC instances, ...).")] bool includeAll = false)
         => session.RunAsync(s =>
         {
-            var mm = (ITcModuleManager3)s.SysManager.GetModuleManager();
+            var mm = ComCapability.Require<ITcModuleManager3>(s.SysManager.GetModuleManager(), "Listing TcCOM objects");
             var list = new List<object>();
             foreach (ITcModuleInstance2 m in mm)
             {

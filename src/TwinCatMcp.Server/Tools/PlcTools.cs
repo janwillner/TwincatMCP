@@ -369,7 +369,7 @@ public sealed class PlcTools(XaeSession session)
                 {
                     sarif = Path.GetFullPath(sarifPath);
                     Directory.CreateDirectory(Path.GetDirectoryName(sarif)!);
-                    ((ITcPlcIECProject7)p.Nested).ExportToSarif(sarif);
+                    ComCapability.Require<ITcPlcIECProject7>(p.Nested, "SARIF export", "TwinCAT 3.1.4026.20").ExportToSarif(sarif);
                 }
                 else
                 {

@@ -15,7 +15,7 @@ public sealed record TcComClassInfo(
 /// <summary>
 /// Reads TcCOM module classes from TMC files (TcModuleClass/Modules/Module). TwinCAT looks for them in
 /// %TWINCAT3DIR%\Config\Modules, %TWINCAT3DIR%\CustomConfig\Modules and the module repository
-/// C:\ProgramData\Beckhoff\TwinCAT\3.1\Repository (vendor\module\version\*.tmc).
+/// C:\ProgramData\Beckhoff\TwinCAT\3.1\Repository on 4026 or %TWINCAT3DIR%Repository on 4024 (vendor\module\version\*.tmc).
 /// </summary>
 public static class TmcCatalog
 {
@@ -40,12 +40,19 @@ public static class TmcCatalog
 
     /// <summary>Default folders that contain TMC files on this PC.</summary>
     public static IEnumerable<string> DefaultFolders()
+        => DefaultFolders(XaeSession.TwinCatDir, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
+
+    /// <summary>
+    /// TMC folders below the installation folder and ProgramData. The module repository lives below ProgramData on
+    /// TwinCAT 3.1.4026 and below the installation folder (C:\TwinCAT\3.1\Repository) on 4024.
+    /// </summary>
+    public static IEnumerable<string> DefaultFolders(string twinCatDir, string commonAppData)
     {
-        var tcDir = XaeSession.TwinCatDir;
-        yield return Path.Combine(tcDir, "Config", "Modules");
-        yield return Path.Combine(tcDir, "CustomConfig", "Modules");
-        yield return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Beckhoff", "TwinCAT", "3.1", "Repository");
-        yield return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Beckhoff", "TwinCAT", "3.1", "CustomConfig", "Modules");
+        yield return Path.Combine(twinCatDir, "Config", "Modules");
+        yield return Path.Combine(twinCatDir, "CustomConfig", "Modules");
+        yield return Path.Combine(twinCatDir, "Repository");
+        yield return Path.Combine(commonAppData, "Beckhoff", "TwinCAT", "3.1", "Repository");
+        yield return Path.Combine(commonAppData, "Beckhoff", "TwinCAT", "3.1", "CustomConfig", "Modules");
     }
 
     /// <summary>Scans folders recursively; for duplicate class ids the newest file wins.</summary>

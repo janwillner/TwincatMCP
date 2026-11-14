@@ -9,10 +9,11 @@ namespace TwinCatMcp.Tools;
 public sealed class SessionTools(XaeSession session)
 {
     [McpServerTool(Name = "xae_start"), Description(
-        "Starts a new TwinCAT XAE IDE instance (TcXaeShell 4026 by default) and connects to it. " +
+        "Starts a new TwinCAT XAE IDE instance (the installed TcXaeShell by default) and connects to it. " +
         "Takes 20-60 s. Dialogs are suppressed (Automation Interface SilentMode).")]
     public Task<CallToolResult> Start(
-        [Description("COM ProgID. Default 'TcXaeShell.DTE.17.0'. Alternatives: 'VisualStudio.DTE.17.0' (VS 2022), 'VisualStudio.DTE.18.0' (VS 2026).")] string? progId = null,
+        [Description("COM ProgID. Default: 'TcXaeShell.DTE.17.0' (TwinCAT 4026) if registered, else 'TcXaeShell.DTE.15.0' (TwinCAT 4024). " +
+                     "Alternatives: 'VisualStudio.DTE.15.0'/'16.0' (VS 2017/2019), 'VisualStudio.DTE.17.0' (VS 2022), 'VisualStudio.DTE.18.0' (VS 2026).")] string? progId = null,
         [Description("Show the IDE main window (useful for watching what happens).")] bool visible = false,
         [Description("Keep the IDE running after the MCP server exits.")] bool keepOpen = false,
         [Description("'com' (default): COM activation - Windows starts a new IDE process; the server identifies it by its main window and owns it. " +

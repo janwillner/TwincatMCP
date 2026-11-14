@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using TCatSysManagerLib;
 using TwinCatMcp.Core;
 using TwinCatMcp.Runtime;
 
@@ -16,7 +17,7 @@ public sealed class VariantTools(XaeSession session)
         => session.RunAsync(s => new
         {
             current = Current(s),
-            config = VariantXml.Parse(s.SysManager.ProjectVariantConfig),
+            config = VariantXml.Parse(Variants(s).ProjectVariantConfig),
         });
 
     [McpServerTool(Name = "variant_get_current", ReadOnly = true), Description("Returns the currently selected project variant (empty = no variant management).")]
@@ -28,7 +29,7 @@ public sealed class VariantTools(XaeSession session)
     public Task<CallToolResult> SetCurrent([Description("Variant name or '[GroupName]'.")] string variant)
         => session.RunAsync(s =>
         {
-            var cfg = VariantXml.Parse(s.SysManager.ProjectVariantConfig);
+            var cfg = VariantXml.Parse(Variants(s).ProjectVariantConfig);
             var name = variant?.Trim() ?? "";
             var known = name.StartsWith('[') && name.EndsWith(']')
                 ? cfg.Groups.Any(g => string.Equals("[" + g.Name + "]", name, StringComparison.OrdinalIgnoreCase))
@@ -38,7 +39,7 @@ public sealed class VariantTools(XaeSession session)
                 throw new TcException($"Unknown variant '{variant}'.") { Hint = "Known variants: " + string.Join(", ", cfg.Variants) + (cfg.Groups.Count > 0 ? "; groups: " + string.Join(", ", cfg.Groups.Select(g => "[" + g.Name + "]")) : "") };
             }
 
-            s.SysManager.CurrentProjectVariant = name;
+            Variants(s).CurrentProjectVariant = name;
             return new { current = Current(s) };
         });
 
@@ -58,10 +59,16 @@ public sealed class VariantTools(XaeSession session)
             var cfg = new VariantXml.VariantConfig(
                 variants.Select(v => v.Trim()).ToList(),
                 (groups ?? []).Select(g => new VariantXml.VariantGroup(g.Key, g.Value.ToList())).ToList());
-            s.SysManager.ProjectVariantConfig = VariantXml.Build(cfg);
-            return new { config = VariantXml.Parse(s.SysManager.ProjectVariantConfig), current = Current(s) };
+            Variants(s).ProjectVariantConfig = VariantXml.Build(cfg);
+            return new { config = VariantXml.Parse(Variants(s).ProjectVariantConfig), current = Current(s) };
         });
 
+    private static ITcSysManager14 Variants(XaeSession s) => s.SysManagerAs<ITcSysManager14>("Project variants");
+
+    /// <summary>Current variant (null = no variant management). A missing ITcSysManager14 (older XAE) is reported, not hidden.</summary>
     private static string? Current(XaeSession s)
-        => XaeRuntime.Try(() => s.SysManager.CurrentProjectVariant) is { Length: > 0 } v ? v : null;
+    {
+        var variants = Variants(s);
+        return XaeRuntime.Try(() => variants.CurrentProjectVariant) is { Length: > 0 } v ? v : null;
+    }
 }
