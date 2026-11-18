@@ -132,3 +132,7 @@ The server also provides these resources:
 - `twincat://guide/st-conventions`
 - `twincat://session/status`
 - `twincat://tree/{path}`
+
+## License
+
+MIT, see [LICENSE](LICENSE). The license covers this project's code only. Building it pulls third-party NuGet packages under their own licenses, among them Beckhoff `TwinCAT.Ads` and `TCatSysManager` (MIT) and Microsoft's Visual Studio interop assemblies (`envdte`), which may not be redistributed.
