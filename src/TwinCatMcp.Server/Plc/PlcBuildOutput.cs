@@ -20,13 +20,15 @@ public sealed record PlcBuildResult(int ErrorCount, int WarningCount, List<PlcDi
 /// </summary>
 public static partial class PlcBuildOutput
 {
-    [GeneratedRegex(@"^(?<file>.+?)\((?<line>\d+)\)\s*:\s*(?<level>error|warning|info|message)\s*:?\s*(?<code>[A-Z]+\d+)\s*:\s*(?<msg>.*)$", RegexOptions.IgnoreCase)]
+    // 4026: "file(8) : error: C0007: msg" / "file(3) : warning SA0033: msg"; 4024: "file(9) : error: msg" (no code).
+    [GeneratedRegex(@"^(?<file>.+?)\((?<line>\d+)\)\s*:\s*(?<level>error|warning|info|message)\s*:?\s*(?:(?<code>[A-Z]+\d+)\s*:\s*)?(?<msg>.*)$", RegexOptions.IgnoreCase)]
     private static partial Regex FileDiag();
 
     [GeneratedRegex(@"^(?<level>error|warning)\s*:?\s*(?<code>[A-Z]+\d+)?\s*:\s*(?<msg>.*)$", RegexOptions.IgnoreCase)]
     private static partial Regex PlainDiag();
 
-    [GeneratedRegex(@"^Compile complete -- (?<e>\d+) errors?, (?<w>\d+) warnings?", RegexOptions.IgnoreCase)]
+    // English and German XAE ("Kompilierung abgeschlossen -- 2 Fehler, 0 Warnungen").
+    [GeneratedRegex(@"^(?:Compile complete|Kompilierung abgeschlossen) -- (?<e>\d+) (?:errors?|Fehler), (?<w>\d+) (?:warnings?|Warnung(?:en)?)", RegexOptions.IgnoreCase)]
     private static partial Regex CompileSummary();
 
     public static PlcBuildResult Parse(string text)
@@ -53,7 +55,7 @@ public static partial class PlcBuildOutput
             if (FileDiag().Match(line) is { Success: true } f)
             {
                 var file = f.Groups["file"].Value.Trim();
-                d = new PlcDiagnostic(Level(f.Groups["level"].Value), f.Groups["code"].Value, f.Groups["msg"].Value.Trim(),
+                d = new PlcDiagnostic(Level(f.Groups["level"].Value), f.Groups["code"].Success ? f.Groups["code"].Value : null, f.Groups["msg"].Value.Trim(),
                     Path.GetFileNameWithoutExtension(file), file, int.Parse(f.Groups["line"].Value));
             }
             else if (PlainDiag().Match(line) is { Success: true } p)

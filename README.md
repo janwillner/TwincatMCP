@@ -22,20 +22,21 @@ The server sends this rule to every MCP client in its instructions and in the `t
 **Requirements**
 
 - Windows 10/11 x64
-- TwinCAT 3.1.4026 XAE. The build needs its Automation Interface (`TCatSysManagerLib` 3.4).
+- TwinCAT 3.1.4026 or 4024 XAE
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - git
 
+The Automation Interface interop comes from the NuGet package `Beckhoff.TwinCAT.TCatSysManager` (4026.22, types embedded), so the build does not depend on the installed TwinCAT version.
+
 **TwinCAT 3.1.4024**
 
-The server also runs against a 4024 XAE, with limits:
+The server also runs against a 4024 XAE, with limits. The 4024.79 Automation Interface ends at `ITcSysManager15` and `ITcPlcIECProject3`:
 
-- Build it on a PC with TwinCAT 4026 and copy `artifacts\twincat-mcp\` over. The interop types are embedded, so no Beckhoff DLL is needed at run time. To build against another interop folder, pass `-p:TwinCatInteropDir=<folder>`.
 - `xae_start` picks `TcXaeShell.DTE.15.0` (the 4024 XAE Shell) when the 4026 shell is not registered.
-- Tools that need a newer Automation Interface fail with "… is not supported by this TwinCAT XAE" and a hint that names the TwinCAT version needed. This covers project variants (`variant_*`) where `ITcSysManager14` is missing, license tools (`license_*`), the SARIF export of `plc_run_static_analysis` (4026.20) and encrypted libraries (`archive_save_as_library`).
+- Tools that need a newer interface fail with "… is not supported by this TwinCAT XAE" and a hint that names the TwinCAT version needed: the SARIF export and the `.csa` settings file of `plc_run_static_analysis`, encrypted libraries (`archive_save_as_library`) and the axis Simulation mode (`motion_set_axis_simulation`).
+- Build diagnostics of a German XAE are parsed too (4024 writes compiler messages without error codes).
 - The Usermode Runtime (`rt_umrt_*`, TC1700) exists only from 4026 on.
 - The ADS tools (`ads_*`, `route_*`) do not depend on the XAE version.
-- The 4024 support has not yet been tested against a real 4024 system (see issue #3). Which `ITcSysManagerN` versions 4024 implements, and the 4024 library and module repository paths, are taken from documentation and not yet verified.
 
 **1. Clone and build**
 
@@ -45,7 +46,7 @@ cd C:\Tools\TwincatMCP
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1
 ```
 
-The server is built into `artifacts\twincat-mcp\`. If the build reports several hundred errors about `TCatSysManagerLib`, the TwinCAT XAE is missing.
+The server is built into `artifacts\twincat-mcp\`.
 
 **2. Register with Claude Code**
 

@@ -23,6 +23,7 @@ public sealed class PlcObjectModelTests
     [InlineData(618, "INTERFACE")]
     [InlineData(623, "ALIAS")]
     [InlineData(601, "FOLDER")]
+    [InlineData(652, "EXTERNAL_TYPES")] // "External data types" node of a 4024 PLC project
     public void Maps_item_types_to_kinds(int itemType, string kind)
     {
         Assert.Equal(kind, PlcObjects.KindOf(itemType));

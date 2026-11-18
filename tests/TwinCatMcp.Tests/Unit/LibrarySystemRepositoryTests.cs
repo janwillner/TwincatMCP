@@ -14,9 +14,18 @@ public sealed class LibrarySystemRepositoryTests
     private const string Repo4024 = @"C:\TwinCAT\3.1\Components\Plc\Managed Libraries";
 
     [Fact]
-    public void The_4026_repository_is_used_when_it_exists()
+    public void The_repository_of_the_installation_folder_wins_over_a_leftover_ProgramData_repository()
     {
+        // Seen live: 4024.79 installed after uninstalling 4026 leaves the 4026 ProgramData repository behind.
         var folder = LibraryRepositoryScanner.SystemRepositoryFolder(ProgramData, TwinCatDir, _ => true);
+
+        Assert.Equal(Repo4024, folder);
+    }
+
+    [Fact]
+    public void The_4026_repository_is_used_when_the_installation_folder_has_none()
+    {
+        var folder = LibraryRepositoryScanner.SystemRepositoryFolder(ProgramData, TwinCatDir, dir => dir == Repo4026);
 
         Assert.Equal(Repo4026, folder);
     }
