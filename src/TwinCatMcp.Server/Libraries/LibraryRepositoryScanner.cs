@@ -16,16 +16,15 @@ public static class LibraryRepositoryScanner
         SystemRepositoryFolder(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Core.XaeSession.TwinCatDir, Directory.Exists);
 
     /// <summary>
-    /// "System" repository: below ProgramData on TwinCAT 3.1.4026, below the installation folder on 4024.
-    /// The first existing one wins; the 4026 location is returned when none exists.
+    /// "System" repository: below the installation folder (%TWINCAT3DIR%) on TwinCAT 3.1.4024, below ProgramData on 4026.
+    /// The one in the installation folder wins because it belongs to the active installation, while a ProgramData
+    /// repository can be left over from an uninstalled 4026 (seen live). The 4026 location is returned when none exists.
     /// </summary>
     public static string SystemRepositoryFolder(string commonAppData, string twinCatDir, Func<string, bool> directoryExists)
     {
         var repo4026 = Path.Combine(commonAppData, @"Beckhoff\TwinCAT\PlcEngineering\Managed Libraries");
         var repo4024 = Path.Combine(twinCatDir, @"Components\Plc\Managed Libraries");
-        return directoryExists(repo4026) ? repo4026
-            : directoryExists(repo4024) ? repo4024
-            : repo4026;
+        return directoryExists(repo4024) ? repo4024 : repo4026;
     }
 
     public static List<InstalledLibrary> Scan(string repositoryName, string rootFolder)

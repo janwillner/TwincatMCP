@@ -225,7 +225,7 @@ public sealed class MotionTools(XaeSession session)
     // ------------------------------------------------------------------ simulation
 
     [McpServerTool(Name = "motion_set_axis_simulation"), Description(
-        "Switches the TwinCAT 4026 axis 'Simulation' mode (Settings tab) on or off. In simulation mode the I/O link is kept but " +
+        "Switches the axis 'Simulation' mode (Settings tab, TwinCAT 3.1.4026 or newer) on or off. In simulation mode the I/O link is kept but " +
         "ignored and a simulated drive + encoder are used, so a configured axis can run without hardware. Implemented by exporting " +
         "the axis (.xti), setting SimulationMode and re-importing it in place with links reconnected. " +
         "Note: an axis that was never linked to I/O already runs simulated (simulation encoder, no drive).")]
@@ -238,11 +238,22 @@ public sealed class MotionTools(XaeSession session)
             {
                 var axis = NcTree.ResolveAxis(s, a);
                 var (item, changed) = AxisSimulation.Set(axis, enabled);
+                var actual = AxisSimulation.Get(item);
+                if (actual != enabled)
+                {
+                    // Verified on 4024.79: the re-import ignores SimulationMode, the axis stays unchanged.
+                    throw new TcException($"The axis Simulation mode of '{item.PathName}' could not be set (still {actual}).")
+                    {
+                        Hint = $"The axis Simulation mode needs {ComCapability.DefaultRequiredVersion} or newer. " +
+                               "On older versions an axis without I/O link already runs with a simulation encoder.",
+                    };
+                }
+
                 var mapping = s.SysManager.ProduceMappingInfo();
                 return new
                 {
                     axis = item.PathName,
-                    simulationMode = AxisSimulation.Get(item),
+                    simulationMode = actual,
                     changed,
                     ioLinkCount = NcTree.CountLinks(mapping, item.PathName, "TIID"),
                     plcLinkCount = NcTree.CountLinks(mapping, item.PathName, "TIPC"),

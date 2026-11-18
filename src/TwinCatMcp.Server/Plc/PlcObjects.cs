@@ -39,6 +39,7 @@ public static class PlcObjects
     public const int ParameterList = 629;
     public const int UmlClassDiagram = 631;
     public const int ProgramReference = 650;
+    public const int ExternalTypes = 652;   // "External data types" node (seen on 4024.79)
     public const int TmcDescription = 653;
     public const int InterfacePropertyGet = 654;
     public const int InterfacePropertySet = 655;
@@ -74,6 +75,7 @@ public static class PlcObjects
         [ProgramReference] = "PROGRAM_REFERENCE",
         [LibraryManager] = "REFERENCES",
         [TmcDescription] = "TMC",
+        [ExternalTypes] = "EXTERNAL_TYPES",
         [App] = "PLC_PROJECT",
     };
 

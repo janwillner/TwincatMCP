@@ -22,6 +22,37 @@ public sealed class PlcBuildOutputTests
         ========== Build: 0 succeeded or up-to-date, 2 failed, 0 skipped ==========
         """;
 
+    // Captured live from a German TcXaeShell 3.1.4024.79 after CheckAllObjects: no error codes, localized summary.
+    private const string CheckOutput4024German = """
+        ------ Build started: Application: Tc4024Test.Plc1 -------
+        typify code ...
+        C:\Temp\Tc4024Test\Tc4024Test\Plc1\POUs\MAIN.TcPOU(9) : error: Cannot convert type 'Unknown type: 'bUnknownVariable'' to type 'UDINT'
+        C:\Temp\Tc4024Test\Tc4024Test\Plc1\POUs\MAIN.TcPOU(9) : error: Identifier 'bUnknownVariable' not defined
+        Kompilierung abgeschlossen -- 2 Fehler, 0 Warnungen
+        """;
+
+    [Fact]
+    public void Parses_4024_compiler_errors_without_error_code()
+    {
+        var r = PlcBuildOutput.Parse(CheckOutput4024German);
+
+        Assert.Equal(2, r.Errors.Count);
+        var e = r.Errors[1];
+        Assert.Equal("MAIN", e.Object);
+        Assert.Null(e.Code);
+        Assert.Equal("Identifier 'bUnknownVariable' not defined", e.Message);
+        Assert.Equal(9, e.FileLine);
+    }
+
+    [Fact]
+    public void Reads_totals_from_the_German_summary_line()
+    {
+        var r = PlcBuildOutput.Parse(CheckOutput4024German);
+
+        Assert.Equal((2, 0), (r.ErrorCount, r.WarningCount));
+        Assert.True(PlcBuildOutput.HasSummary(CheckOutput4024German));
+    }
+
     [Fact]
     public void Parses_compiler_errors_with_object_code_and_message()
     {

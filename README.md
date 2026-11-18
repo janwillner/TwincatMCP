@@ -33,7 +33,8 @@ The Automation Interface interop comes from the NuGet package `Beckhoff.TwinCAT.
 The server also runs against a 4024 XAE, with limits. The 4024.79 Automation Interface ends at `ITcSysManager15` and `ITcPlcIECProject3`:
 
 - `xae_start` picks `TcXaeShell.DTE.15.0` (the 4024 XAE Shell) when the 4026 shell is not registered.
-- Tools that need a newer interface fail with "… is not supported by this TwinCAT XAE" and a hint that names the TwinCAT version needed: the SARIF export and the `.csa` settings file of `plc_run_static_analysis`, and encrypted libraries (`archive_save_as_library`).
+- Tools that need a newer interface fail with "… is not supported by this TwinCAT XAE" and a hint that names the TwinCAT version needed: the SARIF export and the `.csa` settings file of `plc_run_static_analysis`, encrypted libraries (`archive_save_as_library`) and the axis Simulation mode (`motion_set_axis_simulation`).
+- Build diagnostics of a German XAE are parsed too (4024 writes compiler messages without error codes).
 - The Usermode Runtime (`rt_umrt_*`, TC1700) exists only from 4026 on.
 - The ADS tools (`ads_*`, `route_*`) do not depend on the XAE version.
 
