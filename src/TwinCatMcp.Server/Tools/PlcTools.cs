@@ -359,7 +359,9 @@ public sealed class PlcTools(XaeSession session)
             var p = PlcTree.ResolveProject(s, project);
             if (!string.IsNullOrWhiteSpace(settingsFile))
             {
-                ((ITcPlcIECProject4)p.Nested).LoadStaticAnalysisSettings(Path.GetFullPath(settingsFile));
+                // ITcPlcIECProject4 is missing on 4024 (its interop 3.3 ends at ITcPlcIECProject3).
+                ComCapability.Require<ITcPlcIECProject4>(p.Nested, "Loading static analysis settings (.csa)")
+                    .LoadStaticAnalysisSettings(Path.GetFullPath(settingsFile));
             }
 
             string? sarif = null;

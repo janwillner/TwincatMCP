@@ -12,24 +12,17 @@
     <!-- COM interop types are embedded; no Beckhoff DLL needs to be shipped. -->
     <NoWarn>$(NoWarn);CA1416;CS1591</NoWarn>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <TwinCatInteropDir>$(WINDIR)\Microsoft.NET\assembly\GAC_MSIL\TCatSysManagerLib\v4.0_3.4.0.0__180016cd49e5e8c3</TwinCatInteropDir>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="7.0.389" />
+    <!-- TwinCAT Automation Interface interop (TCatSysManagerLib 3.4 = TwinCAT 3.1.4026). The package embeds the interop
+         types, so the build needs no installed TwinCAT and the server also runs against 4024 (see ComCapability). -->
+    <PackageReference Include="Beckhoff.TwinCAT.TCatSysManager" Version="4026.22.0" ExcludeAssets="runtime" />
     <PackageReference Include="envdte" Version="17.14.40260" />
     <PackageReference Include="envdte80" Version="17.14.40260" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
     <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- TwinCAT Automation Interface (TCatSysManagerLib 3.4, shipped with TwinCAT 3.1.4026). -->
-    <Reference Include="TCatSysManagerLib">
-      <HintPath>$(TwinCatInteropDir)\TCatSysManagerLib.dll</HintPath>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 
 </Project>
