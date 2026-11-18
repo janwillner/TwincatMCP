@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>TwinCatMcp</RootNamespace>
     <AssemblyName>TwinCatMcp.Server</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <!-- COM interop types are embedded; no Beckhoff DLL needs to be shipped. -->
     <NoWarn>$(NoWarn);CA1416;CS1591</NoWarn>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
