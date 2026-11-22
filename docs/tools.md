@@ -1,6 +1,6 @@
 # Tool catalog
 
-Generated from the server assembly – 201 tools. Regenerate with `TwinCatMcp.Server.exe --tool-catalog > docs/tools.md`.
+Generated from the server assembly – 203 tools. Regenerate with `TwinCatMcp.Server.exe --tool-catalog > docs/tools.md`.
 
 ## IDE session (`xae_*`, 8)
 
@@ -113,6 +113,13 @@ Generated from the server assembly – 201 tools. Regenerate with `TwinCatMcp.Se
 | `pou_rename` | Renames a PLC object (the declaration header is updated by TwinCAT). Usages in other code are NOT refactored - use plc_grep + pou_multi_replace to update them. | `path`, `newName` |
 | `pou_replace_code` | Replaces an exact text snippet in the declaration or implementation of one PLC object (like a code editor's search & replace). Fails if oldText is not found or occurs more than once (unless replaceAll) - then add more context. Line endings are handled automatically. Returns the changed line numbers and a small diff. | `path`, `oldText`, `newText`, `section`?, `replaceAll`? |
 | `pou_write_code` | Replaces the whole declaration and/or implementation of a PLC object. Pass only the area(s) you want to change. The declaration must start with the matching header (e.g. 'FUNCTION_BLOCK FB_Motor', 'METHOD M_Start : BOOL', 'TYPE ST_Data :', 'VAR_GLOBAL'). For small changes prefer pou_replace_code. Afterwards check with plc_check_all_objects or build_solution. | `path`, `declaration`?, `implementation`? |
+
+## Coding guidelines (`guidelines_*`, 2)
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `guidelines_check` *(read-only)* | Audits existing PLC code against the solution's coding guidelines: checks every name and declaration of one object, a folder or the whole PLC project (not only changes, unlike the write-time check). Returns counts per rule and the findings; optionally writes a SARIF report. Use it after imports (plc_import_plcopen, archives, tree_consume_xml), which are not checked while writing. | `path`?, `project`?, `sarifPath`?, `maxFindings`?, `timeoutSeconds`? |
+| `guidelines_get` *(read-only)* | Shows the coding guidelines of the open solution (.twincat-mcp.json next to the .sln, incl. files it extends): name, active rules with severity, naming templates/prefixes, declaration and header settings, and the prose style guide. Read it before writing PLC code - pou_* write tools reject new/changed code that breaks an 'error' rule. Without config nothing is checked. | `includeGuide`?, `includeEffective`?, `includeSources`? |
 
 ## Libraries (`lib_*`, 18)
 
@@ -312,7 +319,8 @@ Generated from the server assembly – 201 tools. Regenerate with `TwinCatMcp.Se
 
 - `twincat://guide/workflow` – Step-by-step workflow for creating, programming, building and deploying a complete TwinCAT 3.1.4026 project with this server.
 - `twincat://guide/tree-paths` – Cheat sheet: System Manager tree path syntax, root shortcuts and common item paths/sub types.
-- `twincat://guide/st-conventions` – Beckhoff Structured Text naming conventions and code style to use when generating PLC code.
+- `twincat://guide/st-conventions` – Structured Text naming conventions and code style to use when generating PLC code: the style guide of the open solution's coding guidelines (.twincat-mcp.json), otherwise the Beckhoff conventions.
+- `twincat://guidelines/effective` – Coding guidelines of the open solution (.twincat-mcp.json): active rules, naming templates, declaration/header settings and style guide. pou_* write tools enforce them.
 - `twincat://session/status` – Live status of the XAE session (IDE, solution, selected TwinCAT project, target).
 - `twincat://tree/{path}` – A System Manager tree item with two levels of children. 'path' uses '^' as separator, e.g. TIPC or TIRT.
 

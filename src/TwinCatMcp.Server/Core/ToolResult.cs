@@ -67,6 +67,12 @@ public static class ToolResult
             body["twinCatErrors"] = tcErrorLog.Trim();
         }
 
+        if (inner is Guidelines.GuidelineViolationException gve)
+        {
+            body["guidelineViolations"] = gve.Violations;
+            body["hint"] = Guidelines.GuidelineReport.Hint;
+        }
+
         if (xaeDialogs is { Count: > 0 })
         {
             body["xaeDialogs"] = xaeDialogs;

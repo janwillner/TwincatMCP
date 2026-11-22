@@ -3,6 +3,7 @@ using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using TCatSysManagerLib;
 using TwinCatMcp.Core;
+using TwinCatMcp.Guidelines;
 using TwinCatMcp.Plc;
 
 namespace TwinCatMcp.Tools;
@@ -126,9 +127,10 @@ public sealed class PouTools(XaeSession session)
 
             var item = PlcTree.ResolveItem(s, path);
             var current = PlcTree.ReadText(item);
-            PlcTree.WriteText(item,
-                declaration is null ? null : PlcTree.MatchNewlines(current.Declaration, declaration),
-                implementation is null ? null : PlcTree.MatchNewlines(current.Implementation, implementation));
+            var decl = declaration is null ? null : PlcTree.MatchNewlines(current.Declaration, declaration);
+            var impl = implementation is null ? null : PlcTree.MatchNewlines(current.Implementation, implementation);
+            GuidelineGate.CheckWrite(s, item, current, new PouText(decl ?? current.Declaration, impl ?? current.Implementation));
+            PlcTree.WriteText(item, decl, impl);
             var after = PlcTree.ReadText(item);
             return new
             {
@@ -151,7 +153,9 @@ public sealed class PouTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var item = PlcTree.ResolveItem(s, path);
-            var (text, applied) = StCode.ApplyEdit(PlcTree.ReadText(item), new CodeEdit(oldText, newText, section, replaceAll));
+            var before = PlcTree.ReadText(item);
+            var (text, applied) = StCode.ApplyEdit(before, new CodeEdit(oldText, newText, section, replaceAll));
+            GuidelineGate.CheckWrite(s, item, before, text);
             Write(item, text, applied.Section);
             return new { path = item.PathName, applied.Section, applied.Replacements, applied.Lines, applied.Diff };
         });
@@ -195,7 +199,10 @@ public sealed class PouTools(XaeSession session)
                 }
             }
 
-            // 2) write
+            // 2) guidelines: one error anywhere rejects the whole batch before anything is written
+            s.Enforce(byItem.SelectMany(x => GuidelineGate.Findings(s, x.Item, x.Original, x.Text)).ToArray());
+
+            // 3) write
             foreach (var (item, _, text, _, sections) in byItem)
             {
                 foreach (var sec in sections)
@@ -257,9 +264,10 @@ public sealed class PouTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var parent = Parent(s, parentPath, project, "POUs");
+            var text = GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, PlcObjects.PouSubType(type), name), new PouText(declaration, implementation));
             var vInfo = PlcObjects.PouVInfo(type, PlcObjects.ParseLanguage(language), returnType, extends, implements);
             var item = parent.CreateChild(name, PlcObjects.PouSubType(type), "", vInfo);
-            return Created(item, declaration, implementation);
+            return Created(s, item, text.Declaration, text.Implementation);
         });
 
     [McpServerTool(Name = "pou_create_dut"), Description(
@@ -277,8 +285,9 @@ public sealed class PouTools(XaeSession session)
             var sub = PlcObjects.DutSubType(type);
             var parent = Parent(s, parentPath, project, "DUTs");
             var decl = declaration is not null ? PlcTree.MatchNewlines(null, declaration) : PlcObjects.DefaultDutDeclaration(type, name, aliasBaseType);
-            var item = parent.CreateChild(name, sub, "", decl is null ? null : decl);
-            return Created(item, null, null);
+            decl = GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, sub, name), new PouText(decl, null)).Declaration;
+            var item = parent.CreateChild(name, sub, "", decl is null ? null : PlcTree.MatchNewlines(null, decl));
+            return Created(s, item, null, null);
         });
 
     [McpServerTool(Name = "pou_create_gvl"), Description(
@@ -291,8 +300,9 @@ public sealed class PouTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var parent = Parent(s, parentPath, project, "GVLs");
-            var item = parent.CreateChild(name, PlcObjects.Gvl, "", declaration is null ? null : PlcTree.MatchNewlines(null, declaration));
-            return Created(item, null, null);
+            var decl = GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, PlcObjects.Gvl, name), new PouText(declaration, null)).Declaration;
+            var item = parent.CreateChild(name, PlcObjects.Gvl, "", decl is null ? null : PlcTree.MatchNewlines(null, decl));
+            return Created(s, item, null, null);
         });
 
     [McpServerTool(Name = "pou_create_param_list"), Description(
@@ -305,8 +315,9 @@ public sealed class PouTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var parent = Parent(s, parentPath, project, "GVLs");
-            var item = parent.CreateChild(name, PlcObjects.ParameterList, "", declaration is null ? null : PlcTree.MatchNewlines(null, declaration));
-            return Created(item, null, null);
+            var decl = GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, PlcObjects.ParameterList, name), new PouText(declaration, null)).Declaration;
+            var item = parent.CreateChild(name, PlcObjects.ParameterList, "", decl is null ? null : PlcTree.MatchNewlines(null, decl));
+            return Created(s, item, null, null);
         });
 
     [McpServerTool(Name = "pou_create_text_list"), Description("Creates an (empty) text list object. Its entries can only be edited in the IDE or via PLCopen import.")]
@@ -330,8 +341,9 @@ public sealed class PouTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var parent = Parent(s, parentPath, project, "POUs");
+            GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, PlcObjects.Interface, name), new PouText(null, null));
             var item = parent.CreateChild(name, PlcObjects.Interface, "", string.IsNullOrWhiteSpace(extends) ? null : extends.Trim());
-            return Created(item, null, null);
+            return Created(s, item, null, null);
         });
 
     [McpServerTool(Name = "pou_create_method"), Description(
@@ -349,6 +361,14 @@ public sealed class PouTools(XaeSession session)
         {
             var parent = PlcTree.ResolveItem(s, parentPath);
             var ptype = PlcTree.TypeOf(parent);
+            if (ptype != PlcObjects.Interface)
+            {
+                RequireOwner(parent, ptype, "method");
+            }
+
+            var text = GuidelineGate.PrepareCreate(s,
+                GuidelineGate.NewObject(parent, ptype == PlcObjects.Interface ? PlcObjects.InterfaceMethod : PlcObjects.Method, name),
+                new PouText(declaration, implementation));
             ITcSmTreeItem item;
             if (ptype == PlcObjects.Interface)
             {
@@ -356,12 +376,11 @@ public sealed class PouTools(XaeSession session)
             }
             else
             {
-                RequireOwner(parent, ptype, "method");
                 var vInfo = new[] { PlcObjects.ParseLanguage(language).ToString(), returnType?.Trim() ?? "", PlcObjects.ParseAccess(access) };
                 item = parent.CreateChild(name, PlcObjects.Method, "", vInfo);
             }
 
-            return Created(item, declaration, implementation);
+            return Created(s, item, text.Declaration, text.Implementation);
         });
 
     [McpServerTool(Name = "pou_create_property"), Description(
@@ -390,6 +409,22 @@ public sealed class PouTools(XaeSession session)
 
             var parent = PlcTree.ResolveItem(s, parentPath);
             var ptype = PlcTree.TypeOf(parent);
+
+            // Guidelines first, so a rejected name or accessor code leaves nothing behind.
+            var propObj = GuidelineGate.NewObject(parent, ptype == PlcObjects.Interface ? PlcObjects.InterfaceProperty : PlcObjects.Property, name);
+            GuidelineGate.PrepareCreate(s, propObj, new PouText(null, null));
+            if (getImplementation is not null)
+            {
+                getImplementation = GuidelineGate.PrepareCreate(s, new GuidelineObject("PROPERTY_GET", "Get", propObj.Path + "^Get", name, "PROPERTY"),
+                    new PouText(null, getImplementation)).Implementation;
+            }
+
+            if (setImplementation is not null)
+            {
+                setImplementation = GuidelineGate.PrepareCreate(s, new GuidelineObject("PROPERTY_SET", "Set", propObj.Path + "^Set", name, "PROPERTY"),
+                    new PouText(null, setImplementation)).Implementation;
+            }
+
             ITcSmTreeItem prop;
             if (ptype == PlcObjects.Interface)
             {
@@ -419,6 +454,8 @@ public sealed class PouTools(XaeSession session)
                     {
                         PlcTree.WriteText(get, null, PlcTree.MatchNewlines(null, getImplementation));
                     }
+
+                    GuidelineGate.FixSkeleton(s, get, true, getImplementation is not null);
                 }
 
                 if (!readOnly)
@@ -428,8 +465,12 @@ public sealed class PouTools(XaeSession session)
                     {
                         PlcTree.WriteText(set, null, PlcTree.MatchNewlines(null, setImplementation));
                     }
+
+                    GuidelineGate.FixSkeleton(s, set, true, setImplementation is not null);
                 }
             }
+
+            GuidelineGate.FixSkeleton(s, prop, false, true);
 
             return new
             {
@@ -450,8 +491,9 @@ public sealed class PouTools(XaeSession session)
         {
             var parent = PlcTree.ResolveItem(s, parentPath);
             RequireOwner(parent, PlcTree.TypeOf(parent), "action");
+            var text = GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, PlcObjects.Action, name), new PouText(null, implementation));
             var item = parent.CreateChild(name, PlcObjects.Action, "", PlcObjects.ParseLanguage(language));
-            return Created(item, null, implementation);
+            return Created(s, item, null, text.Implementation);
         });
 
     [McpServerTool(Name = "pou_create_transition"), Description(
@@ -465,8 +507,9 @@ public sealed class PouTools(XaeSession session)
         {
             var parent = PlcTree.ResolveItem(s, parentPath);
             RequireOwner(parent, PlcTree.TypeOf(parent), "transition");
+            var text = GuidelineGate.PrepareCreate(s, GuidelineGate.NewObject(parent, PlcObjects.Transition, name), new PouText(null, implementation));
             var item = parent.CreateChild(name, PlcObjects.Transition, "", PlcObjects.ParseLanguage(language));
-            return Created(item, null, implementation);
+            return Created(s, item, null, text.Implementation);
         });
 
     private static void RequireOwner(ITcSmTreeItem parent, int type, string what)
@@ -500,7 +543,11 @@ public sealed class PouTools(XaeSession session)
         return p.Nested;
     }
 
-    private static object Created(ITcSmTreeItem item, string? declaration, string? implementation)
+    /// <summary>
+    /// Writes the passed text into a new object, then applies the guideline create fixes (header, attributes) to the
+    /// parts TwinCAT generated, and returns the object with its final declaration.
+    /// </summary>
+    private static object Created(XaeSession s, ITcSmTreeItem item, string? declaration, string? implementation)
     {
         if (declaration is not null || implementation is not null)
         {
@@ -509,6 +556,10 @@ public sealed class PouTools(XaeSession session)
                 declaration is null ? null : PlcTree.MatchNewlines(cur.Declaration, declaration),
                 implementation is null ? null : PlcTree.MatchNewlines(cur.Implementation, implementation));
         }
+
+        // Graphical languages have no text implementation to put a header into.
+        var isSt = PlcTree.LanguageOf(item) is null or "ST";
+        GuidelineGate.FixSkeleton(s, item, declaration is not null, implementation is not null || !isSt);
 
         var text = PlcTree.ReadText(item);
         return new
@@ -550,6 +601,7 @@ public sealed class PouTools(XaeSession session)
         {
             var item = PlcTree.ResolveItem(s, path);
             var old = item.PathName;
+            GuidelineGate.CheckRename(s, item, newName);
             item.Name = newName;
             return new { oldPath = old, path = item.PathName, declaration = PlcTree.ReadText(item).Declaration };
         });

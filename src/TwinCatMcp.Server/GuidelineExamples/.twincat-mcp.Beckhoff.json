@@ -1,0 +1,71 @@
+{
+  // Beckhoff naming conventions (Hungarian notation, as in TE1200 Static Analysis) for the TwinCAT MCP server.
+  // Use it in a solution: copy this file next to the .sln as .twincat-mcp.json, or extend it:
+  //   { "extends": "builtin:beckhoff" }
+  // Everything is a recommendation ("warn"); switch single rules to "error" in your own file.
+  "$schema": "https://raw.githubusercontent.com/janwillner/TwincatMCP/main/schemas/twincat-mcp.schema.json",
+  "name": "Beckhoff naming conventions",
+  "guide": "plc-coding-guidelines.Beckhoff.md",
+  "defaultSeverity": "warn",
+
+  "naming": {
+    // ARRAY OF ST_Data -> ast, POINTER TO INT -> pn
+    "compositePrefixes": true,
+    "typePrefixes": {
+      "BOOL": "b",
+      "BYTE": "n", "WORD": "n", "DWORD": "n", "LWORD": "n",
+      "SINT": "n", "USINT": "n", "INT": "n", "UINT": "n", "DINT": "n", "UDINT": "n", "LINT": "n", "ULINT": "n",
+      "REAL": "f", "LREAL": "f",
+      "STRING": "s", "WSTRING": "ws",
+      "TIME": "t", "LTIME": "t",
+      "DATE": "d", "DT": "d", "DATE_AND_TIME": "d", "TOD": "d", "TIME_OF_DAY": "d",
+      "ARRAY": "a", "POINTER": "p", "REFERENCE": "ref"
+    },
+    "kindPrefixes": { "functionBlock": "fb", "struct": "st", "enum": "e", "interface": "i" },
+    "typeKinds": [
+      { "match": "^FB_", "kind": "functionBlock" },
+      { "match": "^ST_", "kind": "struct" },
+      { "match": "^E_", "kind": "enum" },
+      { "match": "^I_", "kind": "interface" }
+    ],
+    "types": {
+      "AXIS_REF": "ax",
+      "TON": "fb", "TOF": "fb", "TP": "fb", "CTU": "fb", "CTD": "fb", "CTUD": "fb",
+      "R_TRIG": "fb", "F_TRIG": "fb", "RS": "fb", "SR": "fb",
+      "MC_*": "fb", "ADS*": "fb",
+      "T_MaxString": "s", "PVOID": "p"
+    },
+    "templates": {
+      "var.input": "{type}{Name}",
+      "var.output": "{type}{Name}",
+      "var.inOut": "{type}{Name}",
+      "var.local": "{type}{Name}",
+      "var.methodLocal": "{type}{Name}",
+      "var.functionLocal": "{type}{Name}",
+      "var.temp": "{type}{Name}",
+      "var.stat": "{type}{Name}",
+      "var.inst": "{type}{Name}",
+      "var.member": "{type}{Name}",
+      // The g scope prefix of globals is optional.
+      "var.global": ["{type}{Name}", "g{type}{Name}"],
+      "pou.program": ["PRG_{Name}", "MAIN"],
+      "pou.functionBlock": "FB_{Name}",
+      "pou.function": "F_{Name}",
+      "pou.interface": "I_{Name}",
+      // M_ / P_ are optional for methods and properties.
+      "pou.method": ["M_{Name}", "{Name}"],
+      "pou.property": ["P_{Name}", "{Name}"],
+      "dut.struct": "ST_{Name}",
+      "dut.enum": "E_{Name}",
+      "dut.union": "U_{Name}",
+      "dut.alias": "T_{Name}",
+      "gvl": "GVL_{Name}"
+    }
+  },
+
+  "declarations": {
+    "requiredAttributes": { "GVL": ["qualified_only"], "ENUM": ["strict"] }
+  },
+
+  "autoFix": { "headers": false, "requiredAttributes": true }
+}

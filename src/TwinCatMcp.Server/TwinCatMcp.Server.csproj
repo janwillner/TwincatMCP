@@ -25,4 +25,10 @@
     <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Example coding guideline configs (.twincat-mcp.<Name>.json, 'builtin:<name>') ship in the guidelines folder of every deployment. -->
+    <None Include="GuidelineExamples\**\*" Link="guidelines\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

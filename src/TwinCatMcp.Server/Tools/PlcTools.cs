@@ -351,12 +351,17 @@ public sealed class PlcTools(XaeSession session)
         [Description(ProjectParam)] string? project = null,
         [Description("true = 'Run static analysis [Check all objects]' (also unused objects).")] bool checkAll = true,
         [Description("Optional path of a SARIF file (*.sarif.json) to write the results to (runs the analysis itself).")] string? sarifPath = null,
-        [Description("Optional .csa settings file to load before the analysis.")] string? settingsFile = null,
+        [Description("Optional .csa settings file to load before the analysis. Default: staticAnalysis.settingsFile of the solution's coding guidelines (.twincat-mcp.json), if set.")] string? settingsFile = null,
         [Description("Also return the raw output text.")] bool includeOutput = false,
         int timeoutSeconds = 900)
         => session.RunAsync(s =>
         {
             var p = PlcTree.ResolveProject(s, project);
+            if (string.IsNullOrWhiteSpace(settingsFile))
+            {
+                settingsFile = s.GuidelineProvider.TryFor(s.SolutionFile, out _)?.StaticAnalysisSettingsFile;
+            }
+
             if (!string.IsNullOrWhiteSpace(settingsFile))
             {
                 // ITcPlcIECProject4 is missing on 4024 (its interop 3.3 ends at ITcPlcIECProject3).

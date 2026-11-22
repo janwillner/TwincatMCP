@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/janwillner/TwincatMCP/main/schemas/twincat-mcp.schema.json",
+  "title": "TwinCAT MCP coding guidelines (.twincat-mcp.json)",
+  "description": "Coding guidelines the TwinCAT MCP server enforces for a solution. The file lives next to the .sln. Comments and trailing commas are allowed.",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "severity": { "enum": ["off", "warn", "error"] },
+    "strings": {
+      "description": "A string or a list of alternatives.",
+      "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+    },
+    "ruleKey": {
+      "enum": [
+        "naming.pou.program", "naming.pou.functionBlock", "naming.pou.function", "naming.pou.method", "naming.pou.property",
+        "naming.pou.action", "naming.pou.transition", "naming.pou.interface",
+        "naming.dut.struct", "naming.dut.enum", "naming.dut.union", "naming.dut.alias", "naming.gvl", "naming.paramList",
+        "naming.var.input", "naming.var.output", "naming.var.inOut", "naming.var.local", "naming.var.methodLocal",
+        "naming.var.functionLocal", "naming.var.temp", "naming.var.stat", "naming.var.inst", "naming.var.global", "naming.var.member",
+        "naming.const.local", "naming.const.global", "naming.enum.value", "naming.unknownType",
+        "decl.requiredAttributes", "decl.enum.explicitValues", "decl.enum.valueRange", "decl.method.inputDefaults",
+        "header.copyright", "header.description"
+      ]
+    },
+    "templateKey": {
+      "enum": [
+        "pou.program", "pou.functionBlock", "pou.function", "pou.method", "pou.property", "pou.action", "pou.transition", "pou.interface",
+        "dut.struct", "dut.enum", "dut.union", "dut.alias", "gvl", "paramList",
+        "var.input", "var.output", "var.inOut", "var.local", "var.methodLocal", "var.functionLocal", "var.temp", "var.stat", "var.inst",
+        "var.global", "var.member", "const.local", "const.global", "enum.value"
+      ]
+    },
+    "kind": { "enum": ["functionBlock", "struct", "enum", "union", "alias", "interface"] },
+    "objectKind": {
+      "enum": ["PROGRAM", "FUNCTION_BLOCK", "FUNCTION", "METHOD", "PROPERTY", "INTERFACE", "STRUCT", "ENUM", "UNION", "ALIAS", "GVL", "PARAMETER_LIST", "ACTION", "TRANSITION"]
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "extends": {
+      "type": "string",
+      "description": "Base file this one builds on: a path relative to this file, or 'builtin:<name>' for a shipped example (builtin:beckhoff, builtin:syntegon). Objects merge key by key, other values (arrays too) are replaced."
+    },
+    "name": { "type": "string", "description": "Name of the guideline, shown by guidelines_get and solution_open." },
+    "description": { "type": "string" },
+    "guide": { "type": "string", "description": "Markdown style guide (path relative to this file). Served as resource twincat://guide/st-conventions." },
+    "defaultSeverity": { "$ref": "#/definitions/severity", "description": "Severity of configured rules that 'rules' does not list. Default: warn." },
+    "exclude": {
+      "type": "array", "items": { "type": "string" },
+      "description": "Wildcard patterns (* ?) for objects/identifiers no rule applies to: object name, tree path, identifier or Object.Identifier."
+    },
+    "staticAnalysis": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "settingsFile": { "type": "string", "description": ".csa file plc_run_static_analysis loads by default." } }
+    },
+    "rules": {
+      "type": "object",
+      "description": "Severity per rule key. Patterns 'naming.*', 'decl.*', '*' set every matching rule (except naming.unknownType).",
+      "propertyNames": { "anyOf": [{ "$ref": "#/definitions/ruleKey" }, { "pattern": "^([a-z]+(\\.[a-zA-Z]+)*\\.)?\\*$" }] },
+      "additionalProperties": {
+        "oneOf": [
+          { "$ref": "#/definitions/severity" },
+          {
+            "type": "object", "additionalProperties": false,
+            "properties": { "severity": { "$ref": "#/definitions/severity" }, "exclude": { "type": "array", "items": { "type": "string" } } }
+          }
+        ]
+      }
+    },
+    "naming": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "compositePrefixes": { "type": "boolean", "description": "ARRAY/POINTER/REFERENCE prefixes concatenate from outer to inner (default true)." },
+        "typePrefixes": {
+          "type": "object", "additionalProperties": { "$ref": "#/definitions/strings" },
+          "description": "Prefix per data type name (BOOL, LREAL, ...) and per wrapper (ARRAY, POINTER, REFERENCE)."
+        },
+        "kindPrefixes": {
+          "type": "object", "propertyNames": { "$ref": "#/definitions/kind" }, "additionalProperties": { "$ref": "#/definitions/strings" },
+          "description": "Prefix for variables of user-defined types by kind; the kind comes from typeKinds."
+        },
+        "typeKinds": {
+          "type": "array",
+          "items": {
+            "type": "object", "required": ["match", "kind"], "additionalProperties": false,
+            "properties": { "match": { "type": "string", "description": "Regex on the type name." }, "kind": { "$ref": "#/definitions/kind" } }
+          }
+        },
+        "types": {
+          "type": "object", "additionalProperties": { "$ref": "#/definitions/strings" },
+          "description": "Prefix per type name or wildcard pattern (TON, MC_*). Exact names win over patterns; checked before typePrefixes and typeKinds."
+        },
+        "templates": {
+          "type": "object", "propertyNames": { "$ref": "#/definitions/templateKey" }, "additionalProperties": { "$ref": "#/definitions/strings" },
+          "description": "Name template per category: literal text plus {type}, {Name} (PascalCase), {name}, {NAME} (UPPER_SNAKE), {*} (free). '@' starts a regex that may use the same tokens."
+        }
+      }
+    },
+    "declarations": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "requiredAttributes": {
+          "type": "object", "propertyNames": { "$ref": "#/definitions/objectKind" },
+          "additionalProperties": { "type": "array", "items": { "type": "string" } },
+          "description": "Attributes a declaration must carry per object kind, e.g. { \"ENUM\": [\"qualified_only\", \"strict\"] }."
+        },
+        "enum": {
+          "type": "object", "required": ["min"], "additionalProperties": false,
+          "properties": {
+            "min": { "type": "integer" }, "max": { "type": "integer" },
+            "extensionMin": { "type": "integer", "description": "Values from here on are local extensions named <ENUM>_<VALUE>." }
+          }
+        }
+      }
+    },
+    "headers": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "templates": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Template files (relative to this file). Placeholders: {name} {kind} {parent} {date} {year} {description}." },
+        "assign": {
+          "type": "array", "description": "Which template a new object gets (first match wins).",
+          "items": {
+            "type": "object", "required": ["kinds", "template"], "additionalProperties": false,
+            "properties": {
+              "kinds": { "type": "array", "items": { "$ref": "#/definitions/objectKind" } },
+              "parent": { "type": "string", "description": "Regex on the owning POU's name (methods, actions)." },
+              "name": { "type": "string", "description": "Regex on the object name." },
+              "template": { "type": "string" }
+            }
+          }
+        },
+        "placement": { "enum": ["afterHeader", "top"] },
+        "copyright": { "type": "string", "description": "Text every header must contain (whitespace and <br> ignored)." },
+        "description": { "type": "string", "description": "Keyword that must be followed by a description, e.g. DESCRIPTION." },
+        "descriptionPlaceholder": { "type": "string", "description": "What {description} becomes on create; a description still starting with it counts as missing." }
+      }
+    },
+    "autoFix": {
+      "type": "object", "additionalProperties": false,
+      "description": "Fixes applied when an object is created (never to existing code, never renames).",
+      "properties": { "headers": { "type": "boolean" }, "requiredAttributes": { "type": "boolean" } }
+    }
+  }
+}

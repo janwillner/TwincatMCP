@@ -44,6 +44,7 @@ Stack: C# / .NET 10 (`net10.0-windows`, x64), `ModelContextProtocol` 2.4.0 (stdi
 | 4 | I/O & EtherCAT | `io_`, `ecat_`, `mapping_` | devices (EtherCAT master, virtual/other), boxes/terminals by product type, ESI catalog search, scan (where hardware exists), network adapter, process image variables, LinkVariables/UnlinkVariables, mapping info produce/consume/clear, CoE / startup parameters, EtherCAT slave identity |
 | 5 | Motion & TcCOM | `motion_`, `tccom_` | NC task, axes (create, type, parameters via XML), encoder/drive, link axis to I/O drive and to PLC `AXIS_REF`, TcCOM module instances (create, parameters, task context) |
 | 6 | ADS online | `ads_`, `route_` | connect/state/device info, set ADS state, read/write symbols (typed, structs/arrays as JSON), browse symbols, sum read/write, index group/offset access, RPC methods, sampling/monitor over time, routes (list/add), file access via system service, TwinCAT/runtime info |
+| 7 | Coding guidelines | `guidelines_` | `.twincat-mcp.json` per solution (`extends` chain, shipped `builtin:` examples), write-time checks of names/declarations/headers in the `pou_` tools, create fixes, audit + SARIF. See ADR-0001. |
 
 ## Constraints for parallel work
 
