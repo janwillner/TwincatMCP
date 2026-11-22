@@ -165,6 +165,14 @@ Copy one next to your `.sln` as `.twincat-mcp.json`, or extend it and override s
 
 A company base can also be a file path, such as `"extends": "../plc-standards/company.json"`.
 
+To apply one guideline to every solution the server opens, set a server-wide default in the server's environment, for example in the MCP client config:
+
+```json
+"env": { "TWINCAT_MCP_DEFAULT_GUIDELINES": "builtin:syntegon" }
+```
+
+The value is `builtin:<name>` or a path to a config file. The default applies only to solutions without their own `.twincat-mcp.json`; a solution's own file always wins. `guidelines_get` reports `source: serverDefault` when the default is in use. A colleague or CI without the variable gets no checks, so keep a `.twincat-mcp.json` in projects that must give the same results everywhere.
+
 In code, `{attribute 'naming' := 'off' | 'on' | 'omit'}` and `{attribute 'no-analysis'}` (the same pragmas as TE1200) and `{attribute 'mcp-ignore' := 'naming.var.input'}` exempt single declarations.
 
 The format is described by [schemas/twincat-mcp.schema.json](schemas/twincat-mcp.schema.json), and the decisions behind it are in [docs/adr/0001-coding-guidelines-config.md](docs/adr/0001-coding-guidelines-config.md).

@@ -22,7 +22,7 @@ public sealed class XaeSession : IDisposable
     private readonly ILogger<XaeSession> _logger;
     private DTE2? _dte;
     private Project? _project;
-    private readonly GuidelineProvider _guidelines = new();
+    private readonly GuidelineProvider _guidelines = new(serverDefault: Environment.GetEnvironmentVariable(GuidelineProvider.DefaultVariable));
     private readonly List<GuidelineViolation> _guidelineFindings = [];
     private readonly List<string> _guidelineFixes = [];
 
@@ -681,7 +681,7 @@ public sealed class XaeSession : IDisposable
         {
             return new
             {
-                config = GuidelineProvider.ConfigPathOf(solutionFile),
+                config = _guidelines.IsServerDefault ? $"{GuidelineProvider.DefaultVariable}={_guidelines.ServerDefault}" : GuidelineProvider.ConfigPathOf(solutionFile),
                 error = error.Message,
                 hint = "The coding guideline config is broken: PLC code cannot be changed until the user fixes it.",
             };
@@ -692,6 +692,7 @@ public sealed class XaeSession : IDisposable
             : new
             {
                 config = set.Files[^1],
+                source = _guidelines.IsServerDefault ? "serverDefault" : "solution",
                 name = set.Name,
                 rules = set.ActiveRules.Count,
                 hint = "Coding guidelines apply: read resource twincat://guidelines/effective or call guidelines_get before writing PLC code.",

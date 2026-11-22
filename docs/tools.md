@@ -119,7 +119,7 @@ Generated from the server assembly – 203 tools. Regenerate with `TwinCatMcp.Se
 | Tool | Description | Parameters |
 |---|---|---|
 | `guidelines_check` *(read-only)* | Audits existing PLC code against the solution's coding guidelines: checks every name and declaration of one object, a folder or the whole PLC project (not only changes, unlike the write-time check). Returns counts per rule and the findings; optionally writes a SARIF report. Use it after imports (plc_import_plcopen, archives, tree_consume_xml), which are not checked while writing. | `path`?, `project`?, `sarifPath`?, `maxFindings`?, `timeoutSeconds`? |
-| `guidelines_get` *(read-only)* | Shows the coding guidelines of the open solution (.twincat-mcp.json next to the .sln, incl. files it extends): name, active rules with severity, naming templates/prefixes, declaration and header settings, and the prose style guide. Read it before writing PLC code - pou_* write tools reject new/changed code that breaks an 'error' rule. Without config nothing is checked. | `includeGuide`?, `includeEffective`?, `includeSources`? |
+| `guidelines_get` *(read-only)* | Shows the coding guidelines of the open solution (.twincat-mcp.json next to the .sln incl. files it extends, or else the server default TWINCAT_MCP_DEFAULT_GUIDELINES; 'source' tells which): name, active rules with severity, naming templates/prefixes, declaration and header settings, and the prose style guide. Read it before writing PLC code - pou_* write tools reject new/changed code that breaks an 'error' rule. Without config nothing is checked. | `includeGuide`?, `includeEffective`?, `includeSources`? |
 
 ## Libraries (`lib_*`, 18)
 
