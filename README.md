@@ -54,6 +54,14 @@ The server is built into `artifacts\twincat-mcp\`.
 claude mcp add --scope user twincat -- dotnet C:\Tools\TwincatMCP\artifacts\twincat-mcp\TwinCatMcp.Server.dll
 ```
 
+To give every solution a coding guideline preset (see [Coding guidelines](#coding-guidelines)), choose it here with `-e`, for example Syntegon:
+
+```powershell
+claude mcp add --scope user twincat -e TWINCAT_MCP_DEFAULT_GUIDELINES=builtin:syntegon -- dotnet C:\Tools\TwincatMCP\artifacts\twincat-mcp\TwinCatMcp.Server.dll
+```
+
+Shipped presets: `builtin:beckhoff` and `builtin:syntegon`; a path to your own config file works too. Without the variable, only solutions with their own `.twincat-mcp.json` are checked.
+
 Restart Claude Code. `claude mcp get twincat` should then show `Connected`.
 
 The `.mcp.json` in this repo only registers the server when Claude Code is started inside the repo folder.
@@ -65,7 +73,8 @@ The `.mcp.json` in this repo only registers the server when Claude Code is start
   "mcpServers": {
     "twincat": {
       "command": "dotnet",
-      "args": ["C:\\Tools\\TwincatMCP\\artifacts\\twincat-mcp\\TwinCatMcp.Server.dll"]
+      "args": ["C:\\Tools\\TwincatMCP\\artifacts\\twincat-mcp\\TwinCatMcp.Server.dll"],
+      "env": { "TWINCAT_MCP_DEFAULT_GUIDELINES": "builtin:syntegon" }
     }
   }
 }
@@ -73,6 +82,7 @@ The `.mcp.json` in this repo only registers the server when Claude Code is start
 
 Optional environment variables:
 
+- `TWINCAT_MCP_DEFAULT_GUIDELINES`: coding guideline preset for solutions without their own `.twincat-mcp.json` (`builtin:beckhoff`, `builtin:syntegon` or a path to a config file). Leave the `env` entry out for no default.
 - `TWINCAT_MCP_LOGLEVEL`: `Trace` to `Warning`; logs go to stderr.
 - `TWINCAT_MCP_DEBUG=1`: adds stack traces to unexpected errors.
 
@@ -164,6 +174,14 @@ Copy one next to your `.sln` as `.twincat-mcp.json`, or extend it and override s
 ```
 
 A company base can also be a file path, such as `"extends": "../plc-standards/company.json"`.
+
+To apply one guideline to every solution the server opens, set a server-wide default in the server's environment, for example in the MCP client config:
+
+```json
+"env": { "TWINCAT_MCP_DEFAULT_GUIDELINES": "builtin:syntegon" }
+```
+
+The value is `builtin:<name>` or a path to a config file. The default applies only to solutions without their own `.twincat-mcp.json`; a solution's own file always wins. `guidelines_get` reports `source: serverDefault` when the default is in use. A colleague or CI without the variable gets no checks, so keep a `.twincat-mcp.json` in projects that must give the same results everywhere.
 
 In code, `{attribute 'naming' := 'off' | 'on' | 'omit'}` and `{attribute 'no-analysis'}` (the same pragmas as TE1200) and `{attribute 'mcp-ignore' := 'naming.var.input'}` exempt single declarations.
 

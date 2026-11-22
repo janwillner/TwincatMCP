@@ -5,7 +5,8 @@
       "command": "dotnet",
       "args": ["artifacts/twincat-mcp/TwinCatMcp.Server.dll"],
       "env": {
-        "TWINCAT_MCP_LOGLEVEL": "Warning"
+        "TWINCAT_MCP_LOGLEVEL": "Warning",
+        "TWINCAT_MCP_DEFAULT_GUIDELINES": "builtin:syntegon"
       }
     }
   }

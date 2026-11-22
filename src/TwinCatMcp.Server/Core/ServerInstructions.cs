@@ -30,7 +30,8 @@ public static class ServerInstructions
         Libraries: lib_list_installed (catalog) -> lib_add ["Tc2_MC2"] -> lib_get_declaration ["MC_MoveAbsolute"] to see FB interfaces before using them.
         Packaging: lib_set_project_info -> archive_save_as_library; archive_save_solution (.tnzip) / archive_open.
 
-        Coding guidelines: if the open solution has a .twincat-mcp.json next to the .sln, its rules apply. Read them first (guidelines_get or
+        Coding guidelines: if the open solution has a .twincat-mcp.json next to the .sln (or the server sets a default with
+        TWINCAT_MCP_DEFAULT_GUIDELINES), its rules apply. Read them first (guidelines_get or
         resource twincat://guidelines/effective). pou_* write tools check new/changed names and declarations: 'error' findings reject the write
         (nothing is written, guidelineViolations lists them with suggestions), 'warn' findings come back in guidelineViolations, headers and
         required attributes of new objects are added automatically (guidelineFixes). Never edit .twincat-mcp.json or add mcp-ignore/naming

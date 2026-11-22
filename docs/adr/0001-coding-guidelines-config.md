@@ -37,3 +37,12 @@ Agents write PLC code through this server, and companies have their own coding g
 - The parser (`StDeclaration`) now keeps pragmas (per declaration and per object), knows `naming` off/on regions, parses ENUM values and strips `/* */` comments.
 - The heuristic can miss violations of library types that are not listed in `types`. This was chosen over false errors that block an agent.
 - The `tc-naming-conventions` skill of the agent plugin must defer to `guidelines_get` (follow-up issue).
+
+## Amendment (2026-11-22): server-wide default
+
+The user wants one guideline for every solution a server works on, without a file in each project. This partly revises "no implicit machine-level file" and "without the file nothing is checked":
+
+- The environment variable `TWINCAT_MCP_DEFAULT_GUIDELINES` of the server process names a default: `builtin:<name>` or a path to a config file.
+- It applies only to an open solution **without** its own `.twincat-mcp.json`; the solution's file always wins and can extend the same base explicitly. Without the variable, nothing changes.
+- The default is opt-in and visible: `guidelines_get` and the solution_open/xae_status summary report `source: serverDefault`. A broken default blocks writes like a broken project config, and its error names the variable.
+- Trade-off accepted: a colleague or CI without the variable does not check solutions that have no own file. Projects that need the same result everywhere keep a `.twincat-mcp.json` (one line: `{ "extends": "builtin:syntegon" }`).

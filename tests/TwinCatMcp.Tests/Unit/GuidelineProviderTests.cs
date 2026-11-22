@@ -57,6 +57,62 @@ public sealed class GuidelineProviderTests : IDisposable
         Assert.Equal("new", _provider.For(_sln)!.GuideMarkdown);
     }
 
+    private GuidelineProvider WithDefault(string reference)
+    {
+        var builtin = Path.Combine(_dir, "builtin");
+        Directory.CreateDirectory(builtin);
+        File.WriteAllText(Path.Combine(builtin, ".twincat-mcp.Syntegon.json"), """{ "name": "Syntegon" }""");
+        return new GuidelineProvider(builtin, reference);
+    }
+
+    [Fact]
+    public void A_solution_without_config_uses_the_server_default()
+    {
+        var provider = WithDefault("builtin:syntegon");
+
+        Assert.Equal("Syntegon", provider.For(_sln)!.Name);
+        Assert.True(provider.IsServerDefault);
+    }
+
+    [Fact]
+    public void The_solution_config_wins_over_the_server_default()
+    {
+        var provider = WithDefault("builtin:syntegon");
+        WriteConfig("""{ "name": "project" }""", new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+        Assert.Equal("project", provider.For(_sln)!.Name);
+        Assert.False(provider.IsServerDefault);
+    }
+
+    [Fact]
+    public void The_server_default_can_be_a_file_path()
+    {
+        var company = Path.Combine(_dir, "company.json");
+        File.WriteAllText(company, """{ "name": "company", "extends": "builtin:syntegon" }""");
+        var provider = WithDefault(company);
+
+        var set = provider.For(_sln)!;
+
+        Assert.Equal("company", set.Name);
+        Assert.Equal(2, set.Files.Count);
+    }
+
+    [Fact]
+    public void An_unknown_server_default_is_a_config_error_naming_the_setting()
+    {
+        var provider = WithDefault("builtin:nope");
+
+        var ex = Assert.Throws<GuidelineConfigException>(() => provider.For(_sln));
+
+        Assert.Contains(GuidelineProvider.DefaultVariable, ex.Message);
+    }
+
+    [Fact]
+    public void Without_open_solution_the_server_default_does_not_apply()
+    {
+        Assert.Null(WithDefault("builtin:syntegon").For(null));
+    }
+
     [Fact]
     public void Invalid_regexes_and_values_are_config_errors_that_stay_until_fixed()
     {

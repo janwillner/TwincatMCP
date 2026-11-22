@@ -12,7 +12,8 @@ namespace TwinCatMcp.Tools;
 public sealed class GuidelineTools(XaeSession session)
 {
     [McpServerTool(Name = "guidelines_get", ReadOnly = true), Description(
-        "Shows the coding guidelines of the open solution (.twincat-mcp.json next to the .sln, incl. files it extends): name, active rules " +
+        "Shows the coding guidelines of the open solution (.twincat-mcp.json next to the .sln incl. files it extends, or else the server default " +
+        "TWINCAT_MCP_DEFAULT_GUIDELINES; 'source' tells which): name, active rules " +
         "with severity, naming templates/prefixes, declaration and header settings, and the prose style guide. Read it before writing PLC code - " +
         "pou_* write tools reject new/changed code that breaks an 'error' rule. Without config nothing is checked.")]
     public Task<CallToolResult> Get(
@@ -25,14 +26,17 @@ public sealed class GuidelineTools(XaeSession session)
     public static object Describe(XaeSession s, bool includeGuide, bool includeEffective, bool includeSources)
     {
         var solution = s.SolutionFile;
-        var config = GuidelineProvider.ConfigPathOf(solution);
-        var set = s.GuidelineProvider.TryFor(solution, out var error);
+        var provider = s.GuidelineProvider;
+        var set = provider.TryFor(solution, out var error);
+        var source = provider.IsServerDefault ? "serverDefault" : "solution";
+        var config = provider.IsServerDefault ? set?.Files[^1] ?? $"{GuidelineProvider.DefaultVariable}={provider.ServerDefault}" : GuidelineProvider.ConfigPathOf(solution);
         if (error is not null)
         {
             return new
             {
                 solution,
                 config,
+                source,
                 active = false,
                 error = error.Message,
                 hint = "The coding guideline config is broken; pou_* write tools refuse to change PLC code until the user fixes it.",
@@ -50,7 +54,7 @@ public sealed class GuidelineTools(XaeSession session)
                 hint = solution is null
                     ? "No solution is open."
                     : "No coding guidelines for this solution, nothing is checked. Ask the user whether to add .twincat-mcp.json next to the .sln, " +
-                      "e.g. { \"extends\": \"builtin:beckhoff\" }.",
+                      $"e.g. {{ \"extends\": \"builtin:beckhoff\" }}, or to set a server-wide default ({GuidelineProvider.DefaultVariable}).",
             };
         }
 
@@ -58,6 +62,7 @@ public sealed class GuidelineTools(XaeSession session)
         {
             solution,
             config,
+            source,
             active = true,
             name = set.Name,
             description = set.Description,
