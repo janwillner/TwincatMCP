@@ -30,6 +30,12 @@ public static class ServerInstructions
         Libraries: lib_list_installed (catalog) -> lib_add ["Tc2_MC2"] -> lib_get_declaration ["MC_MoveAbsolute"] to see FB interfaces before using them.
         Packaging: lib_set_project_info -> archive_save_as_library; archive_save_solution (.tnzip) / archive_open.
 
+        Coding guidelines: if the open solution has a .twincat-mcp.json next to the .sln, its rules apply. Read them first (guidelines_get or
+        resource twincat://guidelines/effective). pou_* write tools check new/changed names and declarations: 'error' findings reject the write
+        (nothing is written, guidelineViolations lists them with suggestions), 'warn' findings come back in guidelineViolations, headers and
+        required attributes of new objects are added automatically (guidelineFixes). Never edit .twincat-mcp.json or add mcp-ignore/naming
+        pragmas to get around a rule unless the user asks. guidelines_check audits existing or imported code.
+
         Every tool returns JSON. Errors come back with isError=true, a message, an optional hint and the TwinCAT error log.
         After changing ST code always run build_solution (or plc_check_all_objects) and fix reported errors before activating.
         While the XAE is logged in to a PLC nothing may be changed, built or activated: every tool that is not read-only (except plc_online_*, ads_*, route_*)

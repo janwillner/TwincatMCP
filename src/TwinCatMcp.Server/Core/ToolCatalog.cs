@@ -11,7 +11,7 @@ public static class ToolCatalog
     private static readonly (string Prefix, string Title)[] Areas =
     [
         ("xae_", "IDE session"), ("solution_", "Solution"), ("build_", "Build"), ("tree_", "System Manager tree (generic)"),
-        ("plc_online_", "PLC online (XAE)"), ("plc_", "PLC project"), ("pou_", "POUs & code"), ("lib_", "Libraries"), ("archive_", "Archives & export"),
+        ("plc_online_", "PLC online (XAE)"), ("plc_", "PLC project"), ("pou_", "POUs & code"), ("guidelines_", "Coding guidelines"), ("lib_", "Libraries"), ("archive_", "Archives & export"),
         ("system_", "System & activation"), ("rt_", "Real-time"), ("task_", "Tasks"), ("license_", "Licenses"), ("variant_", "Project variants"),
         ("io_", "I/O devices"), ("ecat_", "EtherCAT"), ("mapping_", "Variable mapping"), ("motion_", "Motion (NC)"), ("tccom_", "TcCOM"),
         ("ads_", "ADS online"), ("route_", "ADS routes"),

@@ -1,0 +1,98 @@
+{
+  // Coding guideline "TCAT Programmierrichtlinien 2018" (v1.6, Syntegon) for the TwinCAT MCP server.
+  // Use it in a solution: copy this file next to the .sln as .twincat-mcp.json, or extend it:
+  //   { "extends": "builtin:syntegon" }
+  // Severity: guideline items marked (rule) are "error" (the write is rejected), the others "warn".
+  // Project/hardware/task names, formatting and metrics are not checked yet.
+  "$schema": "https://raw.githubusercontent.com/janwillner/TwincatMCP/main/schemas/twincat-mcp.schema.json",
+  "name": "Syntegon TCAT Programmierrichtlinien 2018 (v1.6)",
+  "guide": "plc-coding-guidelines.Syntegon.md",
+  "defaultSeverity": "warn",
+
+  "rules": {
+    "naming.var.methodLocal": "error",
+    "decl.requiredAttributes": "error",
+    "decl.enum.explicitValues": "error",
+    "decl.enum.valueRange": "error",
+    // (rule, this repo) in the guideline: only projects that must compile on 4024 need it.
+    "decl.method.inputDefaults": "warn",
+    "header.copyright": "error",
+    "header.description": "error"
+  },
+
+  "naming": {
+    "compositePrefixes": true,
+    "typePrefixes": {
+      "BOOL": "b_", "BYTE": "by_", "WORD": "w_", "DWORD": "dw_",
+      "SINT": "sn_", "INT": "n_", "DINT": "dn_", "USINT": "usn_", "UINT": "un_", "UDINT": "udn_",
+      "REAL": "r_", "LREAL": "lr_", "STRING": "str_",
+      "TIME": "time_", "DATE": "date_", "TOD": "dayt_", "TIME_OF_DAY": "dayt_", "DT": "datet_", "DATE_AND_TIME": "datet_",
+      "T_DCTIME64": "dctime64_", "T_DCTIME32": "dctime32_",
+      "POINTER": "p_"
+    },
+    // Variables of user-defined types: FB instances fb_, DUT variables have no type prefix, enums optionally e_.
+    "kindPrefixes": { "functionBlock": "fb_", "struct": "", "union": "", "alias": "", "enum": ["e_", ""] },
+    // How a type name tells its kind (first match wins); types not matched here or in "types" are not prefix-checked.
+    "typeKinds": [
+      { "match": "^_FB_", "kind": "functionBlock" },
+      { "match": "^T[A-Z]", "kind": "struct" }
+    ],
+    // Library types (exact names win over patterns).
+    "types": {
+      "TON": "ton_", "TOF": "tof_", "TP": "tp_",
+      "CTU": "ctu_", "CTD": "ctd_", "CTUD": "ctud_",
+      "R_TRIG": "osr_", "F_TRIG": "osf_",
+      "AXIS_REF": ["ax_", "ax"],
+      "MC_*": "fb_", "FB_*": "fb_", "ADS*": "fb_"
+    },
+    "templates": {
+      "var.input": "vi_{type}{Name}",
+      "var.output": "vo_{type}{Name}",
+      "var.inOut": ["vio_{type}{Name}", "vio_ax"],
+      "var.local": "{type}{Name}",
+      "var.methodLocal": "{type}Temp{Name}",
+      "var.functionLocal": "{type}{Name}",
+      "var.temp": "{type}{Name}",
+      "var.member": "{type}{Name}",
+      // MODx_UNITx_[SubUnit_]t_[i|o]Name - the MODx_UNITx_ part is the author's responsibility ({*}).
+      "var.global": "@{*}{type}[io]?{Name}",
+      "const.local": "{type}{NAME}",
+      "const.global": "{*}{type}{NAME}",
+      "enum.value": "{NAME}",
+      "pou.functionBlock": "_FB_{Name}",
+      "pou.function": "_FC_{Name}",
+      "pou.method": "m_{Name}",
+      "pou.action": "act_{Name}",
+      "pou.program": ["{*}_Program_{Name}", "MAIN"],
+      "dut.struct": "T{Name}",
+      "dut.alias": "T{Name}",
+      "dut.enum": "@(?:{Name}_)?{NAME}",
+      "gvl": ["{*}GlobalVar", "{*}GlobalConst{*}", "{*}_Version"]
+    }
+  },
+
+  "declarations": {
+    "requiredAttributes": { "ENUM": ["qualified_only", "strict"] },
+    // Explicit values 0..99; local extensions from 100 on, named <ENUM_NAME>_<VALUE>.
+    "enum": { "min": 0, "max": 99, "extensionMin": 100 }
+  },
+
+  "headers": {
+    "templates": {
+      "withHistory": "header-pou.Syntegon.txt",
+      "withoutHistory": "header-short.Syntegon.txt"
+    },
+    // Methods, FB actions and programs have no version history; actions of _Main SubUnits do.
+    "assign": [
+      { "kinds": ["ACTION"], "parent": "_Main$", "template": "withHistory" },
+      { "kinds": ["FUNCTION_BLOCK", "FUNCTION"], "template": "withHistory" },
+      { "kinds": ["PROGRAM", "METHOD"], "template": "withoutHistory" }
+    ],
+    "placement": "afterHeader",
+    "copyright": "© Syntegon Group.\nAll rights reserved, also regarding any disposal, exploitation, reproduction, editing, distribution,\nas well as in the event of applications for industrial property rights.",
+    "description": "DESCRIPTION",
+    "descriptionPlaceholder": "TODO"
+  },
+
+  "autoFix": { "headers": true, "requiredAttributes": true }
+}

@@ -1,0 +1,23 @@
+(*
+****************************************************************************************************
+© Syntegon Group.<br>
+All rights reserved, also regarding any disposal, exploitation, reproduction, editing, distribution,<br>
+as well as in the event of applications for industrial property rights.<br>
+<br>
+DESCRIPTION:<br>
+	{description}<br>
+<br>
+PARAMETERS:<br>
+<br>
+INPUT VALUES:<br>
+<br>
+OUTPUT VALUES:<br>
+<br>
+LIMITS:<br>
+<br>
+ERROR DESCRIPTION:<br>
+<br>
+VERSION HISTORY:<br>
+	{date}	C1.001	{name} created<br>
+****************************************************************************************************
+*)

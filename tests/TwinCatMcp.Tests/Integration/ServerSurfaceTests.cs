@@ -17,7 +17,7 @@ public sealed partial class ServerSurfaceTests(McpServerFixture fx)
 {
     private static readonly string[] AllowedPrefixes =
     [
-        "xae_", "solution_", "tree_", "build_", "plc_", "pou_", "lib_", "archive_", "system_", "task_", "rt_", "license_",
+        "xae_", "solution_", "tree_", "build_", "plc_", "pou_", "guidelines_", "lib_", "archive_", "system_", "task_", "rt_", "license_",
         "variant_", "io_", "ecat_", "mapping_", "motion_", "tccom_", "ads_", "route_",
     ];
 

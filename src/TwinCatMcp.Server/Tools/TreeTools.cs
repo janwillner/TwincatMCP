@@ -92,6 +92,11 @@ public sealed class TreeTools(XaeSession session)
         => session.RunAsync(s =>
         {
             var item = s.Lookup(treePath);
+            if (item.PathName.StartsWith("TIPC^", StringComparison.OrdinalIgnoreCase))
+            {
+                Guidelines.GuidelineGate.CheckRename(s, item, newName);
+            }
+
             item.Name = newName;
             return TreeInfo.Describe(item);
         });

@@ -4,6 +4,7 @@ using EnvDTE80;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
 using TCatSysManagerLib;
+using TwinCatMcp.Guidelines;
 
 namespace TwinCatMcp.Core;
 
@@ -21,6 +22,9 @@ public sealed class XaeSession : IDisposable
     private readonly ILogger<XaeSession> _logger;
     private DTE2? _dte;
     private Project? _project;
+    private readonly GuidelineProvider _guidelines = new();
+    private readonly List<GuidelineViolation> _guidelineFindings = [];
+    private readonly List<string> _guidelineFixes = [];
 
     public XaeSession(StaComThread sta, ILogger<XaeSession> logger)
     {
@@ -56,7 +60,21 @@ public sealed class XaeSession : IDisposable
     {
         try
         {
-            var payload = await _sta.InvokeAsync(() => work(this), timeout ?? DefaultTimeout, ct).ConfigureAwait(false);
+            // Guideline findings and fixes are collected per call on the STA, so concurrent calls cannot mix them up.
+            var payload = await _sta.InvokeAsync(() =>
+            {
+                _guidelineFindings.Clear();
+                _guidelineFixes.Clear();
+                try
+                {
+                    return GuidelineReport.Attach(work(this), _guidelineFindings.ToArray(), _guidelineFixes.ToArray());
+                }
+                finally
+                {
+                    _guidelineFindings.Clear();
+                    _guidelineFixes.Clear();
+                }
+            }, timeout ?? DefaultTimeout, ct).ConfigureAwait(false);
             return ToolResult.Ok(payload);
         }
         catch (Exception ex) when (IsIdeGone(ex))
@@ -605,7 +623,79 @@ public sealed class XaeSession : IDisposable
             project = _project is null ? null : new { name = _project.Name, file = _project.FullName },
             targetNetId,
             twinCatProjects = solutionOpen ? SafeGet(() => EnumerateTwinCatProjects().Select(p => p.Name).ToArray()) ?? [] : [],
+            guidelines = GuidelineSummary(solution),
         };
+    }
+
+    // ------------------------------------------------------------------ coding guidelines (STA only)
+
+    public GuidelineProvider GuidelineProvider => _guidelines;
+
+    /// <summary>The .sln of the open solution, null without IDE or open solution.</summary>
+    public string? SolutionFile
+    {
+        get
+        {
+            if (_dte is null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return _dte.Solution.IsOpen && _dte.Solution.FullName is { Length: > 0 } f ? f : null;
+            }
+            catch (COMException)
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The coding guidelines of the open solution (.twincat-mcp.json next to the .sln); null without config.
+    /// Throws for a broken config, so write tools refuse to work until it is fixed.
+    /// </summary>
+    public GuidelineSet? Guidelines => _guidelines.For(SolutionFile);
+
+    /// <summary>Rejects the current write when a finding has severity 'error'; warnings are added to the tool result.</summary>
+    public void Enforce(IReadOnlyCollection<GuidelineViolation> findings)
+    {
+        if (findings.Any(f => f.Severity == "error"))
+        {
+            throw new GuidelineViolationException(findings.ToArray());
+        }
+
+        _guidelineFindings.AddRange(findings);
+    }
+
+    /// <summary>Reports fixes applied to a new object (header, attributes) in the tool result.</summary>
+    public void RecordFixes(IEnumerable<string> fixes) => _guidelineFixes.AddRange(fixes);
+
+    /// <summary>Short guideline status for solution_open / xae_status; null when the solution has no config.</summary>
+    public object? GuidelineSummary(string? solutionFile = null)
+    {
+        solutionFile ??= SolutionFile;
+        var set = _guidelines.TryFor(solutionFile, out var error);
+        if (error is not null)
+        {
+            return new
+            {
+                config = GuidelineProvider.ConfigPathOf(solutionFile),
+                error = error.Message,
+                hint = "The coding guideline config is broken: PLC code cannot be changed until the user fixes it.",
+            };
+        }
+
+        return set is null
+            ? null
+            : new
+            {
+                config = set.Files[^1],
+                name = set.Name,
+                rules = set.ActiveRules.Count,
+                hint = "Coding guidelines apply: read resource twincat://guidelines/effective or call guidelines_get before writing PLC code.",
+            };
     }
 
     // ------------------------------------------------------------------ solution handling (STA only)
@@ -650,6 +740,7 @@ public sealed class XaeSession : IDisposable
             fullyLoaded = loaded,
             selectedProject = _project?.Name,
             twinCatProjects = EnumerateTwinCatProjects().Select(p => new { name = p.Name, file = p.FullName }).ToArray(),
+            guidelines = GuidelineSummary(),
         };
     }
 

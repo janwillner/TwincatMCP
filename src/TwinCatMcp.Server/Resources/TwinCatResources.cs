@@ -17,8 +17,29 @@ public sealed class TwinCatResources(XaeSession session)
     public static string TreePathGuide() => Guides.TreePaths;
 
     [McpServerResource(UriTemplate = "twincat://guide/st-conventions", Name = "st-conventions", MimeType = "text/markdown"),
-     Description("Beckhoff Structured Text naming conventions and code style to use when generating PLC code.")]
-    public static string StConventions() => Guides.StConventions;
+     Description("Structured Text naming conventions and code style to use when generating PLC code: the style guide of the open solution's " +
+                 "coding guidelines (.twincat-mcp.json), otherwise the Beckhoff conventions.")]
+    public async Task<string> StConventions()
+    {
+        try
+        {
+            var guide = await session.Sta.InvokeAsync(
+                () => session.GuidelineProvider.TryFor(session.SolutionFile, out _)?.GuideMarkdown, TimeSpan.FromSeconds(30));
+            return guide ?? Guides.StConventions;
+        }
+        catch (Exception)
+        {
+            return Guides.StConventions;
+        }
+    }
+
+    [McpServerResource(UriTemplate = "twincat://guidelines/effective", Name = "coding-guidelines", MimeType = "application/json"),
+     Description("Coding guidelines of the open solution (.twincat-mcp.json): active rules, naming templates, declaration/header settings and style guide. " +
+                 "pou_* write tools enforce them.")]
+    public async Task<string> CodingGuidelines()
+        => Json.Serialize(await session.Sta.InvokeAsync(
+            () => TwinCatMcp.Tools.GuidelineTools.Describe(session, includeGuide: true, includeEffective: true, includeSources: false),
+            TimeSpan.FromSeconds(30)));
 
     [McpServerResource(UriTemplate = "twincat://session/status", Name = "session-status", MimeType = "application/json"),
      Description("Live status of the XAE session (IDE, solution, selected TwinCAT project, target).")]

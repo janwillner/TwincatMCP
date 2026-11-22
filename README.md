@@ -105,6 +105,7 @@ You don't need to call the tools yourself: describe the task and the agent picks
 | System Manager tree | `tree_get_item` `tree_get_children` `tree_find` `tree_exists` `tree_create_child` `tree_delete_child` `tree_delete_item` `tree_rename_item` `tree_set_comment` `tree_set_disabled` `tree_produce_xml` `tree_consume_xml` `tree_export_child` `tree_import_child` |
 | PLC project | `plc_create_project` `plc_delete_project` `plc_list_projects` `plc_find_elements` `plc_grep` `plc_create_folder` `plc_compile` `plc_check_all_objects` `plc_run_static_analysis` `plc_get_settings` `plc_set_settings` `plc_get_task_reference` `plc_set_task_reference` `plc_generate_boot_project` `plc_export_plcopen` `plc_import_plcopen` |
 | POUs & code | `pou_create` `pou_create_method` `pou_create_property` `pou_create_action` `pou_create_transition` `pou_create_interface` `pou_create_dut` `pou_create_gvl` `pou_create_param_list` `pou_create_text_list` `pou_read_code` `pou_get_declaration` `pou_write_code` `pou_replace_code` `pou_multi_replace` `pou_grep` `pou_rename` `pou_move` `pou_delete` |
+| Coding guidelines | `guidelines_get` `guidelines_check` |
 | PLC online | `plc_online_login` `plc_online_logout` `plc_online_start` `plc_online_stop` `plc_online_reset` `plc_online_state` |
 | Libraries | `lib_add` `lib_remove` `lib_list_references` `lib_add_placeholder` `lib_set_resolution` `lib_freeze_placeholders` `lib_get_declaration` `lib_get_signatures` `lib_list_installed` `lib_install` `lib_uninstall` `lib_scan` `lib_list_repositories` `lib_insert_repository` `lib_move_repository` `lib_remove_repository` `lib_get_project_info` `lib_set_project_info` |
 | Archives & export | `archive_save_solution` `archive_open` `archive_export_plc_project` `archive_import_plc_project` `archive_save_as_library` |
@@ -129,9 +130,44 @@ The server also provides these resources:
 
 - `twincat://guide/workflow`
 - `twincat://guide/tree-paths`
-- `twincat://guide/st-conventions`
+- `twincat://guide/st-conventions` (the solution's style guide if it has coding guidelines)
+- `twincat://guidelines/effective`
 - `twincat://session/status`
 - `twincat://tree/{path}`
+
+## Coding guidelines
+
+A solution can carry its own coding guidelines in `.twincat-mcp.json` next to the `.sln`. Without this file nothing is checked. With it, the `pou_*` write tools check every new or changed name and declaration:
+
+- A rule with severity `error` rejects the write. Nothing is written, and `guidelineViolations` in the result lists the findings with a suggested name.
+- A rule with severity `warn` lets the write through and reports the finding in `guidelineViolations`.
+- New objects get the header template and required attributes automatically. They are listed in `guidelineFixes`.
+- Existing code that already breaks a rule is only reported when it is changed.
+- `guidelines_check` audits a whole project, for example after a PLCopen import, and can write a SARIF report.
+
+Every deployment ships two example configs in `artifacts/twincat-mcp/guidelines/`:
+
+| File | Content |
+|---|---|
+| `.twincat-mcp.Beckhoff.json` | Beckhoff Hungarian notation (`bEnable`, `astAxes`, `FB_Motor`, `E_State`) |
+| `.twincat-mcp.Syntegon.json` | Syntegon TCAT guideline 2018 (`vi_b_Init`, `lr_TempAngle`, `_FB_..._Main`, copyright/help header, enum rules) |
+
+Copy one next to your `.sln` as `.twincat-mcp.json`, or extend it and override single rules:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/janwillner/TwincatMCP/main/schemas/twincat-mcp.schema.json",
+  "extends": "builtin:syntegon",
+  "exclude": ["ST_Visu*", "E_Visu*", "GVL_Visu"],
+  "rules": { "naming.var.input": "error", "decl.method.inputDefaults": "error" }
+}
+```
+
+A company base can also be a file path, such as `"extends": "../plc-standards/company.json"`.
+
+In code, `{attribute 'naming' := 'off' | 'on' | 'omit'}` and `{attribute 'no-analysis'}` (the same pragmas as TE1200) and `{attribute 'mcp-ignore' := 'naming.var.input'}` exempt single declarations.
+
+The format is described by [schemas/twincat-mcp.schema.json](schemas/twincat-mcp.schema.json), and the decisions behind it are in [docs/adr/0001-coding-guidelines-config.md](docs/adr/0001-coding-guidelines-config.md).
 
 ## License
 
